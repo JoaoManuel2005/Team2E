@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RomAccom{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        /* colour variables */
+        :root {
+            --md-primary: #6750A4;
+            --md-primary-container: #EADDFF;
+            --md-on-primary: #FFFFFF;
+            --md-on-primary-container: #21005E;
+            --md-secondary: #9A4FA7;
+            --md-secondary-container: #F6EDFF;
+            --md-on-secondary: #FFFFFF;
+            --md-on-secondary-container: #35063C;
+            --md-tertiary: #7D5260;
+            --md-tertiary-container: #FFD8E4;
+            --md-on-tertiary: #FFFFFF;
+            --md-on-tertiary-container: #370B1E;
+            --md-error: #B3261E;
+            --md-background: #FFFBFE;
+            --md-surface: #FFFBFE;
+            --md-on-surface: #1C1B1F;
+            --md-surface-variant: #E7E0EC;
+            --md-on-surface-variant: #49454F;
+            --md-outline: #79747E;
+            --md-outline-variant: #CAC4D0;
+            
+            /* Elevation values */
+            --md-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+            --md-elevation-2: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
+            --md-elevation-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10);
+            
+            /* Spacing tokens based on 8dp grid */
+            --md-space-1: 8px;
+            --md-space-2: 16px;
+            --md-space-3: 24px;
+            --md-space-4: 32px;
+            --md-space-5: 40px;
+            --md-space-6: 48px;
+            
+            /* Border radius */
+            --md-radius-small: 4px;
+            --md-radius-medium: 12px;
+            --md-radius-large: 16px;
+            --md-radius-extra-large: 28px;
+        }
+        
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--md-background);
+            color: var(--md-on-surface);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--md-space-2);
+            position: relative;
+        }
+        
+        /* Typography */
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        p {
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        
+        /* Header styles */
+        .header {
+            text-align: center;
+            margin: var(--md-space-4) 0;
+            padding: var(--md-space-3);
+            position: relative;
+        }
+        
+        .logo {
+            color: var(--md-primary);
+            margin-bottom: var(--md-space-1);
+        }
+        
+        .tagline {
+            color: var(--md-primary);
+            font-size: 1.2rem;
+        }
+        
+        /* Home button */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;  
+            background-color: #6750A4;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .home-button:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: var(--md-space-6);
+            padding: var(--md-space-3);
+            color: var(--md-on-surface-variant);
+            font-size: 0.9rem;
+        }
+        
+        .footer a {
+            color: var(--md-primary);
+            text-decoration: none;
+            margin: 0 var(--md-space-2);
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .footer a:hover {
+            color: var(--md-secondary);
+            text-decoration: underline;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+    {% block head_extras %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        {% block home_button %}
+        <a href="{% url 'home' %}" class="home-button">
+            <span class="material-icons">home</span>
+        </a>
+        {% endblock %}
+        
+        {% block header %}
+        <header class="header">
+            {% block header_content %}
+            <h1 class="logo">RomAccom</h1>
+            <p class="tagline">Did you fall in love with your accom?</p>
+            {% endblock %}
+        </header>
+        {% endblock %}
+        
+        {% block content %}{% endblock %}
+        
+        {% block footer %}
+        <footer class="footer">
+            {% block footer_content %}
+            <a href="{% url 'contact' %}">Contact Us</a>
+            <a href="{% url 'about' %}">About</a>
+            {% endblock %}
+            {% block copyright %}&copy; 2025 RomAccom. All rights reserved.{% endblock %}
+        </footer>
+        {% endblock %}
+    </div>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RomAccom - Registration</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005E;
+            --md-sys-color-secondary: #625B71;
+            --md-sys-color-on-secondary: #FFFFFF;
+            --md-sys-color-secondary-container: #E8DEF8;
+            --md-sys-color-on-secondary-container: #1E192B;
+            --md-sys-color-surface: #FFFBFE;
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-surface-variant: #E7E0EC;
+            --md-sys-color-on-surface-variant: #49454E;
+            --md-sys-color-outline: #79747E;
+            --md-sys-color-outline-variant: #CAC4D0;
+            --md-sys-color-error: #B3261E;
+            --md-sys-color-on-error: #FFFFFF;
+            --md-sys-color-error-container: #F9DEDC;
+            --md-sys-color-on-error-container: #410E0B;
+            --md-sys-color-background: #FFFBFE;
+            --md-sys-color-on-background: #1C1B1F;
+            
+            --md-elevation-1: 0px 1px 3px 0px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+            --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--md-sys-color-primary);
+            margin: 0;
+        }
+        
+        .tagline {
+            font-size: 1rem;
+            color: var(--md-sys-color-primary);
+            margin: 0;
+        }
+        
+        .content {
+            padding: 24px 0;
+        }
+        
+        .registration-container {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .registration-card {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--md-sys-color-surface);
+            border-radius: 12px;
+            box-shadow: var(--md-elevation-1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-top: 0;
+            margin-bottom: 24px;
+            color: var(--md-sys-color-on-surface);
+        }
+        
+        .text-field {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .text-field input {
+            width: 100%;
+            height: 56px;
+            padding: 0 16px;
+            font-size: 16px;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 4px;
+            background-color: transparent;
+            box-sizing: border-box;
+            outline: none;
+            transition: border 0.2s;
+        }
+        
+        .text-field input:focus {
+            border: 2px solid var(--md-sys-color-primary);
+        }
+        
+        .text-field label {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            font-size: 16px;
+            color: var(--md-sys-color-on-surface-variant);
+            transition: all 0.2s;
+            pointer-events: none;
+            background-color: var(--md-sys-color-surface);
+            padding: 0 4px;
+        }
+        
+        .text-field input:focus + label,
+        .text-field input:not(:placeholder-shown) + label {
+            top: -8px;
+            font-size: 12px;
+            color: var(--md-sys-color-primary);
+        }
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 24px;
+            height: 40px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            border: none;
+            outline: none;
+        }
+        
+        .button-filled {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+        }
+        
+        .button-filled:hover {
+            background-color: #7F67B8;
+            box-shadow: var(--md-elevation-1);
+        }
+        
+        .button-outlined {
+            background-color: transparent;
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-outline);
+        }
+        
+        .button-outlined:hover {
+            background-color: rgba(103, 80, 164, 0.08);
+        }
+        
+        /* Home button */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;  
+            background-color: #6750A4;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .home-button:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .registration-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}" class="home-button">
+        <span class="material-icons">home</span>
+    </a>
+    
+    <div class="app-bar">
+        <div class="logo-container">
+            <h1 class="logo">RomAccom</h1>
+            <p class="tagline">Did you fall in love with your accom?</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="content">
+            <div class="registration-container">
+                <div class="registration-card">
+                    <h2 class="card-title">User Registration</h2>
+                    <form method="post" action="{% url 'user_register' %}">
+                        {% csrf_token %}
+                        <div class="text-field">
+                            <input type="text" id="username" name="username" placeholder=" " required>
+                            <label for="username">Username</label>
+                        </div>
+                        <div class="text-field">
+                            <input type="password" id="password" name="password" placeholder=" " required>
+                            <label for="password">Password</label>
+                        </div>
+                        <button type="submit" class="button button-filled">Register!</button>
+                    </form>
+                </div>
+                
+                <div class="registration-card">
+                    <h2 class="card-title">Operator Registration</h2>
+                    <form method="post" action="{% url 'operator_register' %}">
+                        {% csrf_token %}
+                        <div class="text-field">
+                            <input type="text" id="property_name" name="property_name" placeholder=" " required>
+                            <label for="property_name">Property name</label>
+                        </div>
+                        <div class="text-field">
+                            <input type="password" id="operator_password" name="password" placeholder=" " required>
+                            <label for="operator_password">Password</label>
+                        </div>
+                        <button type="submit" class="button button-outlined">Authenticate</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

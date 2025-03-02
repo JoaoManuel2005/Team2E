@@ -94,11 +94,8 @@
 </head>
 <body>
     <a href="{% url 'home' %}" class="home-button">
-    <!-- make sure you have a pattern named home in urls.py:
-    urlpatterns = [
-    path('', views.home, name='home'),
-    # ...other URL patterns...
-    ]-->
+    <!-- for urls.py, do this:
+    urlpatterns = [path('', views.home, name='home'),# ...other URL patterns...]-->
         <span class="material-icons">home</span>
     </a>
     

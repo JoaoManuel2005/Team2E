@@ -1,0 +1,215 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}Write a Review - {{ accommodation.name }} - RomAccom{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: var(--md-space-3);
+    }
+    
+    .review-form-header {
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .review-form-title {
+        font-size: 1.8rem;
+        font-weight: 500;
+        color: var(--md-on-surface);
+        margin-bottom: var(--md-space-2);
+    }
+    
+    .accommodation-info {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        padding: var(--md-space-3);
+        box-shadow: var(--md-elevation-1);
+        margin-bottom: var(--md-space-4);
+        display: flex;
+        align-items: center;
+    }
+    
+    .accommodation-image {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--md-radius-small);
+        object-fit: cover;
+        margin-right: var(--md-space-3);
+    }
+    
+    .accommodation-details h3 {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: var(--md-space-1);
+        color: var(--md-on-surface);
+    }
+    
+    .accommodation-details p {
+        color: var(--md-on-surface-variant);
+        font-size: 0.9rem;
+    }
+    
+    .review-form {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        padding: var(--md-space-4);
+        box-shadow: var(--md-elevation-1);
+    }
+    
+    .form-group {
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: var(--md-space-2);
+        font-weight: 500;
+        color: var(--md-on-surface);
+    }
+    
+    .rating-selector {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    
+    .rating-selector input {
+        display: none;
+    }
+    
+    .rating-selector label {
+        cursor: pointer;
+        font-size: 2rem;
+        color: #e0e0e0;
+        padding: 0 var(--md-space-1);
+        transition: color 0.2s ease;
+    }
+    
+    .rating-selector label:hover,
+    .rating-selector label:hover ~ label,
+    .rating-selector input:checked ~ label {
+        color: #FFC107;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: var(--md-space-2);
+        border: 1px solid var(--md-outline);
+        border-radius: var(--md-radius-small);
+        background-color: var(--md-surface);
+        color: var(--md-on-surface);
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--md-primary);
+        box-shadow: 0 0 0 2px rgba(var(--md-primary-rgb), 0.2);
+    }
+    
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+    
+    .submit-btn {
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+        border: none;
+        border-radius: var(--md-radius-extra-large);
+        padding: var(--md-space-2) var(--md-space-4);
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: var(--md-elevation-1);
+        transition: box-shadow 0.3s;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .submit-btn:hover {
+        box-shadow: var(--md-elevation-2);
+    }
+    
+    .submit-btn .material-icons {
+        margin-right: var(--md-space-1);
+    }
+    
+    .cancel-link {
+        margin-left: var(--md-space-3);
+        color: var(--md-on-surface-variant);
+        text-decoration: none;
+    }
+    
+    .cancel-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="review-form-header">
+        <h1 class="review-form-title">Write a Review</h1>
+    </div>
+    
+    <div class="accommodation-info">
+        {% if accommodation.image %}
+            <img src="{{ accommodation.image.url }}" alt="{{ accommodation.name }}" class="accommodation-image">
+        {% else %}
+            <img src="{% static 'images/default-accommodation.jpg' %}" alt="{{ accommodation.name }}" class="accommodation-image">
+        {% endif %}
+        
+        <div class="accommodation-details">
+            <h3>{{ accommodation.name }}</h3>
+            <p>{{ accommodation.address }}, {{ accommodation.postcode }}</p>
+        </div>
+    </div>
+    
+    <form method="post" action="{% url 'write_review' accommodation.id %}" class="review-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label">Rating</label>
+            <div class="rating-selector">
+                <input type="radio" id="star5" name="rating" value="5" required>
+                <label for="star5" class="material-icons">star</label>
+                
+                <input type="radio" id="star4" name="rating" value="4">
+                <label for="star4" class="material-icons">star</label>
+                
+                <input type="radio" id="star3" name="rating" value="3">
+                <label for="star3" class="material-icons">star</label>
+                
+                <input type="radio" id="star2" name="rating" value="2">
+                <label for="star2" class="material-icons">star</label>
+                
+                <input type="radio" id="star1" name="rating" value="1">
+                <label for="star1" class="material-icons">star</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="review-title" class="form-label">Title (optional)</label>
+            <input type="text" id="review-title" name="title" class="form-control" placeholder="Summarize your experience">
+        </div>
+        
+        <div class="form-group">
+            <label for="review-text" class="form-label">Review</label>
+            <textarea id="review-text" name="review_text" class="form-control" placeholder="Share your experience at this accommodation" required></textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">
+                <span class="material-icons">check</span>
+                Submit Review
+            </button>
+            <a href="{% url 'accommodation_detail' accommodation.id %}" class="cancel-link">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

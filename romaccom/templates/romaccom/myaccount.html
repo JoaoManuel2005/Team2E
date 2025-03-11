@@ -106,15 +106,12 @@
     
     .account-nav {
         display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: var(--md-space-2);
+        flex-direction: column;
+        gap: var(--md-space-3);
         margin-bottom: var(--md-space-4);
     }
     
     .nav-card {
-        flex: 1;
-        min-width: 250px;
         background-color: var(--md-surface);
         border-radius: var(--md-radius-medium);
         box-shadow: var(--md-elevation-1);
@@ -194,7 +191,7 @@
     
     .btn-danger {
         background-color: var(--md-error);
-        color: var (--md-on-error);
+        color: var(--md-on-error);
     }
     
     .btn-danger:hover {
@@ -217,23 +214,28 @@
         }
     }
     
-    /* Add these new styles for the privacy switch */
-    .privacy-switch-container {
+    /* Privacy switch styles - made bigger */
+    .privacy-card {
         display: flex;
         align-items: center;
-        margin-top: var(--md-space-3);
-        background-color: var(--md-secondary-container);
-        padding: var(--md-space-2) var(--md-space-3);
-        border-radius: var(--md-radius-medium);
-        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .privacy-card-content {
+        flex: 1;
+    }
+    
+    .switch-container {
+        display: flex;
+        align-items: center;
+        margin-left: var(--md-space-3);
     }
     
     .switch {
         position: relative;
         display: inline-block;
-        width: 50px;
-        height: 24px;
-        margin-left: auto;
+        width: 60px;
+        height: 34px;
     }
     
     .switch input {
@@ -251,16 +253,16 @@
         bottom: 0;
         background-color: var(--md-surface-variant);
         transition: .4s;
-        border-radius: 24px;
+        border-radius: 34px;
     }
     
     .slider:before {
         position: absolute;
         content: "";
-        height: 18px;
-        width: 18px;
-        left: 3px;
-        bottom: 3px;
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
         background-color: white;
         transition: .4s;
         border-radius: 50%;
@@ -272,12 +274,6 @@
     
     input:checked + .slider:before {
         transform: translateX(26px);
-    }
-    
-    .privacy-label {
-        font-size: 0.9rem;
-        color: var(--md-on-secondary-container);
-        margin-right: var(--md-space-2);
     }
     
     .account-visibility {
@@ -319,15 +315,6 @@
                     Private Profile
                 {% endif %}
             </div>
-            
-            <!-- privacy switch -->
-            <div class="privacy-switch-container">
-                <span class="privacy-label">Set your account as private</span>
-                <label class="switch">
-                    <input type="checkbox" id="privacy-toggle" {% if not user.profile_visibility %}checked{% endif %}>
-                    <span class="slider"></span>
-                </label>
-            </div>
         </div>
         
         <div class="profile-details">
@@ -361,6 +348,24 @@
     </div>
     
     <div class="account-nav">
+        <!-- Privacy Settings Card -->
+        <div class="nav-card privacy-card">
+            <div class="nav-card-icon">
+                <span class="material-icons">security</span>
+            </div>
+            <div class="nav-card-content privacy-card-content">
+                <h3>Privacy Settings</h3>
+                <p>Set your account to private</p>
+            </div>
+            <div class="switch-container">
+                <label class="switch">
+                    <input type="checkbox" id="privacy-toggle" {% if not user.profile_visibility %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- My Reviews Card -->
         <a href="{% url 'myreviews' %}" class="nav-card">
             <div class="nav-card-icon">
                 <span class="material-icons">rate_review</span>
@@ -374,16 +379,6 @@
     
     <div class="account-actions">
         <h3 class="actions-title">Account Actions</h3>
-        
-        <a href="#" class="action-btn btn-primary">
-            <span class="material-icons">edit</span>
-            Edit Profile
-        </a>
-        
-        <a href="#" class="action-btn btn-primary">
-            <span class="material-icons">password</span>
-            Change Password
-        </a>
         
         <a href="#" class="action-btn btn-danger">
             <span class="material-icons">logout</span>

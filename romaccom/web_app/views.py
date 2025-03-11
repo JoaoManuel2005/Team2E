@@ -144,6 +144,9 @@ def write_review_view(request, accom_id):
     return render(request, 'romaccom/write-review.html', {'accommodation': accommodation})
 
 # Operator Login
+#The accommodation ID is properly passed from the accommodation detail page
+#The operator login page gracefully handles cases where the accommodation might not exist
+#The back link works properly in all cases
 def operator_login_view(request):
     # Get accommodation ID from the URL parameters
     accom_id = request.GET.get('accommodation_id')

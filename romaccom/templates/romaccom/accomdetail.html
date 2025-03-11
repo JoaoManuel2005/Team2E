@@ -1,0 +1,431 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}{{ accommodation.name }} - RomAccom{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--md-space-2);
+    }
+    
+    .accommodation-header {
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .accommodation-title {
+        font-size: 2rem;
+        font-weight: 500;
+        color: var(--md-on-surface);
+        margin-bottom: var(--md-space-1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .accommodation-rating {
+        display: flex;
+        align-items: center;
+        color: #FFC107;
+    }
+    
+    .accommodation-rating .material-icons {
+        margin-right: var(--md-space-1);
+    }
+    
+    .rating-value {
+        font-weight: 500;
+        font-size: 1.2rem;
+    }
+    
+    .accommodation-address {
+        color: var(--md-on-surface-variant);
+        margin-bottom: var(--md-space-2);
+    }
+    
+    .view-count {
+        font-size: 0.9rem;
+        color: var(--md-on-surface-variant);
+        display: flex;
+        align-items: center;
+    }
+    
+    .view-count .material-icons {
+        font-size: 18px;
+        margin-right: 4px;
+    }
+    
+    .main-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--md-space-3);
+        margin-bottom: var(--md-space-5);
+    }
+    
+    .accom-image-container {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .accom-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+    }
+    
+    .accom-info {
+        flex: 1;
+        min-width: 300px;
+        background-color: var(--md-surface);
+        padding: var(--md-space-3);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+    }
+    
+    .info-title {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: var(--md-space-2);
+        padding-bottom: var(--md-space-1);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+    
+    .accom-map {
+        flex: 1;
+        min-width: 300px;
+        height: 300px;
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        overflow: hidden;
+    }
+    
+    .section-divider {
+        margin: var(--md-space-4) 0;
+        border: none;
+        height: 1px;
+        background-color: var(--md-outline-variant);
+    }
+    
+    .reviews-section {
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .reviews-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--md-space-3);
+    }
+    
+    .reviews-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: var(--md-primary);
+    }
+    
+    .write-review-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--md-space-1) var(--md-space-3);
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+        border-radius: var(--md-radius-extra-large);
+        text-decoration: none;
+        font-weight: 500;
+        box-shadow: var(--md-elevation-1);
+        transition: box-shadow 0.3s;
+    }
+    
+    .write-review-btn:hover {
+        box-shadow: var(--md-elevation-2);
+    }
+    
+    .write-review-btn .material-icons {
+        margin-right: var(--md-space-1);
+    }
+    
+    .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--md-space-3);
+    }
+    
+    .review-card {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        padding: var(--md-space-3);
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--md-space-2);
+    }
+    
+    .reviewer-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .reviewer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--md-primary-container);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: var(--md-space-2);
+        color: var(--md-on-primary-container);
+        font-weight: 500;
+    }
+    
+    .reviewer-name {
+        font-weight: 500;
+    }
+    
+    .review-rating {
+        display: flex;
+        align-items: center;
+        color: #FFC107;
+    }
+    
+    .review-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: var(--md-space-1);
+    }
+    
+    .review-text {
+        color: var(--md-on-surface-variant);
+        line-height: 1.6;
+    }
+    
+    .review-images {
+        display: flex;
+        gap: var(--md-space-2);
+        margin-top: var(--md-space-2);
+        overflow-x: auto;
+        padding: var(--md-space-1) 0;
+    }
+    
+    .review-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: var(--md-radius-small);
+    }
+    
+    .auth-prompt {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        padding: var(--md-space-3);
+        text-align: center;
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .auth-text {
+        margin-bottom: var(--md-space-2);
+        color: var(--md-on-surface-variant);
+    }
+    
+    .auth-buttons {
+        display: flex;
+        justify-content: center;
+        gap: var(--md-space-2);
+        margin-bottom: var(--md-space-2);
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--md-space-1) var(--md-space-3);
+        border-radius: var(--md-radius-extra-large);
+        text-decoration: none;
+        font-weight: 500;
+        transition: box-shadow 0.3s;
+    }
+    
+    .btn-primary {
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+        box-shadow: var(--md-elevation-1);
+    }
+    
+    .btn-primary:hover {
+        box-shadow: var(--md-elevation-2);
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        color: var(--md-primary);
+        border: 1px solid var(--md-outline);
+    }
+    
+    .btn-outline:hover {
+        background-color: var(--md-primary-container);
+        color: var(--md-on-primary-container);
+    }
+    
+    .operator-section {
+        text-align: center;
+        margin-top: var(--md-space-3);
+        padding-top: var(--md-space-3);
+        border-top: 1px solid var(--md-outline-variant);
+    }
+    
+    @media (max-width: 768px) {
+        .main-content {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="accommodation-header">
+        <div class="accommodation-title">
+            <h1>{{ accommodation.name }}</h1>
+            <div class="accommodation-rating">
+                <span class="material-icons">star</span>
+                <span class="rating-value">
+                    {% if accommodation.average_rating > 0 %}
+                        {{ accommodation.average_rating|floatformat:1 }}
+                    {% else %}
+                        No ratings
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <p class="accommodation-address">{{ accommodation.address }}, {{ accommodation.postcode }}</p>
+        
+        <div class="view-count">
+            <span class="material-icons">visibility</span>
+            <span>{{ accommodation.view_count }} views</span>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="accom-image-container">
+            {% if accommodation.image %}
+                <img src="{{ accommodation.image.url }}" alt="{{ accommodation.name }}" class="accom-image">
+            {% else %}
+                <img src="{% static 'images/default-accommodation.jpg' %}" alt="{{ accommodation.name }}" class="accom-image">
+            {% endif %}
+        </div>
+        
+        <div class="accom-info">
+            <h3 class="info-title">About this accommodation</h3>
+            <p>
+                {% if accommodation.description %}
+                    {{ accommodation.description }}
+                {% else %}
+                    This accommodation is located at {{ accommodation.address }} in Glasgow.
+                    It is a popular choice for students looking for quality accommodation.
+                    For more detailed information, please check the reviews below.
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="accom-map">
+            {% if accommodation.map_link %}
+                <iframe src="{{ accommodation.map_link }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            {% else %}
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d71502.97242874595!2d-4.3002124867187505!3d55.860916099999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x488815562056ceeb%3A0x71e683b805ef511e!2sGlasgow%2C%20UK!5e0!3m2!1sen!2sus!4v1645564556012!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            {% endif %}
+        </div>
+    </div>
+    
+    <hr class="section-divider">
+    
+    <div class="reviews-section">
+        <div class="reviews-header">
+            <h2 class="reviews-title">Reviews</h2>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'write_review' accommodation.id %}" class="write-review-btn">
+                    <span class="material-icons">rate_review</span>
+                    Write a review
+                </a>
+            {% endif %}
+        </div>
+        
+        {% if not user.is_authenticated %}
+            <div class="auth-prompt">
+                <p class="auth-text">Login or sign up to leave a review for this accommodation.</p>
+                <div class="auth-buttons">
+                    <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+                    <a href="{% url 'user_register' %}" class="btn btn-outline">Sign up</a>
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="reviews-list">
+            {% if accommodation.reviews.all %}
+                {% for review in accommodation.reviews.all %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">
+                                    {% if review.user.profile.picture %}
+                                        <img src="{{ review.user.profile.picture.url }}" alt="{{ review.user.username }}" class="reviewer-avatar">
+                                    {% else %}
+                                        {{ review.user.username|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <span class="reviewer-name">{{ review.user.username }}</span>
+                            </div>
+                            
+                            <div class="review-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <span class="material-icons">star</span>
+                                    {% else %}
+                                        <span class="material-icons">star_outline</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        {% if review.title %}
+                            <h3 class="review-title">{{ review.title }}</h3>
+                        {% endif %}
+                        
+                        <p class="review-text">{{ review.review_text }}</p>
+                        
+                        {% if review.images.all %}
+                            <div class="review-images">
+                                {% for image in review.images.all %}
+                                    <img src="{{ image.image.url }}" alt="Review image" class="review-image">
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="review-card">
+                    <p>No reviews yet. Be the first to review this accommodation!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="operator-section">
+        <p>Are you the operator of this accommodation?</p>
+        <a href="{% url 'operator_login' %}" class="btn btn-outline">
+            <span class="material-icons">business</span>
+            Operator Sign In
+        </a>
+    </div>
+</div>
+{% endblock %}

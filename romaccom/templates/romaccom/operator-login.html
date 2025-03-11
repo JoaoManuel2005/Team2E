@@ -1,0 +1,234 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}Operator Login - RomAccom{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: var(--md-space-2);
+    }
+    
+    .operator-header {
+        margin-bottom: var(--md-space-4);
+        text-align: center;
+    }
+    
+    .operator-title {
+        font-size: 1.8rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: var(--md-space-2);
+    }
+    
+    .operator-subtitle {
+        color: var(--md-on-surface-variant);
+    }
+    
+    .login-card {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        padding: var(--md-space-4);
+    }
+    
+    .property-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--md-space-4);
+        padding-bottom: var(--md-space-3);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+    
+    .property-icon {
+        width: 50px;
+        height: 50px;
+        background-color: var(--md-primary-container);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: var(--md-space-3);
+    }
+    
+    .property-icon .material-icons {
+        font-size: 24px;
+        color: var(--md-on-primary-container);
+    }
+    
+    .property-name {
+        font-size: 1.3rem;
+        font-weight: 500;
+        color: var(--md-on-surface);
+        margin: 0;
+    }
+    
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-bottom: var(--md-space-3);
+        color: var(--md-primary);
+    }
+    
+    .form-group {
+        margin-bottom: var(--md-space-3);
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: var(--md-space-1);
+        color: var(--md-on-surface-variant);
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: var(--md-space-2);
+        border: 1px solid var(--md-outline);
+        border-radius: var(--md-radius-small);
+        font-size: 1rem;
+        background-color: var(--md-surface);
+        transition: border-color 0.3s;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: var(--md-primary);
+    }
+    
+    .submit-btn {
+        display: inline-block;
+        padding: var(--md-space-2) var(--md-space-4);
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+        border: none;
+        border-radius: var(--md-radius-extra-large);
+        font-size: 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        box-shadow: var(--md-elevation-1);
+    }
+    
+    .submit-btn:hover {
+        background-color: var(--md-primary);
+        box-shadow: var(--md-elevation-2);
+    }
+    
+    .error-message {
+        color: var(--md-error);
+        margin-bottom: var(--md-space-3);
+        padding: var(--md-space-2);
+        background-color: rgba(179, 38, 30, 0.1);
+        border-radius: var(--md-radius-small);
+    }
+    
+    .register-link {
+        display: block;
+        margin-top: var(--md-space-3);
+        text-align: center;
+    }
+    
+    .register-link a {
+        color: var(--md-primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+    
+    .back-to-accom {
+        margin-top: var(--md-space-4);
+        text-align: center;
+    }
+    
+    .back-to-accom a {
+        display: inline-flex;
+        align-items: center;
+        color: var(--md-on-surface-variant);
+        text-decoration: none;
+    }
+    
+    .back-to-accom a:hover {
+        color: var(--md-primary);
+    }
+    
+    .back-to-accom .material-icons {
+        margin-right: var(--md-space-1);
+        font-size: 18px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="operator-header">
+        <h1 class="operator-title">Operator Login</h1>
+        <p class="operator-subtitle">Access your accommodation dashboard</p>
+    </div>
+    
+    <div class="login-card">
+        {% if accommodation %}
+            <div class="property-info">
+                <div class="property-icon">
+                    <span class="material-icons">apartment</span>
+                </div>
+                <h2 class="property-name">{{ accommodation.name }}</h2>
+            </div>
+        {% else %}
+            <div class="property-info">
+                <div class="property-icon">
+                    <span class="material-icons">apartment</span>
+                </div>
+                <h2 class="property-name">Unknown Accommodation</h2>
+            </div>
+        {% endif %}
+        
+        {% if error %}
+        <div class="error-message">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <form method="post" action="{% url 'operator_login' %}">
+            {% csrf_token %}
+            <!-- Hidden input to pass the accommodation ID -->
+            {% if accommodation %}
+                <input type="hidden" name="accommodation_id" value="{{ accommodation.id }}">
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-input" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">Login</button>
+        </form>
+        
+        <div class="register-link">
+            Don't have operator access? <a href="{% url 'operator_register' %}">Register here</a>
+        </div>
+        
+        {% if accommodation %}
+            <div class="back-to-accom">
+                <a href="{% url 'accommodation_detail' accommodation.id %}">
+                    <span class="material-icons">arrow_back</span>
+                    Back to accommodation details
+                </a>
+            </div>
+        {% else %}
+            <div class="back-to-accom">
+                <a href="{% url 'home' %}">
+                    <span class="material-icons">arrow_back</span>
+                    Back to homepage
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

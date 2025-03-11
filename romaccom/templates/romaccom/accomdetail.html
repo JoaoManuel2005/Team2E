@@ -272,7 +272,7 @@
     
     .btn-outline:hover {
         background-color: var(--md-primary-container);
-        color: var(--md-on-primary-container);
+        color: var (--md-on-primary-container);
     }
     
     .operator-section {
@@ -422,9 +422,9 @@
     
     <div class="operator-section">
         <p>Are you the operator of this accommodation?</p>
-        <a href="{% url 'operator_login' %}" class="btn btn-outline">
+        <a href="{% url 'operator_login' %}?accommodation_id={{ accommodation.id }}" class="btn btn-outline">
             <span class="material-icons">business</span>
-            Operator Sign In
+            Operator Log In
         </a>
     </div>
 </div>

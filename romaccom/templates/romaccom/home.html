@@ -8,23 +8,23 @@
 {% block extra_css %}
 <style>
     .app-icon {
-        width: 96px;  /* Increased further from 150px */
-        height: 96px; /* Made it square for better centering */
+        width: 96px;
+        height: 96px;
         background-color: transparent; 
         border-radius: var(--md-radius-large);
         margin: 0 auto var(--md-space-3);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: none; /* Removed shadow around container */
+        box-shadow: none;
         overflow: hidden;
     }
     
     .app-icon img {
-        width: 96px; /* Set a fixed size for the actual image */
+        width: 96px;
         height: 96px;
-        object-fit: contain; /* Still using contain but with better proportions */
-        margin: 0 auto; /* Center the image inside container */
+        object-fit: contain;
+        margin: 0 auto;
     }
     
     .tagline {
@@ -56,6 +56,16 @@
         width: 100%;
         max-width: 600px;
         margin: 0 auto var(--md-space-5);
+        position: relative;
+    }
+    
+    .search-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--md-space-2);
+    }
+    
+    .search-input-container {
         position: relative;
     }
     
@@ -104,11 +114,87 @@
         font-size: 24px;
     }
     
+    .postcode-select-container {
+        position: relative;
+    }
+    
+    .postcode-select {
+        width: 100%;
+        padding: var(--md-space-2) var(--md-space-2) var(--md-space-2) var(--md-space-5);
+        border: none;
+        border-radius: var(--md-radius-extra-large);
+        font-size: 1rem;
+        background-color: var(--md-surface-variant);
+        color: var(--md-on-surface);
+        appearance: none;
+        box-shadow: var(--md-elevation-1);
+        transition: box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .postcode-select:focus {
+        outline: none;
+        box-shadow: var(--md-elevation-2);
+        background-color: var(--md-surface);
+        border: 1px solid var(--md-outline);
+    }
+    
+    .postcode-icon {
+        position: absolute;
+        left: var(--md-space-2);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--md-on-surface-variant);
+    }
+    
+    .postcode-icon .material-icons {
+        font-size: 24px;
+    }
+    
+    .select-arrow {
+        position: absolute;
+        right: var(--md-space-2);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--md-on-surface-variant);
+        pointer-events: none;
+    }
+    
+    .search-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: var(--md-space-2);
+    }
+    
+    .submit-btn {
+        padding: var(--md-space-2) var(--md-space-4);
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+        border: none;
+        border-radius: var(--md-radius-extra-large);
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: var(--md-elevation-1);
+        transition: box-shadow 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .submit-btn:hover {
+        box-shadow: var(--md-elevation-2);
+    }
+    
+    .submit-btn .material-icons {
+        margin-right: var(--md-space-1);
+    }
+    
     .auth-section {
         text-align: center;
         margin: var(--md-space-5) 0;
         padding: var(--md-space-3);
-        background-color: var(--md-surface);
+        background-color: var (--md-surface);
         border-radius: var(--md-radius-medium);
         box-shadow: var(--md-elevation-1);
     }
@@ -141,7 +227,7 @@
     
     .btn-primary:hover {
         background-color: var(--md-primary);
-        box-shadow: var (--md-elevation-2);
+        box-shadow: var(--md-elevation-2);
     }
     
     .btn-outline {

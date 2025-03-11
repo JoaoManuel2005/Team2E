@@ -144,8 +144,47 @@ def write_review_view(request, accom_id):
     return render(request, 'romaccom/write-review.html', {'accommodation': accommodation})
 
 # Operator Login
+#The accommodation ID is properly passed from the accommodation detail page
+#The operator login page gracefully handles cases where the accommodation might not exist
+#The back link works properly in all cases
 def operator_login_view(request):
-    return render(request, 'romaccom/operator-login.html')
+    # Get accommodation ID from the URL parameters
+    accom_id = request.GET.get('accommodation_id')
+    error = None
+    accommodation = None
+    
+    if accom_id:
+        try:
+            accommodation = Accommodation.objects.get(id=accom_id)
+        except Accommodation.DoesNotExist:
+            error = "Accommodation not found"
+    
+    if request.method == "POST":
+        password = request.POST.get('password')
+        post_accom_id = request.POST.get('accommodation_id')
+        
+        if post_accom_id:
+            try:
+                accommodation = Accommodation.objects.get(id=post_accom_id)
+                # Check if the operator with this password owns this accommodation
+                operator = Operator.objects.filter(accommodations=accommodation, password=password).first()
+                
+                if operator:
+                    # Store operator info in session
+                    request.session['operator_id'] = operator.id
+                    request.session['operator_name'] = operator.name
+                    return redirect('operator_dashboard')
+                else:
+                    error = "Invalid password for this accommodation operator"
+            except Accommodation.DoesNotExist:
+                error = "Accommodation not found"
+        else:
+            error = "No accommodation selected"
+    
+    return render(request, 'romaccom/operator-login.html', {
+        'accommodation': accommodation,
+        'error': error
+    })
 
 # Operator Dashboard
 def operator_dashboard_view(request):

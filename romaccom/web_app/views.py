@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout  # Add this import
 from .models import Accommodation
 # from django.contrib.auth.models import User
 from .models import User
@@ -95,6 +95,11 @@ def login_view(request):
         else:
             return render(request, 'romaccom/login.html', {'error': 'Invalid username or password'})
     return render(request, 'romaccom/login.html')
+
+# User Logout
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 # User Account
 def my_account_view(request):

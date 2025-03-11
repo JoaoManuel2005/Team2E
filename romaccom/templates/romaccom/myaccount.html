@@ -1,0 +1,432 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}My Account - RomAccom{% endblock %}
+
+{% block extra_css %}
+<style>
+    .account-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: var(--md-space-3);
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 500;
+        color: var(--md-on-surface);
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .profile-section {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        margin-bottom: var(--md-space-4);
+        overflow: hidden;
+    }
+    
+    .profile-sidebar {
+        flex: 0 0 250px;
+        background-color: var(--md-primary-container);
+        padding: var(--md-space-4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: var(--md-secondary-container);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--md-on-secondary-container);
+        font-size: 2.5rem;
+        font-weight: 500;
+        margin-bottom: var(--md-space-3);
+        overflow: hidden;
+    }
+    
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-username {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: var(--md-on-primary-container);
+        margin-bottom: var(--md-space-2);
+        text-align: center;
+    }
+    
+    .profile-email {
+        font-size: 0.9rem;
+        color: var(--md-on-primary-container);
+        opacity: 0.8;
+        margin-bottom: var(--md-space-3);
+        text-align: center;
+    }
+    
+    .profile-details {
+        flex: 1;
+        padding: var(--md-space-4);
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: var(--md-space-3);
+        padding-bottom: var(--md-space-2);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+    
+    .detail-row {
+        display: flex;
+        margin-bottom: var(--md-space-3);
+    }
+    
+    .detail-label {
+        flex: 0 0 150px;
+        font-weight: 500;
+        color: var(--md-on-surface-variant);
+    }
+    
+    .detail-value {
+        flex: 1;
+        color: var(--md-on-surface);
+    }
+    
+    .account-nav {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--md-space-2);
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .nav-card {
+        flex: 1;
+        min-width: 250px;
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        padding: var(--md-space-3);
+        transition: box-shadow 0.3s;
+        text-decoration: none;
+        color: var(--md-on-surface);
+        display: flex;
+        align-items: center;
+    }
+    
+    .nav-card:hover {
+        box-shadow: var(--md-elevation-2);
+    }
+    
+    .nav-card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--md-radius-small);
+        background-color: var(--md-primary-container);
+        color: var(--md-on-primary-container);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: var(--md-space-3);
+    }
+    
+    .nav-card-icon .material-icons {
+        font-size: 24px;
+    }
+    
+    .nav-card-content h3 {
+        font-weight: 500;
+        margin-bottom: var(--md-space-1);
+    }
+    
+    .nav-card-content p {
+        font-size: 0.9rem;
+        color: var(--md-on-surface-variant);
+    }
+    
+    .account-actions {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        padding: var(--md-space-3);
+    }
+    
+    .actions-title {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: var(--md-space-3);
+        padding-bottom: var(--md-space-2);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+    
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--md-space-2) var(--md-space-3);
+        border-radius: var(--md-radius-medium);
+        text-decoration: none;
+        font-weight: 500;
+        margin-right: var(--md-space-2);
+        transition: background-color 0.3s;
+    }
+    
+    .btn-primary {
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--md-primary-hover);
+    }
+    
+    .btn-danger {
+        background-color: var(--md-error);
+        color: var (--md-on-error);
+    }
+    
+    .btn-danger:hover {
+        background-color: var(--md-error-hover);
+    }
+    
+    .action-btn .material-icons {
+        margin-right: var(--md-space-1);
+        font-size: 18px;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-section {
+            flex-direction: column;
+        }
+        
+        .profile-sidebar {
+            flex: 0 0 auto;
+            width: 100%;
+        }
+    }
+    
+    /* Add these new styles for the privacy switch */
+    .privacy-switch-container {
+        display: flex;
+        align-items: center;
+        margin-top: var(--md-space-3);
+        background-color: var(--md-secondary-container);
+        padding: var(--md-space-2) var(--md-space-3);
+        border-radius: var(--md-radius-medium);
+        width: 100%;
+    }
+    
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+        margin-left: auto;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--md-surface-variant);
+        transition: .4s;
+        border-radius: 24px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background-color: var(--md-primary);
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    
+    .privacy-label {
+        font-size: 0.9rem;
+        color: var(--md-on-secondary-container);
+        margin-right: var(--md-space-2);
+    }
+    
+    .account-visibility {
+        display: flex;
+        align-items: center;
+        color: var(--md-on-primary-container);
+        margin-bottom: var(--md-space-3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <h1 class="page-title">My Account</h1>
+    
+    <div class="profile-section">
+        <div class="profile-sidebar">
+            <div class="profile-avatar">
+                {% if user.profile.picture %}
+                    <img src="{{ user.profile.picture.url }}" alt="{{ user.username }}">
+                {% else %}
+                    {{ user.username|first|upper }}
+                {% endif %}
+            </div>
+            <h2 class="profile-username">{{ user.username }}</h2>
+            <p class="profile-email">{{ user.email }}</p>
+            
+            <div class="account-visibility">
+                <span class="material-icons" style="vertical-align: middle; margin-right: 4px;">
+                    {% if user.profile_visibility %}
+                    visibility
+                    {% else %}
+                    visibility_off
+                    {% endif %}
+                </span>
+                {% if user.profile_visibility %}
+                    Public Profile
+                {% else %}
+                    Private Profile
+                {% endif %}
+            </div>
+            
+            <!-- privacy switch -->
+            <div class="privacy-switch-container">
+                <span class="privacy-label">Set your account as private</span>
+                <label class="switch">
+                    <input type="checkbox" id="privacy-toggle" {% if not user.profile_visibility %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="profile-details">
+            <h3 class="section-title">Account Information</h3>
+            
+            <div class="detail-row">
+                <div class="detail-label">Username:</div>
+                <div class="detail-value">{{ user.username }}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Email:</div>
+                <div class="detail-value">{{ user.email }}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Account Type:</div>
+                <div class="detail-value">{{ user.account_type|title }}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Date Joined:</div>
+                <div class="detail-value">{{ user.date_joined|date:"F j, Y" }}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Reviews Written:</div>
+                <div class="detail-value">{{ user.reviews.count }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="account-nav">
+        <a href="{% url 'myreviews' %}" class="nav-card">
+            <div class="nav-card-icon">
+                <span class="material-icons">rate_review</span>
+            </div>
+            <div class="nav-card-content">
+                <h3>My Reviews</h3>
+                <p>View and manage all your accommodation reviews</p>
+            </div>
+        </a>
+    </div>
+    
+    <div class="account-actions">
+        <h3 class="actions-title">Account Actions</h3>
+        
+        <a href="#" class="action-btn btn-primary">
+            <span class="material-icons">edit</span>
+            Edit Profile
+        </a>
+        
+        <a href="#" class="action-btn btn-primary">
+            <span class="material-icons">password</span>
+            Change Password
+        </a>
+        
+        <a href="#" class="action-btn btn-danger">
+            <span class="material-icons">logout</span>
+            Logout
+        </a>
+    </div>
+</div>
+
+<script>
+    // Add JavaScript to handle the toggle switch
+    document.addEventListener('DOMContentLoaded', function() {
+        const privacyToggle = document.getElementById('privacy-toggle');
+        
+        privacyToggle.addEventListener('change', function() {
+            // Send AJAX request to update privacy setting
+            fetch('/update-privacy/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'private': this.checked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the visibility indicator
+                    location.reload();
+                } else {
+                    alert('Failed to update privacy settings');
+                    // Revert the toggle if update failed
+                    this.checked = !this.checked;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating privacy settings');
+                // Revert the toggle if update failed
+                this.checked = !this.checked;
+            });
+        });
+    });
+</script>
+{% endblock %}

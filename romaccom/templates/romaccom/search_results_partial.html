@@ -1,0 +1,25 @@
+{% load static %}
+<div class="results-list">
+    {% if results %}
+        {% for accom in results %}
+            <div class="accommodation-card">
+                {% if accom.image %}
+                    <img src="{{ accom.image.url }}" alt="{{ accom.name }}" class="accom-image">
+                {% else %}
+                    <img src="{% static 'images/default-accommodation.jpg' %}" alt="Default accommodation image" class="accom-image">
+                {% endif %}
+                
+                <div class="accom-content">
+                    <h2 class="accom-name">
+                        <a href="{% url 'accommodation_detail' accom.id %}">{{ accom.name }}</a>
+                    </h2>
+                    <p class="accom-address">{{ accom.address }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-results">
+            <p>No accommodations match your search.</p>
+        </div>
+    {% endif %}
+</div>

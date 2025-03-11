@@ -189,21 +189,14 @@
 
 <!-- New search bar for modifying search -->
 <div class="search-container">
-    <form method="GET" action="{% url 'search_results' %}">
-        <span class="search-icon">
-            <span class="material-icons">search</span>
-        </span>
-        <input type="text" name="query" class="search-input" value="{{ query }}" placeholder="Refine your search">
-    
-        <!-- Postcode Dropdown -->
-        <select name="postcode" class="postcode-select">
+    <form id="search-form" method="GET" action="{% url 'search_results' %}">
+        <input type="text" id="query-input" name="query" class="search-input" value="{{ query }}" placeholder="Search again...">
+        <select id="postcode-dropdown" name="postcode" class="postcode-select">
             <option value="">Select a Postcode</option>
             {% for code in glasgow_postcodes %}
                 <option value="{{ code }}" {% if code == postcode_prefix %}selected{% endif %}>{{ code }}</option>
             {% endfor %}
         </select>
-
-        <button type="submit" class="submit-btn">Search</button>
     </form>
 </div>
 
@@ -219,7 +212,8 @@
 </div>
 
 <div class="results-list">
-    {% if results %}
+    {% include 'romaccom/search_results_partial.html' %}
+    <!-- {% if results %}
         {% for accom in results %}
             <div class="accommodation-card">
                 {% if accom.image %}
@@ -260,6 +254,38 @@
             <p>We couldn't find any accommodations matching your search.</p>
             <p class="search-again">Try different keywords or browse our trending accommodations.</p>
         </div>
-    {% endif %}
+    {% endif %} -->
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchForm = document.getElementById("search-form");
+    const queryInput = document.getElementById("query-input");
+    const postcodeDropdown = document.getElementById("postcode-dropdown");
+    const resultsContainer = document.querySelector(".results-list");
+
+    function fetchResults() {
+        let query = queryInput.value.trim();
+        let postcode = postcodeDropdown.value;
+        let url = "{% url 'search_results' %}?query=" + encodeURIComponent(query) + "&postcode=" + encodeURIComponent(postcode);
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.html) {
+                resultsContainer.innerHTML = data.html;
+            }
+        })
+        .catch(error => console.error("Error fetching search results:", error));
+    }
+
+    queryInput.addEventListener("input", fetchResults);
+    postcodeDropdown.addEventListener("change", fetchResults);
+});
+
+</script>
 {% endblock %}

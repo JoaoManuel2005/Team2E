@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
 from .models import Accommodation
 # from django.contrib.auth.models import User
@@ -36,6 +37,10 @@ def search_results_view(request):
 
     if query:
         results = results.filter(name__icontains=query)
+
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        html = render(request, 'romaccom/search_results_partial.html', {'results': results}).content.decode('utf-8')
+        return JsonResponse({'html': html})
 
     return render(request, 'romaccom/search_results.html', {
         'results': results,

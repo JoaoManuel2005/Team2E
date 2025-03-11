@@ -111,7 +111,16 @@ def accom_map_view(request, accom_id):
 
 # Write a Review
 def write_review_view(request, accom_id):
-    return render(request, 'romaccom/write-review.html')
+    accommodation = Accommodation.objects.get(id=accom_id)
+    
+    # Handle form submission if it's a POST request
+    if request.method == 'POST':
+        # Process form data
+        # Create a new review
+        # Redirect to accommodation detail page
+        pass
+        
+    return render(request, 'romaccom/write-review.html', {'accommodation': accommodation})
 
 # Operator Login
 def operator_login_view(request):

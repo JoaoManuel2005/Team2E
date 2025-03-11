@@ -402,3 +402,33 @@
 
 <div class="results-list"></div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.querySelector(".search-input");
+    const postcodeDropdown = document.querySelector(".postcode-select");
+    const resultsContainer = document.querySelector(".results-list");
+
+    function fetchResults() {
+        let query = searchInput.value.trim();
+        let postcode = postcodeDropdown.value;
+        let url = "{% url 'search_results' %}?query=" + encodeURIComponent(query) + "&postcode=" + encodeURIComponent(postcode);
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.html) {
+                resultsContainer.innerHTML = data.html;
+            }
+        })
+        .catch(error => console.error("Error fetching search results:", error));
+    }
+
+    searchInput.addEventListener("input", fetchResults);
+    postcodeDropdown.addEventListener("change", fetchResults);
+});
+</script>
+{% endblock %}

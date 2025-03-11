@@ -1,10 +1,6 @@
 from django.shortcuts import render, redirect
-<<<<<<< HEAD
 from django.http import JsonResponse
-from django.contrib.auth import login, authenticate
-=======
-from django.contrib.auth import login, authenticate, logout  # Add this import
->>>>>>> 682f26ba44f6f347d2e2616afe625ef185ed52b9
+from django.contrib.auth import login, authenticate, logout 
 from .models import Accommodation
 # from django.contrib.auth.models import User
 from .models import User

@@ -3,7 +3,7 @@ from django.contrib import admin
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
     path('', views.home_view, name='home'),
     path('trending/', views.trending_view, name='trending'),
     path('top-rated/', views.top_rated_view, name='top_rated'),

@@ -130,7 +130,7 @@
         left: var(--md-space-2);
         top: 50%;
         transform: translateY(-50%);
-        color: var(--md-on-surface-variant);
+        color: var (--md-on-surface-variant);
     }
     
     .postcode-icon .material-icons {
@@ -334,21 +334,38 @@
     <!-- Center column - Search Bar -->
     <div class="center-column">
         <div class="search-container">
-            <form method="GET" action="{% url 'search_results' %}">
-                <span class="search-icon">
-                    <span class="material-icons">search</span>
-                </span>
-                <input type="text" name="query" class="search-input" placeholder="Discover student accommodations in Glasgow">
-        
-                <!-- Postcode Dropdown -->
-                <select name="postcode" class="postcode-select">
-                    <option value="">Select a Postcode</option>
-                    {% for code in glasgow_postcodes %}
-                        <option value="{{ code }}">{{ code }}</option>
-                    {% endfor %}
-                </select>
-
-                <button type="submit" class="submit-btn">Search</button>
+            <form method="GET" action="{% url 'search_results' %}" class="search-form">
+                <!-- Search input with icon -->
+                <div class="search-input-container">
+                    <span class="search-icon">
+                        <span class="material-icons">search</span>
+                    </span>
+                    <input type="text" name="query" class="search-input" placeholder="Discover student accommodations in Glasgow">
+                </div>
+                
+                <!-- Postcode dropdown with icon -->
+                <div class="postcode-select-container">
+                    <span class="postcode-icon">
+                        <span class="material-icons">place</span>
+                    </span>
+                    <select name="postcode" class="postcode-select">
+                        <option value="">All Glasgow Postcodes</option>
+                        {% for code in glasgow_postcodes %}
+                            <option value="{{ code }}">{{ code }} - Glasgow Area</option>
+                        {% endfor %}
+                    </select>
+                    <span class="select-arrow">
+                        <span class="material-icons">arrow_drop_down</span>
+                    </span>
+                </div>
+                
+                <!-- Search button with icon -->
+                <div class="search-actions">
+                    <button type="submit" class="submit-btn">
+                        <span class="material-icons">search</span>
+                        Find Accommodation
+                    </button>
+                </div>
             </form>
         </div>
         

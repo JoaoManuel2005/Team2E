@@ -5,6 +5,15 @@ from .models import Accommodation
 from .models import User
 
 # Home Page
+def index(request):
+    trending_accommodations = Accommodation.objects.order_by('-view_count')[:5]
+    top_rated_accommodations = Accommodation.objects.order_by('-average_rating')[:5]
+    return render(request, 'romaccom/home.html', {
+        'trending_accommodations': trending_accommodations,
+        'top_rated_accommodations': top_rated_accommodations
+    })
+
+# Home Page
 def home_view(request):
     trending_accommodations = Accommodation.objects.order_by('-view_count')[:5]
     top_rated_accommodations = Accommodation.objects.order_by('-average_rating')[:5]
@@ -78,10 +87,6 @@ def my_account_view(request):
 # User Reviews
 def my_reviews_view(request):
     return render(request, 'romaccom/myreviews.html')
-
-# Privacy Settings
-def privacy_settings_view(request):
-    return render(request, 'romaccom/privacy-settings.html')
 
 # Accommodation Search
 def search_view(request):

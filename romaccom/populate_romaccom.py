@@ -3,10 +3,10 @@ import django
 import random
 from faker import Faker
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Team2E.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "romaccom.settings")
 django.setup()
 
-from romaccom.models import User, Operator, Accommodation, Review
+from web_app.models import User, Operator, Accommodation, Review
 
 fake = Faker()
 

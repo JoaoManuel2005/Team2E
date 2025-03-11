@@ -1,35 +1,28 @@
-from django.urls import path
+"""romaccom URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/2.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
 from django.contrib import admin
-from . import views
+from django.urls import path
+from django.urls import include
+from web_app import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home_view, name='home'),
-    path('trending/', views.trending_view, name='trending'),
-    path('top-rated/', views.top_rated_view, name='top_rated'),
-    path('contact-us/', views.contact_view, name='contact'),
-    path('about-us/', views.about_view, name='about'),
-    
-    path('register/', views.user_register_view, name='user_register'),
-    path('operator/register/', views.operator_register_view, name='operator_register'),
-    
-    path('login/', views.login_view, name='login'),
-    path('user/myaccount/', views.my_account_view, name='myaccount'),
-    path('user/myaccount/myreviews/', views.my_reviews_view, name='myreviews'),
-    path('user/myaccount/privacy-settings/', views.privacy_settings_view, name='privacy_settings'),
+    path('romaccom/', include('web_app.urls')),
+    path('', views.home_view, name='index'),
 
-    path('search/', views.search_view, name='search'),
-    path('search/results/', views.search_results_view, name='search_results'),
-    path('search/accomlist/', views.accom_list_view, name='accomlist'),
-    path('search/accomlist/accompage/<int:accom_id>/', views.accom_page_view, name='accommodation_detail'),
-    path('search/accomlist/accompage/info/<int:accom_id>/', views.accom_page_view, name='accom_info'),
-    path('search/accomlist/accompage/reviews/<int:accom_id>/', views.accom_reviews_view, name='accom_reviews'),
-    path('search/accomlist/accompage/map/<int:accom_id>/', views.accom_map_view, name='accom_map'),
-    path('search/accomlist/accompage/write-review/<int:accom_id>/', views.write_review_view, name='write_review'),
-
-    path('operator/login/', views.operator_login_view, name='operator_login'),
-    path('operator/dashboard/', views.operator_dashboard_view, name='operator_dashboard'),
-    path('operator/dashboard/mylistings/', views.my_listings_view, name='mylistings'),
-    path('operator/dashboard/addnewaccommodation/', views.add_accommodation_view, name='add_accommodation'),
-    path('operator/dashboard/manageaccommodationinfo/', views.manage_accom_info_view, name='manage_accom_info'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'romaccom',
+    'web_app',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Team2E.wsgi.application'
+WSGI_APPLICATION = 'romaccom.wsgi.application'
 
 
 # Database
@@ -85,7 +85,7 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'romaccom.User'
+AUTH_USER_MODEL = 'web_app.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

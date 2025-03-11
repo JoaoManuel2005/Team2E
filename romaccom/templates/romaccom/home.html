@@ -253,6 +253,16 @@
                     <span class="material-icons">search</span>
                 </span>
                 <input type="text" name="query" class="search-input" placeholder="Discover student accommodations in Glasgow">
+        
+                <!-- Postcode Dropdown -->
+                <select name="postcode" class="postcode-select">
+                    <option value="">Select a Postcode</option>
+                    {% for code in glasgow_postcodes %}
+                        <option value="{{ code }}">{{ code }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="submit-btn">Search</button>
             </form>
         </div>
         

@@ -4,6 +4,8 @@ from .models import Accommodation
 # from django.contrib.auth.models import User
 from .models import User
 
+GLASGOW_POSTCODES = ["G1", "G2", "G3", "G4", "G5", "G11", "G12", "G13", "G14", "G15", "G20", "G21", "G22", "G23", "G31", "G32", "G33", "G34", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G51", "G52", "G53", "G61", "G62", "G64", "G65", "G66", "G67", "G68", "G69", "G70"]
+
 # Home Page
 def index(request):
     trending_accommodations = Accommodation.objects.order_by('-view_count')[:5]
@@ -19,14 +21,28 @@ def home_view(request):
     top_rated_accommodations = Accommodation.objects.order_by('-average_rating')[:5]
     return render(request, 'romaccom/home.html', {
         'trending_accommodations': trending_accommodations,
-        'top_rated_accommodations': top_rated_accommodations
+        'top_rated_accommodations': top_rated_accommodations,
+        'glasgow_postcodes' : GLASGOW_POSTCODES,
     })
 
-#Search results view
 def search_results_view(request):
-    query = request.GET.get('query', '')
-    results = Accommodation.objects.filter(name__icontains=query)
-    return render(request, 'romaccom/search_results.html', {'results': results, 'query': query})
+    query = request.GET.get('query', '').strip()
+    postcode_prefix = request.GET.get('postcode', '').strip()
+
+    results = Accommodation.objects.all()
+
+    if postcode_prefix in GLASGOW_POSTCODES:
+        results = results.filter(postcode__startswith=postcode_prefix)
+
+    if query:
+        results = results.filter(name__icontains=query)
+
+    return render(request, 'romaccom/search_results.html', {
+        'results': results,
+        'query': query,
+        'postcode_prefix': postcode_prefix,
+        'glasgow_postcodes': GLASGOW_POSTCODES,
+    })
 
 # Trending Accommodations
 def trending_view(request):

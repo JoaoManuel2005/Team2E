@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout 
-from .models import Accommodation
+from .models import Accommodation, Review
+from .forms import ReviewForm
+from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 from .models import User
 
@@ -141,17 +143,24 @@ def accom_map_view(request, accom_id):
     return render(request, 'romaccom/map.html', {'accommodation': accommodation})
 
 # Write a Review
+@login_required
 def write_review_view(request, accom_id):
-    accommodation = Accommodation.objects.get(id=accom_id)
-    
-    # Handle form submission if it's a POST request
+    accommodation = get_object_or_404(Accommodation, id=accom_id)
+
     if request.method == 'POST':
-        # Process form data
-        # Create a new review
-        # Redirect to accommodation detail page
-        pass
-        
-    return render(request, 'romaccom/write-review.html', {'accommodation': accommodation})
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user  
+            review.accommodation = accommodation  
+            review.save()  
+            accommodation.update_average_rating() 
+            return redirect('accom_page_view', accom_id=accommodation.id)  
+
+    else:
+        form = ReviewForm()
+
+    return render(request, 'romaccom/write-review.html', {'accommodation': accommodation, 'form': form})
 
 # Operator Login
 #The accommodation ID is properly passed from the accommodation detail page

@@ -211,3 +211,44 @@ def add_accommodation_view(request):
 # Manage Accommodation Info
 def manage_accom_info_view(request):
     return render(request, 'romaccom/manageaccommodationinfo.html')
+
+import json
+import logging
+from django.views.decorators.csrf import csrf_exempt
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def update_privacy_view(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            logger.info(f"Updating privacy for user: {request.user.username}")
+            data = json.loads(request.body)
+            private = data.get('private', False)
+            logger.info(f"Received private value: {private}")
+            
+            request.user.profile_visibility = not private
+            request.user.save()
+            logger.info(f"Successfully updated privacy to: {request.user.profile_visibility}")
+            
+            return JsonResponse({
+                'success': True,
+                'new_visibility': request.user.profile_visibility
+            })
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid JSON data'
+            }, status=400)
+        except Exception as e:
+            logger.error(f"Error updating privacy: {str(e)}", exc_info=True)
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    logger.warning("Invalid request method or unauthenticated user")
+    return JsonResponse({
+        'success': False,
+        'error': 'Invalid request'
+    }, status=400)

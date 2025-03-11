@@ -394,7 +394,7 @@
         
         privacyToggle.addEventListener('change', function() {
             // Send AJAX request to update privacy setting
-            fetch('/update-privacy/', {
+            fetch('{% url "update-privacy" %}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

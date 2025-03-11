@@ -127,7 +127,7 @@
     
     .btn-primary:hover {
         background-color: var(--md-primary);
-        box-shadow: var(--md-elevation-2);
+        box-shadow: var (--md-elevation-2);
     }
     
     .btn-outline {
@@ -257,10 +257,24 @@
         </div>
         
         <div class="auth-section">
-            <h3 class="auth-title">To Leave a review</h3>
-            <a href="{% url 'login' %}" class="btn btn-primary">Log In</a>
-            <p>or</p>
-            <a href="{% url 'user_register' %}" class="btn btn-outline">Sign Up</a>
+            {% if user.is_authenticated %}
+                <h3 class="auth-title">Welcome back!</h3>
+                <p>You are logged in as <strong>{{ user.username }}</strong></p>
+                <a href="{% url 'myaccount' %}" class="btn btn-primary">
+                    <span class="material-icons" style="font-size: 16px; margin-right: 4px; vertical-align: middle;">account_circle</span>
+                    My Account
+                </a>
+                <p>or</p>
+                <a href="{% url 'login' %}" class="btn btn-outline">
+                    <span class="material-icons" style="font-size: 16px; margin-right: 4px; vertical-align: middle;">logout</span>
+                    Logout
+                </a>
+            {% else %}
+                <h3 class="auth-title">To Leave a review</h3>
+                <a href="{% url 'login' %}" class="btn btn-primary">Log In</a>
+                <p>or</p>
+                <a href="{% url 'user_register' %}" class="btn btn-outline">Sign Up</a>
+            {% endif %}
         </div>
     </div>
     

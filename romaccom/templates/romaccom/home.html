@@ -77,6 +77,20 @@
         background-color: var(--md-surface);
         border: 1px solid var(--md-outline);
     }
+
+    .postcode-select {
+        width: 100%;
+        max-width: 250px;
+        padding: 12px;
+        border-radius: 30px;
+        background-color: #f4f4f4;
+        font-size: 1rem;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .postcode-select:hover, .postcode-select:focus {
+        background-color: #eaeaea;
+    }
     
     .search-icon {
         position: absolute;
@@ -248,21 +262,18 @@
     <!-- Center column - Search Bar -->
     <div class="center-column">
         <div class="search-container">
-            <form method="GET" action="{% url 'search_results' %}">
+            <form id="search-form" method="GET" action="{% url 'search_results' %}">
                 <span class="search-icon">
                     <span class="material-icons">search</span>
                 </span>
-                <input type="text" name="query" class="search-input" placeholder="Discover student accommodations in Glasgow">
-        
-                <!-- Postcode Dropdown -->
-                <select name="postcode" class="postcode-select">
+                <input type="text" id="query_input" name="query" class="search-input" placeholder="Discover student accommodations in Glasgow">
+                
+                <select id="postcode-dropdown" name="postcode" class="postcode-select">
                     <option value="">Select a Postcode</option>
                     {% for code in glasgow_postcodes %}
                         <option value="{{ code }}">{{ code }}</option>
                     {% endfor %}
                 </select>
-
-                <button type="submit" class="submit-btn">Search</button>
             </form>
         </div>
         
@@ -313,4 +324,37 @@
         </section>
     </div>
 </div>
+
+<div class="results-list"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchForm = document.getElementById("search-form");
+    const queryInput = document.getElementById("query-input");
+    const postcodeDropdown = document.getElementById("postcode-dropdown");
+    const resultsContainer = document.querySelector(".results-list");
+
+    function fetchResults() {
+        let query = queryInput.value;
+        let postcode = postcodeDropdown.value;
+        let url = `/search/results/?query=${query}&postcode=${postcode}`;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                let parser = new DOMParser();
+                let newResults = parser.parseFromString(data, "text/html").querySelector(".results-list");
+                if (newResults)
+                {
+                    resultsContainer.innerHTML = newResults.innerHTML;
+                }
+            });
+    }
+
+    queryInput.addEventListener("input", fetchResults);
+    postcodeDropdown.addEventListener("change", fetchResults);
+});
+</script>
 {% endblock %}

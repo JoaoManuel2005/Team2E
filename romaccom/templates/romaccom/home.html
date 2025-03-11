@@ -67,6 +67,7 @@
     
     .search-input-container {
         position: relative;
+        margin-bottom: 0;
     }
     
     .search-input {
@@ -130,7 +131,7 @@
         left: var(--md-space-2);
         top: 50%;
         transform: translateY(-50%);
-        color: var (--md-on-surface-variant);
+        color: var(--md-on-surface-variant);
     }
     
     .postcode-icon .material-icons {
@@ -289,6 +290,57 @@
     .accommodation-item:hover {
         background-color: var(--md-surface-variant);
     }
+
+    /* Add these new styles for the dropdown */
+    .search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: var(--md-surface);
+        border-radius: 0 0 var(--md-radius-medium) var(--md-radius-medium);
+        box-shadow: var(--md-elevation-2);
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+    }
+    
+    .search-suggestions.active {
+        display: block;
+    }
+    
+    .suggestion-item {
+        padding: var(--md-space-2) var(--md-space-3);
+        border-bottom: 1px solid var(--md-outline-variant);
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+    
+    .suggestion-item:hover {
+        background-color: var(--md-surface-variant);
+    }
+    
+    .suggestion-icon {
+        margin-right: var(--md-space-2);
+        color: var(--md-on-surface-variant);
+    }
+    
+    .suggestion-text {
+        flex: 1;
+        color: var(--md-on-surface);
+    }
+    
+    .suggestion-highlight {
+        font-weight: 500;
+        color: var(--md-primary);
+    }
 </style>
 {% endblock %}
 
@@ -334,13 +386,14 @@
     <!-- Center column - Search Bar -->
     <div class="center-column">
         <div class="search-container">
-            <form method="GET" action="{% url 'search_results' %}" class="search-form">
+            <form method="GET" action="{% url 'search_results' %}" class="search-form" id="search-form">
                 <!-- Search input with icon -->
                 <div class="search-input-container">
                     <span class="search-icon">
                         <span class="material-icons">search</span>
                     </span>
-                    <input type="text" name="query" class="search-input" placeholder="Discover student accommodations in Glasgow">
+                    <input type="text" name="query" id="search-input" class="search-input" placeholder="Discover student accommodations in Glasgow" autocomplete="off">
+                    <div class="search-suggestions" id="search-suggestions"></div>
                 </div>
                 
                 <!-- Postcode dropdown with icon -->
@@ -348,7 +401,7 @@
                     <span class="postcode-icon">
                         <span class="material-icons">place</span>
                     </span>
-                    <select name="postcode" class="postcode-select">
+                    <select name="postcode" id="postcode-select" class="postcode-select">
                         <option value="">All Glasgow Postcodes</option>
                         {% for code in glasgow_postcodes %}
                             <option value="{{ code }}">{{ code }} - Glasgow Area</option>
@@ -423,29 +476,153 @@
 {% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const searchInput = document.querySelector(".search-input");
-    const postcodeDropdown = document.querySelector(".postcode-select");
-    const resultsContainer = document.querySelector(".results-list");
-
-    function fetchResults() {
-        let query = searchInput.value.trim();
-        let postcode = postcodeDropdown.value;
-        let url = "{% url 'search_results' %}?query=" + encodeURIComponent(query) + "&postcode=" + encodeURIComponent(postcode);
-
-        fetch(url, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.html) {
-                resultsContainer.innerHTML = data.html;
+    const searchInput = document.querySelector("#search-input");
+    const postcodeDropdown = document.querySelector("#postcode-select");
+    const suggestionsContainer = document.querySelector("#search-suggestions");
+    const searchForm = document.querySelector("#search-form");
+    let debounceTimer;
+    
+    // Function to fetch and display suggestions
+    function fetchSuggestions() {
+        clearTimeout(debounceTimer);
+        
+        debounceTimer = setTimeout(() => {
+            const query = searchInput.value.trim();
+            if (query.length < 1) {
+                suggestionsContainer.classList.remove("active");
+                suggestionsContainer.innerHTML = "";
+                return;
             }
-        })
-        .catch(error => console.error("Error fetching search results:", error));
+            
+            const postcode = postcodeDropdown.value;
+            const url = "{% url 'search_results' %}?query=" + encodeURIComponent(query) + 
+                        "&postcode=" + encodeURIComponent(postcode);
+            
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.html) {
+                    // Extract accommodation items from the HTML response
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data.html, 'text/html');
+                    const accomItems = doc.querySelectorAll('.accommodation-card');
+                    
+                    suggestionsContainer.innerHTML = '';
+                    
+                    if (accomItems.length > 0) {
+                        accomItems.forEach(item => {
+                            const accomName = item.querySelector('.accom-name a').textContent;
+                            const accomLink = item.querySelector('.accom-name a').getAttribute('href');
+                            
+                            // Create a suggestion item with highlighted matching text
+                            const suggestionItem = document.createElement('div');
+                            suggestionItem.className = 'suggestion-item';
+                            
+                            const regex = new RegExp(`(${query})`, 'gi');
+                            const highlightedName = accomName.replace(
+                                regex, 
+                                '<span class="suggestion-highlight">$1</span>'
+                            );
+                            
+                            suggestionItem.innerHTML = `
+                                <span class="suggestion-icon material-icons">apartment</span>
+                                <span class="suggestion-text">${highlightedName}</span>
+                            `;
+                            
+                            suggestionItem.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                window.location.href = accomLink;
+                            });
+                            
+                            suggestionsContainer.appendChild(suggestionItem);
+                        });
+                        
+                        suggestionsContainer.classList.add("active");
+                    } else {
+                        // Show "No results" message
+                        const noResults = document.createElement('div');
+                        noResults.className = 'suggestion-item';
+                        noResults.innerHTML = `
+                            <span class="suggestion-icon material-icons">search_off</span>
+                            <span class="suggestion-text">No results found for "${query}"</span>
+                        `;
+                        suggestionsContainer.appendChild(noResults);
+                        suggestionsContainer.classList.add("active");
+                    }
+                }
+            })
+            .catch(error => console.error("Error fetching search suggestions:", error));
+        }, 300); // 300ms debounce delay
     }
-
-    searchInput.addEventListener("input", fetchResults);
-    postcodeDropdown.addEventListener("change", fetchResults);
+    
+    // Event listeners
+    searchInput.addEventListener("input", fetchSuggestions);
+    
+    postcodeDropdown.addEventListener("change", fetchSuggestions);
+    
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+            suggestionsContainer.classList.remove('active');
+        }
+    });
+    
+    // Focus input, show suggestions again if there's content
+    searchInput.addEventListener('focus', function() {
+        if (searchInput.value.trim().length > 0) {
+            fetchSuggestions();
+        }
+    });
+    
+    // Handle form submission
+    searchForm.addEventListener('submit', function(e) {
+        const query = searchInput.value.trim();
+        if (query.length < 1) {
+            e.preventDefault();
+        }
+    });
+    
+    // Handle keyboard navigation in suggestions
+    searchInput.addEventListener('keydown', function(e) {
+        const items = suggestionsContainer.querySelectorAll('.suggestion-item');
+        if (!items.length) return;
+        
+        const active = suggestionsContainer.querySelector('.suggestion-item.active');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            
+            if (!active) {
+                items[0].classList.add('active');
+            } else {
+                const next = [...items].indexOf(active) + 1;
+                if (next < items.length) {
+                    active.classList.remove('active');
+                    items[next].classList.add('active');
+                }
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            
+            if (active) {
+                const prev = [...items].indexOf(active) - 1;
+                active.classList.remove('active');
+                if (prev >= 0) {
+                    items[prev].classList.add('active');
+                }
+            }
+        } else if (e.key === 'Enter' && active) {
+            e.preventDefault();
+            const link = active.getAttribute('data-link');
+            if (link) {
+                window.location.href = link;
+            }
+        } else if (e.key === 'Escape') {
+            suggestionsContainer.classList.remove('active');
+        }
+    });
 });
 </script>
 {% endblock %}

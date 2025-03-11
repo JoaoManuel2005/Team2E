@@ -87,20 +87,6 @@
         background-color: var(--md-surface);
         border: 1px solid var(--md-outline);
     }
-
-    .postcode-select {
-        width: 100%;
-        max-width: 250px;
-        padding: 12px;
-        border-radius: 30px;
-        background-color: #f4f4f4;
-        font-size: 1rem;
-        transition: background 0.3s ease-in-out;
-    }
-
-    .postcode-select:hover, .postcode-select:focus {
-        background-color: #eaeaea;
-    }
     
     .search-icon {
         position: absolute;
@@ -194,7 +180,7 @@
         text-align: center;
         margin: var(--md-space-5) 0;
         padding: var(--md-space-3);
-        background-color: var (--md-surface);
+        background-color: var(--md-surface);
         border-radius: var(--md-radius-medium);
         box-shadow: var(--md-elevation-1);
     }
@@ -375,7 +361,7 @@
                     My Account
                 </a>
                 <p>or</p>
-                <a href="{% url 'login' %}" class="btn btn-outline">
+                <a href="{% url 'logout' %}" class="btn btn-outline">
                     <span class="material-icons" style="font-size: 16px; margin-right: 4px; vertical-align: middle;">logout</span>
                     Logout
                 </a>

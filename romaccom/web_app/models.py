@@ -28,8 +28,8 @@ class UserProfile(models.Model):
 # Operator Model
 class Operator(models.Model):
     name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)  # Ideally, use Django's authentication system for hashing
+    email = models.EmailField(blank=True, null=True)  # Make email optional
+    password = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name

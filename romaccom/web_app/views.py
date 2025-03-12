@@ -133,6 +133,11 @@ def logout_view(request):
 def my_account_view(request):
     return render(request, 'romaccom/myaccount.html')
 
+# ANy User Account
+def user_profile_view(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    return render(request, 'romaccom/account.html', {'profile_user': profile_user})
+
 # User Reviews
 def my_reviews_view(request):
     user_reviews = Review.objects.filter(user=request.user).select_related('accommodation')

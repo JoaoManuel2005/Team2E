@@ -383,7 +383,11 @@
                                         {{ review.user.username|first|upper }}
                                     {% endif %}
                                 </div>
-                                <span class="reviewer-name">{{ review.user.username }}</span>
+                                <span class="reviewer-name">
+                                    <a href="{% url 'user_profile' review.user.username %}" class="profile-link">
+                                        {{ review.user.username }}
+                                    </a>
+                                </span>
                             </div>
                             
                             <div class="review-rating">

@@ -165,8 +165,10 @@
             
             <p class="review-author">
                 <span class="material-icons">person</span>
-                {{ review.user.username }} reviewed {{ review.accommodation.name }}
-            </p>
+                <a href="{% url 'user_profile' review.user.username %}" class="profile-link">
+                    {{ review.user.username }}
+                </a> reviewed {{ review.accommodation.name }}
+            </p>            
             
             <div class="review-rating">
                 {% for i in "12345" %}

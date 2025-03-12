@@ -1,0 +1,208 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }}'s Profile - RomAccom{% endblock %}
+
+{% block extra_css %}
+<style>
+    .account-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: var(--md-space-3);
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 500;
+        color: var(--md-on-surface);
+        margin-bottom: var(--md-space-4);
+    }
+
+    .profile-section {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+        margin-bottom: var(--md-space-4);
+        overflow: hidden;
+    }
+    
+    .profile-sidebar {
+        flex: 0 0 250px;
+        background-color: var(--md-primary-container);
+        padding: var(--md-space-4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: var(--md-secondary-container);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--md-on-secondary-container);
+        font-size: 2.5rem;
+        font-weight: 500;
+        margin-bottom: var(--md-space-3);
+        overflow: hidden;
+    }
+    
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-username {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: var(--md-on-primary-container);
+        margin-bottom: var(--md-space-2);
+        text-align: center;
+    }
+    
+    .profile-email {
+        font-size: 0.9rem;
+        color: var(--md-on-primary-container);
+        opacity: 0.8;
+        margin-bottom: var(--md-space-3);
+        text-align: center;
+    }
+    
+    .profile-details {
+        flex: 1;
+        padding: var(--md-space-4);
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: var(--md-space-3);
+        padding-bottom: var(--md-space-2);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+
+    .reviews-container {
+        margin-top: var(--md-space-4);
+    }
+
+    .private-message {
+        text-align: center;
+        font-size: 1rem;
+        color: var(--md-on-surface-variant);
+        background-color: var(--md-surface);
+        padding: var(--md-space-3);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <h1 class="page-title">{{ profile_user.username }}'s Profile</h1>
+
+    <div class="profile-section">
+        <div class="profile-sidebar">
+            <div class="profile-avatar">
+                {% if profile_user.profile.picture %}
+                    <img src="{{ profile_user.profile.picture.url }}" alt="{{ profile_user.username }}">
+                {% else %}
+                    {{ profile_user.username|first|upper }}
+                {% endif %}
+            </div>
+            <h2 class="profile-username">{{ profile_user.username }}</h2>
+            <p class="profile-email">{{ profile_user.email }}</p>
+
+            <div class="account-visibility">
+                <span class="material-icons" style="vertical-align: middle; margin-right: 4px;">
+                    {% if profile_user.profile_visibility %}
+                    visibility
+                    {% else %}
+                    visibility_off
+                    {% endif %}
+                </span>
+                {% if profile_user.profile_visibility %}
+                    Public Profile
+                {% else %}
+                    Private Profile
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-details">
+            <h3 class="section-title">Account Information</h3>
+            
+            <p><strong>Username:</strong> {{ profile_user.username }}</p>
+            <p><strong>Account Type:</strong> {{ profile_user.account_type|title }}</p>
+            <p><strong>Date Joined:</strong> {{ profile_user.date_joined|date:"F j, Y" }}</p>
+            <p><strong>Reviews Written:</strong> {{ profile_user.reviews.count }}</p>
+        </div>
+    </div>
+
+    <div class="reviews-container">
+        <h3 class="section-title">User Reviews</h3>
+
+        {% if profile_user.profile_visibility %}
+            {% if profile_user.reviews.all %}
+                <div class="reviews-list">
+                    {% for review in profile_user.reviews.all %}
+                        <div class="review-card">
+                            <div class="accom-header">
+                                <h2 class="accom-name">
+                                    <a href="{% url 'accommodation_detail' review.accommodation.id %}">
+                                        {{ review.accommodation.name }}
+                                    </a>
+                                </h2>
+                                <div class="review-rating">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <span class="material-icons">star</span>
+                                        {% else %}
+                                            <span class="material-icons">star_outline</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="review-content">
+                                {% if review.title %}
+                                    <h3 class="review-title">
+                                        <a href="{% url 'accom_review_detail' review.accommodation.id review.id %}">{{ review.title }}</a>
+                                    </h3>
+                                {% endif %}
+
+                                <div class="review-text">{{ review.review_text }}</div>
+
+                                {% if review.images.all %}
+                                    <div class="review-images">
+                                        {% for image in review.images.all %}
+                                            <img src="{{ image.image.url }}" alt="Review image" class="review-image">
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                <div class="review-date">
+                                    Reviewed on {{ review.created_at|date:"F j, Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No reviews yet.</p>
+            {% endif %}
+        {% else %}
+            <div class="private-message">
+                <p>This user's profile is private. You cannot view their reviews.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

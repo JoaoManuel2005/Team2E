@@ -28,6 +28,9 @@ urlpatterns = [
     path('search/accomlist/accompage/map/<int:accom_id>/', views.accom_map_view, name='accom_map'),
     path('search/accomlist/accompage/write-review/<int:accom_id>/', views.write_review_view, name='write_review'),
 
+    path('accom/<int:accom_id>/', views.accom_page_view, name='accom_page_view'),
+    path('accom/<int:accom_id>/write-review/', views.write_review_view, name='write_review'),
+
     path('operator/login/', views.operator_login_view, name='operator_login'),
     path('operator/dashboard/', views.operator_dashboard_view, name='operator_dashboard'),
     path('operator/dashboard/mylistings/', views.my_listings_view, name='mylistings'),

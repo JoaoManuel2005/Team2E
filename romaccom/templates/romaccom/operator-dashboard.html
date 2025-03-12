@@ -1,0 +1,799 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Operator Dashboard - {{ accommodation.name }} - RomAccom{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--md-space-3);
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--md-space-4);
+        padding-bottom: var(--md-space-3);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+    
+    .accom-name {
+        font-size: 2rem;
+        font-weight: 500;
+        color: var(--md-on-surface);
+        margin-bottom: var(--md-space-1);
+    }
+    
+    .operator-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--md-primary-container);
+        color: var(--md-on-primary-container);
+        padding: var(--md-space-1) var(--md-space-2);
+        border-radius: var(--md-radius-extra-large);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .operator-badge .material-icons {
+        font-size: 16px;
+        margin-right: var(--md-space-1);
+    }
+    
+    .dashboard-actions {
+        display: flex;
+        gap: var(--md-space-2);
+    }
+    
+    .dashboard-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--md-space-2) var(--md-space-3);
+        border-radius: var(--md-radius-extra-large);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        box-shadow: var(--md-elevation-1);
+    }
+    
+    .btn-primary {
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+    }
+    
+    .btn-primary:hover {
+        box-shadow: var(--md-elevation-2);
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        color: var(--md-on-surface);
+        border: 1px solid var(--md-outline);
+    }
+    
+    .btn-outline:hover {
+        background-color: var(--md-surface-variant);
+    }
+    
+    .dashboard-section {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-large);
+        box-shadow: var(--md-elevation-1);
+        padding: var(--md-space-4);
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .section-title {
+        display: flex;
+        align-items: center;
+        font-size: 1.3rem;
+        font-weight: 500;
+        color: var(--md-on-surface);
+        margin-bottom: var(--md-space-3);
+        padding-bottom: var(--md-space-2);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+    
+    .section-title .material-icons {
+        margin-right: var(--md-space-2);
+        color: var(--md-primary);
+    }
+    
+    /* Review Analytics Styles */
+    .review-summary {
+        display: flex;
+        gap: var(--md-space-4);
+        margin-bottom: var(--md-space-4);
+    }
+    
+    .review-stats {
+        flex: 1;
+    }
+    
+    .review-count {
+        font-size: 3rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        display: flex;
+        align-items: center;
+    }
+    
+    .review-count-label {
+        font-size: 1rem;
+        color: var(--md-on-surface-variant);
+        margin-left: var(--md-space-2);
+    }
+    
+    .average-rating {
+        display: flex;
+        align-items: center;
+        color: #FFC107;
+        margin-top: var(--md-space-2);
+    }
+    
+    .average-rating .material-icons {
+        font-size: 24px;
+        margin-right: var(--md-space-1);
+    }
+    
+    .rating-value {
+        font-size: 1.3rem;
+        font-weight: 500;
+    }
+    
+    .rating-distribution {
+        flex: 2;
+    }
+    
+    .rating-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--md-space-2);
+    }
+    
+    .rating-label {
+        display: flex;
+        align-items: center;
+        width: 80px;
+        color: var(--md-on-surface-variant);
+    }
+    
+    .rating-label .material-icons {
+        font-size: 16px;
+        color: #FFC107;
+    }
+    
+    .rating-progress {
+        flex: 1;
+        height: 10px;
+        background-color: var(--md-surface-variant);
+        border-radius: var(--md-radius-small);
+        margin: 0 var(--md-space-2);
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background-color: var(--md-primary);
+        border-radius: var(--md-radius-small);
+    }
+    
+    .rating-percent {
+        width: 40px;
+        text-align: right;
+        font-weight: 500;
+    }
+    
+    /* Accommodation Info Form */
+    .form-group {
+        margin-bottom: var(--md-space-3);
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: var(--md-space-1);
+        color: var(--md-on-surface-variant);
+        font-weight: 500;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: var(--md-space-2);
+        border: 1px solid var(--md-outline);
+        border-radius: var(--md-radius-small);
+        background-color: var(--md-surface);
+        color: var(--md-on-surface);
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--md-primary);
+        box-shadow: 0 0 0 1px var(--md-primary);
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .form-hint {
+        font-size: 0.85rem;
+        color: var(--md-on-surface-variant);
+        margin-top: var(--md-space-1);
+    }
+    
+    /* Image Gallery Management */
+    .gallery-container {
+        margin-bottom: var(--md-space-3);
+    }
+    
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--md-space-2);
+        margin-bottom: var(--md-space-3);
+    }
+    
+    .gallery-item {
+        position: relative;
+        border-radius: var(--md-radius-small);
+        overflow: hidden;
+        aspect-ratio: 1/1;
+    }
+    
+    .gallery-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .gallery-actions {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-bottom-left-radius: var(--md-radius-small);
+        display: flex;
+    }
+    
+    .gallery-action-btn {
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: var(--md-space-1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .upload-container {
+        border: 2px dashed var(--md-outline);
+        border-radius: var(--md-radius-medium);
+        padding: var(--md-space-3);
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .upload-container:hover {
+        background-color: var(--md-surface-variant);
+    }
+    
+    .upload-label {
+        display: block;
+        color: var(--md-primary);
+        font-weight: 500;
+    }
+    
+    .upload-hint {
+        font-size: 0.9rem;
+        color: var(--md-on-surface-variant);
+        margin-top: var(--md-space-1);
+    }
+    
+    /* Danger Zone */
+    .danger-zone {
+        background-color: rgba(179, 38, 30, 0.05);
+        border: 1px solid var(--md-error);
+        border-radius: var(--md-radius-large);
+        padding: var(--md-space-4);
+    }
+    
+    .danger-title {
+        display: flex;
+        align-items: center;
+        color: var(--md-error);
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: var(--md-space-3);
+    }
+    
+    .danger-title .material-icons {
+        margin-right: var(--md-space-2);
+    }
+    
+    .danger-action {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--md-space-3);
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-medium);
+        box-shadow: var(--md-elevation-1);
+    }
+    
+    .danger-info h4 {
+        color: var(--md-error);
+        margin-bottom: var(--md-space-1);
+    }
+    
+    .btn-danger {
+        background-color: var(--md-error);
+        color: white;
+    }
+    
+    /* Modal styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal {
+        background-color: var(--md-surface);
+        border-radius: var(--md-radius-large);
+        width: 90%;
+        max-width: 500px;
+        box-shadow: var(--md-elevation-3);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--md-space-3);
+        border-bottom: 1px solid var(--md-outline-variant);
+    }
+    
+    .modal-title {
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: var(--md-on-surface-variant);
+    }
+    
+    .modal-body {
+        padding: var(--md-space-3);
+    }
+    
+    .modal-footer {
+        padding: var(--md-space-3);
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--md-space-2);
+        border-top: 1px solid var(--md-outline-variant);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <h1 class="accom-name">{{ accommodation.name }}</h1>
+            <span class="operator-badge">
+                <span class="material-icons">business</span>
+                Operator Dashboard
+            </span>
+        </div>
+        <div class="dashboard-actions">
+            <a href="{% url 'accommodation_detail' accommodation.id %}" class="dashboard-btn btn-outline">
+                <span class="material-icons">visibility</span>
+                View Public Page
+            </a>
+            <button id="save-changes-btn" class="dashboard-btn btn-primary">
+                <span class="material-icons">save</span>
+                Save All Changes
+            </button>
+        </div>
+    </div>
+    
+    <!-- Review Analytics Section -->
+    <div class="dashboard-section">
+        <h2 class="section-title">
+            <span class="material-icons">analytics</span>
+            Review Analytics
+        </h2>
+        
+        <div class="review-summary">
+            <div class="review-stats">
+                <div class="review-count">
+                    {{ accommodation.reviews.count }}
+                    <span class="review-count-label">Total Reviews</span>
+                </div>
+                <div class="average-rating">
+                    <span class="material-icons">star</span>
+                    <span class="rating-value">
+                        {% if accommodation.average_rating > 0 %}
+                            {{ accommodation.average_rating|floatformat:1 }}
+                        {% else %}
+                            No ratings
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="rating-distribution">
+                {% for i in "54321" %}
+                {% with i_number=i|add:"0" %}
+                <div class="rating-bar">
+                    <div class="rating-label">
+                        {{ i }} <span class="material-icons">star</span>
+                    </div>
+                    <div class="rating-progress">
+                        {% with percent=accommodation.get_rating_percent|get_item:i_number %}
+                        <div class="progress-fill" style="width: {{ percent }}%;"></div>
+                        {% endwith %}
+                    </div>
+                    <div class="rating-percent">
+                        {% with percent=accommodation.get_rating_percent|get_item:i_number %}
+                        {{ percent }}%
+                        {% endwith %}
+                    </div>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Accommodation Information Section -->
+    <div class="dashboard-section">
+        <h2 class="section-title">
+            <span class="material-icons">edit</span>
+            Accommodation Information
+        </h2>
+        
+        <form id="accom-info-form">
+            <input type="hidden" name="accommodation_id" value="{{ accommodation.id }}">
+            
+            <div class="form-group">
+                <label for="accom-name" class="form-label">Accommodation Name</label>
+                <input type="text" id="accom-name" name="name" class="form-control" value="{{ accommodation.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="accom-address" class="form-label">Address</label>
+                <input type="text" id="accom-address" name="address" class="form-control" value="{{ accommodation.address }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="accom-postcode" class="form-label">Postcode</label>
+                <input type="text" id="accom-postcode" name="postcode" class="form-control" value="{{ accommodation.postcode }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="accom-description" class="form-label">Description</label>
+                <textarea id="accom-description" name="description" class="form-control">{{ accommodation.description }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="accom-map" class="form-label">Google Maps Embed Link</label>
+                <input type="text" id="accom-map" name="map_link" class="form-control" value="{{ accommodation.map_link }}">
+                <div class="form-hint">Enter the full embed URL from Google Maps (iframe src value)</div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Image Gallery Section -->
+    <div class="dashboard-section">
+        <h2 class="section-title">
+            <span class="material-icons">photo_library</span>
+            Image Gallery
+        </h2>
+        
+        <div class="gallery-container">
+            <div class="gallery-grid">
+                {% if accommodation.images.all %}
+                    {% for image in accommodation.images.all %}
+                    <div class="gallery-item">
+                        <img src="{{ image.image.url }}" alt="Accommodation image" class="gallery-image">
+                        <div class="gallery-actions">
+                            <button class="gallery-action-btn set-main-image" data-image-id="{{ image.id }}" title="Set as main image">
+                                <span class="material-icons">{% if image.is_main %}star{% else %}star_border{% endif %}</span>
+                            </button>
+                            <button class="gallery-action-btn delete-image" data-image-id="{{ image.id }}" title="Delete image">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="gallery-item" style="display: flex; align-items: center; justify-content: center; background-color: var(--md-surface-variant);">
+                        <span class="material-icons" style="font-size: 48px; color: var(--md-on-surface-variant);">image_not_supported</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="upload-container" id="upload-trigger">
+                <span class="material-icons" style="font-size: 36px; color: var(--md-primary);">file_upload</span>
+                <label class="upload-label">Upload Images</label>
+                <p class="upload-hint">Click to select or drag and drop your images here</p>
+                <input type="file" id="image-upload" multiple accept="image/*" style="display: none;">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Danger Zone Section -->
+    <div class="dashboard-section danger-zone">
+        <h2 class="danger-title">
+            <span class="material-icons">warning</span>
+            Danger Zone
+        </h2>
+        
+        <div class="danger-action">
+            <div class="danger-info">
+                <h4>Delete this accommodation</h4>
+                <p>Once you delete an accommodation, there is no going back. Please be certain.</p>
+            </div>
+            <button id="delete-accom-btn" class="dashboard-btn btn-danger">Delete Accommodation</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirm-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Delete Accommodation?</h3>
+            <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to permanently delete <strong>{{ accommodation.name }}</strong>?</p>
+            <p>This action cannot be undone. All reviews and images associated with this accommodation will be permanently deleted.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="dashboard-btn btn-outline" id="cancel-delete">Cancel</button>
+            <button class="dashboard-btn btn-danger" id="confirm-delete">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Image upload functionality
+        const uploadTrigger = document.getElementById('upload-trigger');
+        const imageUpload = document.getElementById('image-upload');
+        
+        uploadTrigger.addEventListener('click', function() {
+            imageUpload.click();
+        });
+        
+        imageUpload.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                uploadImages(e.target.files);
+            }
+        });
+        
+        // Drag and drop functionality
+        uploadTrigger.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadTrigger.classList.add('dragging');
+        });
+        
+        uploadTrigger.addEventListener('dragleave', function() {
+            uploadTrigger.classList.remove('dragging');
+        });
+        
+        uploadTrigger.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadTrigger.classList.remove('dragging');
+            if (e.dataTransfer.files.length > 0) {
+                uploadImages(e.dataTransfer.files);
+            }
+        });
+        
+        function uploadImages(files) {
+            const formData = new FormData();
+            formData.append('accommodation_id', '{{ accommodation.id }}');
+            
+            for (let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+            
+            // Send AJAX request to upload images
+            fetch('{% url "upload_accommodation_images" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh the page to show new images
+                    location.reload();
+                } else {
+                    alert('Error uploading images: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading images.');
+            });
+        }
+        
+        // Save changes functionality
+        document.getElementById('save-changes-btn').addEventListener('click', function() {
+            const form = document.getElementById('accom-info-form');
+            const formData = new FormData(form);
+            
+            fetch('{% url "update_accommodation" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Accommodation information updated successfully!');
+                } else {
+                    alert('Error updating accommodation: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the accommodation information.');
+            });
+        });
+        
+        // Delete accommodation functionality
+        const deleteButton = document.getElementById('delete-accom-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const modalClose = document.getElementById('modal-close');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const confirmDelete = document.getElementById('confirm-delete');
+        
+        deleteButton.addEventListener('click', function() {
+            confirmModal.style.display = 'flex';
+        });
+        
+        modalClose.addEventListener('click', function() {
+            confirmModal.style.display = 'none';
+        });
+        
+        cancelDelete.addEventListener('click', function() {
+            confirmModal.style.display = 'none';
+        });
+        
+        confirmDelete.addEventListener('click', function() {
+            fetch('{% url "delete_accommodation" %}', {
+                method: 'POST',
+                body: JSON.stringify({
+                    accommodation_id: {{ accommodation.id }}
+                }),
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '{% url "operator_dashboard" %}';
+                } else {
+                    alert('Error deleting accommodation: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the accommodation.');
+            });
+        });
+        
+        // Set main image functionality
+        document.querySelectorAll('.set-main-image').forEach(button => {
+            button.addEventListener('click', function() {
+                const imageId = this.getAttribute('data-image-id');
+                
+                fetch('{% url "set_main_image" %}', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        image_id: imageId,
+                        accommodation_id: {{ accommodation.id }}
+                    }),
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error setting main image: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while setting the main image.');
+                });
+            });
+        });
+        
+        // Delete image functionality
+        document.querySelectorAll('.delete-image').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete this image?')) {
+                    const imageId = this.getAttribute('data-image-id');
+                    
+                    fetch('{% url "delete_accommodation_image" %}', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            image_id: imageId
+                        }),
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Error deleting image: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting the image.');
+                    });
+                }
+            });
+        });
+        
+        // Utility function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

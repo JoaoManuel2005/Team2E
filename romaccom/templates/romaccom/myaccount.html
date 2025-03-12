@@ -326,11 +326,6 @@
             </div>
             
             <div class="detail-row">
-                <div class="detail-label">Email:</div>
-                <div class="detail-value">{{ user.email }}</div>
-            </div>
-            
-            <div class="detail-row">
                 <div class="detail-label">Account Type:</div>
                 <div class="detail-value">{{ user.account_type|title }}</div>
             </div>
@@ -380,7 +375,7 @@
     <div class="account-actions">
         <h3 class="actions-title">Account Actions</h3>
         
-        <a href="#" class="action-btn btn-danger">
+        <a href="{% url 'logout' %}" class="action-btn btn-danger">
             <span class="material-icons">logout</span>
             Logout
         </a>

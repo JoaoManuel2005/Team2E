@@ -197,17 +197,15 @@
         </div>
         
         <div class="form-group">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Title (optional)</label>
             {{ form.title.errors }}
-            {{ form.title }}
-            <label for="review-title" class="form-label">Title (optional)</label>
-            <input type="text" id="review-title" name="title" class="form-control" placeholder="Summarize your experience">
+            <input type="text" id="{{ form.title.id_for_label }}" name="title" class="form-control" placeholder="Summarize your experience" {% if form.title.value %}value="{{ form.title.value }}"{% endif %}>
         </div>
         
         <div class="form-group">
-            <label for="review-text" class="form-label">Review</label>
-            <textarea id="review-text" name="review_text" class="form-control" placeholder="Share your experience at this accommodation" required></textarea>
+            <label for="{{ form.review_text.id_for_label }}" class="form-label">Review</label>
             {{ form.review_text.errors }}
-            {{ form.review_text }}
+            <textarea id="{{ form.review_text.id_for_label }}" name="review_text" class="form-control" placeholder="Share your experience at this accommodation" required>{% if form.review_text.value %}{{ form.review_text.value }}{% endif %}</textarea>
         </div>
 
         <div class="form-group">

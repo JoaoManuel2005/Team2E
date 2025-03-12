@@ -23,10 +23,9 @@ def create_users(n=20):
 def create_operators(n=5):
     operators = []
     
-    # Create a well-known operator
+    # Create a well-known operator with just name and password
     aparto_operator = Operator.objects.create(
         name="aparto Student",
-        email="glasgow@apartostudent.com",
         password="securepassword"
     )
     operators.append(aparto_operator)
@@ -34,10 +33,13 @@ def create_operators(n=5):
     # Create other random student accommodation operators
     for _ in range(n):
         name = fake.company() + " Accommodation"
-        email = fake.email()
         password = "securepassword"
-        operator = Operator.objects.create(name=name, email=email, password=password)
+        operator = Operator.objects.create(
+            name=name,
+            password=password
+        )
         operators.append(operator)
+    
     return operators
 
 def create_accommodations(operators, n=30):

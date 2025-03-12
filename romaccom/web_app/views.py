@@ -316,3 +316,102 @@ def update_privacy_view(request):
         'success': False,
         'error': 'Invalid request'
     }, status=400)
+
+@csrf_exempt
+def upload_accommodation_images_view(request):
+    if request.method == 'POST':
+        accommodation_id = request.POST.get('accommodation_id')
+        images = request.FILES.getlist('images')
+        
+        try:
+            accommodation = Accommodation.objects.get(id=accommodation_id)
+            
+            for img in images:
+                Image.objects.create(
+                    accommodation=accommodation,
+                    image=img,
+                    is_main=False  # Set as not main by default
+                )
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@csrf_exempt
+def update_accommodation_view(request):
+    if request.method == 'POST':
+        accommodation_id = request.POST.get('accommodation_id')
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        postcode = request.POST.get('postcode')
+        description = request.POST.get('description')
+        map_link = request.POST.get('map_link')
+        
+        try:
+            accommodation = Accommodation.objects.get(id=accommodation_id)
+            accommodation.name = name
+            accommodation.address = address
+            accommodation.postcode = postcode
+            accommodation.description = description
+            accommodation.map_link = map_link
+            accommodation.save()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@csrf_exempt
+def delete_accommodation_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            accommodation_id = data.get('accommodation_id')
+            accommodation = Accommodation.objects.get(id=accommodation_id)
+            accommodation.delete()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@csrf_exempt
+def set_main_image_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            image_id = data.get('image_id')
+            accommodation_id = data.get('accommodation_id')
+            
+            # Reset all images to not main
+            Image.objects.filter(accommodation_id=accommodation_id).update(is_main=False)
+            
+            # Set selected image as main
+            image = Image.objects.get(id=image_id)
+            image.is_main = True
+            image.save()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@csrf_exempt
+def delete_accommodation_image_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            image_id = data.get('image_id')
+            image = Image.objects.get(id=image_id)
+            image.delete()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})

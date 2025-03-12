@@ -1,6 +1,5 @@
 {% extends 'romaccom/base.html' %}
 {% load static %}
-{% load custom_filters %}
 
 {% block title %}Operator Dashboard - {{ accommodation.name }} - RomAccom{% endblock %}
 
@@ -103,91 +102,6 @@
         color: var(--md-primary);
     }
     
-    /* Review Analytics Styles */
-    .review-summary {
-        display: flex;
-        gap: var(--md-space-4);
-        margin-bottom: var(--md-space-4);
-    }
-    
-    .review-stats {
-        flex: 1;
-    }
-    
-    .review-count {
-        font-size: 3rem;
-        font-weight: 500;
-        color: var(--md-primary);
-        display: flex;
-        align-items: center;
-    }
-    
-    .review-count-label {
-        font-size: 1rem;
-        color: var(--md-on-surface-variant);
-        margin-left: var(--md-space-2);
-    }
-    
-    .average-rating {
-        display: flex;
-        align-items: center;
-        color: #FFC107;
-        margin-top: var(--md-space-2);
-    }
-    
-    .average-rating .material-icons {
-        font-size: 24px;
-        margin-right: var(--md-space-1);
-    }
-    
-    .rating-value {
-        font-size: 1.3rem;
-        font-weight: 500;
-    }
-    
-    .rating-distribution {
-        flex: 2;
-    }
-    
-    .rating-bar {
-        display: flex;
-        align-items: center;
-        margin-bottom: var(--md-space-2);
-    }
-    
-    .rating-label {
-        display: flex;
-        align-items: center;
-        width: 80px;
-        color: var(--md-on-surface-variant);
-    }
-    
-    .rating-label .material-icons {
-        font-size: 16px;
-        color: #FFC107;
-    }
-    
-    .rating-progress {
-        flex: 1;
-        height: 10px;
-        background-color: var(--md-surface-variant);
-        border-radius: var(--md-radius-small);
-        margin: 0 var(--md-space-2);
-        overflow: hidden;
-    }
-    
-    .progress-fill {
-        height: 100%;
-        background-color: var(--md-primary);
-        border-radius: var(--md-radius-small);
-    }
-    
-    .rating-percent {
-        width: 40px;
-        text-align: right;
-        font-weight: 500;
-    }
-    
     /* Accommodation Info Form */
     .form-group {
         margin-bottom: var(--md-space-3);
@@ -258,7 +172,7 @@
         top: 0;
         right: 0;
         background-color: rgba(0, 0, 0, 0.5);
-        border-bottom-left-radius: var(--md-radius-small);
+        border-bottom-left-radius: var (--md-radius-small);
         display: flex;
     }
     
@@ -415,55 +329,6 @@
                 <span class="material-icons">save</span>
                 Save All Changes
             </button>
-        </div>
-    </div>
-    
-    <!-- Review Analytics Section -->
-    <div class="dashboard-section">
-        <h2 class="section-title">
-            <span class="material-icons">analytics</span>
-            Review Analytics
-        </h2>
-        
-        <div class="review-summary">
-            <div class="review-stats">
-                <div class="review-count">
-                    {{ accommodation.reviews.count }}
-                    <span class="review-count-label">Total Reviews</span>
-                </div>
-                <div class="average-rating">
-                    <span class="material-icons">star</span>
-                    <span class="rating-value">
-                        {% if accommodation.average_rating > 0 %}
-                            {{ accommodation.average_rating|floatformat:1 }}
-                        {% else %}
-                            No ratings
-                        {% endif %}
-                    </span>
-                </div>
-            </div>
-            
-            <div class="rating-distribution">
-                {% for i in "54321" %}
-                {% with i_number=i|add:"0" %}
-                <div class="rating-bar">
-                    <div class="rating-label">
-                        {{ i }} <span class="material-icons">star</span>
-                    </div>
-                    <div class="rating-progress">
-                        {% with percent=accommodation.get_rating_percent|get_item:i_number %}
-                        <div class="progress-fill" style="width: {{ percent }}%;"></div>
-                        {% endwith %}
-                    </div>
-                    <div class="rating-percent">
-                        {% with percent=accommodation.get_rating_percent|get_item:i_number %}
-                        {{ percent }}%
-                        {% endwith %}
-                    </div>
-                </div>
-                {% endwith %}
-                {% endfor %}
-            </div>
         </div>
     </div>
     

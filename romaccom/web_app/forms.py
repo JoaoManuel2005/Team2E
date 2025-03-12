@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import UserProfile, Review
+from .models import UserProfile, Review, Image
 
 User = get_user_model()
 
@@ -20,6 +20,8 @@ class UserProfileForm(forms.ModelForm):
         fields = ['website', 'picture']
 
 class ReviewForm(forms.ModelForm):
+    images = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}), required=False)
+    
     class Meta:
         model = Review
         fields = ['title', 'rating', 'review_text']

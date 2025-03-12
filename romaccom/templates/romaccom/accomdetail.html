@@ -398,7 +398,9 @@
                         </div>
                         
                         {% if review.title %}
-                            <h3 class="review-title">{{ review.title }}</h3>
+                            <h3 class="review-title">
+                                <a href="{% url 'accom_review_detail' accommodation.id review.id %}">{{ review.title }}</a>
+                            </h3>
                         {% endif %}
                         
                         <p class="review-text">{{ review.review_text }}</p>

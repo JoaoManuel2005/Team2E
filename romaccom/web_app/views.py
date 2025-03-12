@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout 
-from .models import Accommodation, Review
+from .models import Accommodation, Review, Image
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
@@ -133,9 +133,11 @@ def accom_page_view(request, accom_id):
     return render(request, 'romaccom/accomdetail.html', {'accommodation': accommodation})
 
 # Accommodation Reviews
-def accom_reviews_view(request, accom_id):
-    accommodation = Accommodation.objects.get(id=accom_id)
-    return render(request, 'romaccom/reviews.html', {'accommodation': accommodation})
+def accom_reviews_view(request, accom_id, review_id):
+    accommodation = get_object_or_404(Accommodation, id=accom_id)
+    review = get_object_or_404(Review, id=review_id, accommodation=accommodation)
+    
+    return render(request, 'romaccom/reviews.html', {'accommodation': accommodation, 'review': review})
 
 # Accommodation Map
 def accom_map_view(request, accom_id):
@@ -154,6 +156,11 @@ def write_review_view(request, accom_id):
             review.user = request.user  
             review.accommodation = accommodation  
             review.save()  
+
+            images = request.FILES.getlist('images')
+            for img in images:
+                Image.objects.create(review=review, image=img)
+
             accommodation.update_average_rating() 
             return redirect('accom_page_view', accom_id=accommodation.id)  
 

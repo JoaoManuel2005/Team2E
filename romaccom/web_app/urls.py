@@ -24,7 +24,7 @@ urlpatterns = [
     path('search/accomlist/', views.accom_list_view, name='accomlist'),
     path('search/accomlist/accompage/<int:accom_id>/', views.accom_page_view, name='accommodation_detail'),
     path('search/accomlist/accompage/info/<int:accom_id>/', views.accom_page_view, name='accom_info'),
-    path('search/accomlist/accompage/reviews/<int:accom_id>/', views.accom_reviews_view, name='accom_reviews'),
+    path('search/accomlist/accompage/<int:accom_id>/reviews/<int:review_id>/', views.accom_reviews_view, name='accom_review_detail'),
     path('search/accomlist/accompage/map/<int:accom_id>/', views.accom_map_view, name='accom_map'),
     path('search/accomlist/accompage/write-review/<int:accom_id>/', views.write_review_view, name='write_review'),
 

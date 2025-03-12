@@ -1,0 +1,39 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}Review by {{ review.user.username }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1 class="review-title">{{ review.title }}</h1>
+    <p class="review-author">By {{ review.user.username }} on {{ review.accommodation.name }}</p>
+
+    <div class="review-rating">
+        {% for i in "12345" %}
+            {% if forloop.counter <= review.rating %}
+                <span class="material-icons">star</span>
+            {% else %}
+                <span class="material-icons">star_outline</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <p class="review-text">{{ review.review_text }}</p>
+
+    {% if review.images.all %}
+        <div class="review-images">
+            {% for image in review.images.all %}
+                <img src="{{ image.image.url }}" alt="Review image" class="review-image">
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if review.accommodation %}
+    <a href="{% url 'accommodation_detail' review.accommodation.id %}" class="back-link">
+        Back to {{ review.accommodation.name }}
+    </a>
+    {% else %}
+        <a href="{% url 'home' %}" class="back-link">Back to Home</a>
+    {% endif %}
+</div>
+{% endblock %}

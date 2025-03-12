@@ -208,7 +208,13 @@
                     
                     <div class="review-content">
                         {% if review.title %}
-                            <h3 class="review-title">{{ review.title }}</h3>
+                            {% if review.accommodation %}
+                                <h3 class="review-title">
+                                    <a href="{% url 'accom_review_detail' review.accommodation.id review.id %}">{{ review.title }}</a>
+                                </h3>
+                            {% else %}
+                                <h3 class="review-title">{{ review.title }}</h3>
+                            {% endif %}
                         {% endif %}
                         
                         <div class="review-text">{{ review.review_text }}</div>

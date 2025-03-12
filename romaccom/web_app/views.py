@@ -135,7 +135,8 @@ def my_account_view(request):
 
 # User Reviews
 def my_reviews_view(request):
-    return render(request, 'romaccom/myreviews.html')
+    user_reviews = Review.objects.filter(user=request.user).select_related('accommodation')
+    return render(request, 'romaccom/myreviews.html', {'reviews': user_reviews})
 
 # Accommodation Search
 def search_view(request):

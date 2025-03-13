@@ -175,6 +175,12 @@ def accom_map_view(request, accom_id):
 @login_required
 def write_review_view(request, accom_id):
     accommodation = get_object_or_404(Accommodation, id=accom_id)
+    
+    # Check if the user already has a review for this accommodation
+    existing_review = Review.objects.filter(user=request.user, accommodation=accommodation).first()
+    if existing_review:
+        # If a review exists, redirect to the edit page
+        return redirect('edit_review', review_id=existing_review.id)
 
     if request.method == 'POST':
         form = ReviewForm(request.POST)

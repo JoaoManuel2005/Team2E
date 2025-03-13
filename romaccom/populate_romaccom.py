@@ -8,9 +8,21 @@ from datetime import timedelta
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "romaccom.settings")
 django.setup()
 
-from web_app.models import User, Operator, Accommodation, Review
+from web_app.models import User, Operator, Accommodation, Review, AccommodationImage, Image, OperatorProfile
+
 
 fake = Faker()
+
+IMAGE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "populate_images")
+OPERATOR_LOGOS_DIR = os.path.join(IMAGE_DIR, "operator_logos")
+ACCOMMODATION_IMAGES_DIR = os.path.join(IMAGE_DIR, "accommodation_images")
+REVIEW_IMAGES_DIR = os.path.join(IMAGE_DIR, "review_images")
+
+def get_random_image(directory):
+    """Returns a random image file path from a given directory."""
+    if not os.path.exists(directory) or not os.listdir(directory):
+        return None  # Return None if no images found
+    return random.choice(os.listdir(directory))
 
 def create_users(n=20):
     users = []
@@ -30,6 +42,15 @@ def create_operators(n=5):
         name="aparto Student",
         password="securepassword"
     )
+
+    # Assign a random logo if available
+    logo_filename = get_random_image(OPERATOR_LOGOS_DIR)
+    if logo_filename:
+        aparto_profile = OperatorProfile.objects.create(
+            operator=aparto_operator,
+            logo=f"operator_logos/{logo_filename}"
+        )
+
     operators.append(aparto_operator)
     
     # Create other random student accommodation operators
@@ -40,6 +61,14 @@ def create_operators(n=5):
             name=name,
             password=password
         )
+        #Assign a random logo
+        logo_filename = get_random_image(OPERATOR_LOGOS_DIR)
+        if logo_filename:
+            OperatorProfile.objects.create(
+                operator=operator,
+                logo=f"operator_logos/{logo_filename}"
+            )
+
         operators.append(operator)
     
     return operators
@@ -79,6 +108,16 @@ def create_accommodations(operators, n=30):
         accommodation.operators.set(random.sample(other_operators, random.randint(1, len(other_operators))))
         accommodations.append(accommodation)
 
+        # Add images
+        for _ in range(random.randint(1, 3)):  # Assign 1-3 images per accommodation
+            image_filename = get_random_image(ACCOMMODATION_IMAGES_DIR)
+            if image_filename:
+                AccommodationImage.objects.create(
+                    accommodation=accommodation,
+                    image=f"accommodation_images/{image_filename}",
+                    is_main=False
+                )
+
     return accommodations
 
 def create_reviews(users, accommodations, n=50):
@@ -103,13 +142,20 @@ def create_reviews(users, accommodations, n=50):
     
     for i in range(5):
         user = random.choice(users)
-        Review.objects.create(
+        review = Review.objects.create(
             user=user,
             accommodation=aparto_accom,
             rating=5,
             title="Fantastic Experience",
             review_text=premium_reviews[i]
         )
+        # Assign an image to the review
+        image_filename = get_random_image(REVIEW_IMAGES_DIR)
+        if image_filename:
+            Image.objects.create(
+                review=review,
+                image=f"review_images/{image_filename}"
+            )
 
     # Create a mix of good and bad reviews for other accommodations
     for _ in range(n):
@@ -123,7 +169,7 @@ def create_reviews(users, accommodations, n=50):
             else fake.paragraph()
         )
 
-        Review.objects.create(
+        review = Review.objects.create(
             user=user,
             accommodation=accommodation,
             rating=rating,
@@ -131,6 +177,14 @@ def create_reviews(users, accommodations, n=50):
             review_text=review_text,
             created_at=random_date()  # Add the random date
         )
+
+        # Assign an image
+        image_filename = get_random_image(REVIEW_IMAGES_DIR)
+        if image_filename:
+            Image.objects.create(
+                review=review,
+                image=f"review_images/{image_filename}"
+            )
 
 def populate():
     print("Creating users...")

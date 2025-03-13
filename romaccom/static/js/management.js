@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const accommodationNameElement = document.getElementById('accommodation-name');
     
     let currentAccommodationId = null;
+
+    if (modal) {
+        modal.style.display = 'none';
+    }
     
     // Open modal when delete button is clicked
     document.querySelectorAll('.delete-accommodation').forEach(button => {
@@ -65,4 +69,77 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    const confirmDeleteAccountModal = document.getElementById('confirm-delete-modal');
+    const closeDeleteAccountModal = document.getElementById('close-delete-modal');
+    const cancelDeleteAccount = document.getElementById('cancel-delete-account');
+    const confirmDeleteAccount = document.getElementById('confirm-delete-account');
+
+    // Ensure account deletion modal is hidden on page load
+    if (confirmDeleteAccountModal) {
+        confirmDeleteAccountModal.style.display = 'none';
+    }
+
+    // Show confirmation modal for account deletion when button is clicked
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', function() {
+            confirmDeleteAccountModal.style.display = 'flex';
+        });
+    }
+
+    // Close modal for account deletion
+    if (closeDeleteAccountModal) {
+        closeDeleteAccountModal.addEventListener('click', function() {
+            confirmDeleteAccountModal.style.display = 'none';
+        });
+    }
+
+    if (cancelDeleteAccount) {
+        cancelDeleteAccount.addEventListener('click', function() {
+            confirmDeleteAccountModal.style.display = 'none';
+        });
+    }
+
+    // Confirm delete operator account
+    if (confirmDeleteAccount) {
+        confirmDeleteAccount.addEventListener('click', function() {
+            fetch('/romaccom/operator/delete-account/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Your account has been deleted.');
+                    window.location.href = data.redirect_url;  // Redirect to homepage
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting your account.');
+            });
+        });
+    }
+
+    // Utility function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 });

@@ -819,3 +819,42 @@ def edit_operator_profile_view(request):
         'form': form,
         'operator': operator
     })
+
+from django.db import transaction
+
+@csrf_exempt
+def delete_operator_account_view(request):
+    if request.method == 'POST':
+        operator_id = request.session.get('operator_id')
+        if not operator_id:
+            return JsonResponse({'success': False, 'error': 'Authentication required'}, status=403)
+
+        try:
+            with transaction.atomic():
+                operator = Operator.objects.get(id=operator_id)
+
+                # Delete all accommodations associated with the operator
+                accommodations = operator.accommodations.all()
+                for accommodation in accommodations:
+                    accommodation.reviews.all().delete()  # Delete reviews
+                    accommodation.images.all().delete()  # Delete images
+                    accommodation.delete()  # Delete accommodation
+
+                # Delete the operator profile
+                if hasattr(operator, "profile"):
+                    operator.profile.delete()
+
+                # Delete the operator account
+                operator.delete()
+
+                # Clear session
+                request.session.flush()
+
+            return JsonResponse({'success': True, 'redirect_url': '/'})  # Redirect to homepage after deletion
+
+        except Operator.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Operator not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)

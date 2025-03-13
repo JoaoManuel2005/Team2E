@@ -75,6 +75,41 @@
     {% endif %}
 </div>
 
+<!-- Danger Zone Delete Operator, Accomodations and Reviews Section -->
+<div class="dashboard-section danger-zone">
+    <h2 class="danger-title">
+        <span class="material-icons">warning</span>
+        Danger Zone
+    </h2>
+
+    <div class="danger-action">
+        <div class="danger-info">
+            <h4>Delete Your Account</h4>
+            <p>Once you delete your account, all your accommodations and associated reviews will be permanently removed.</p>
+        </div>
+        <button id="delete-account-btn" class="dashboard-btn btn-danger">Delete Account</button>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirm-delete-modal" style="display: none;">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Delete Your Account?</h3>
+            <button class="modal-close" id="close-delete-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to permanently delete your account?</p>
+            <p>This action <strong>cannot</strong> be undone. All accommodations, reviews, and associated data will be lost.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="dashboard-btn btn-outline" id="cancel-delete-account">Cancel</button>
+            <button class="dashboard-btn btn-danger" id="confirm-delete-account">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+
 <!-- Confirmation Modal -->
 <div class="modal-overlay" id="confirm-modal" style="display: none;">
     <div class="modal">

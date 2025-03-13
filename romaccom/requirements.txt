@@ -1,0 +1,5 @@
+Django==2.1.5
+Faker==37.0.0
+Pillow==5.4.1
+pytz==2025.1
+tzdata==2025.1

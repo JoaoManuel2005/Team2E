@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function deleteReview(reviewId) {
-        fetch('/delete_review/', {
+        fetch('/romaccom/delete_review/', {
             method: 'POST',
             body: JSON.stringify({
                 review_id: reviewId
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // If no reviews left, show a message
                     if (document.querySelectorAll('.review-card').length === 0) {
                         const reviewsList = document.querySelector('.reviews-list');
-                        reviewsList.innerHTML = '<p class="no-reviews">You haven\'t written any reviews yet.</p>';
+                        reviewsList.innerHTML = '<div class="no-reviews"><p>You haven\'t written any reviews yet.</p><p>Share your experiences with accommodations and help other students make informed decisions!</p><a href="/" class="browse-btn"><span class="material-icons">search</span>Find your next accommodation</a></div>';
                     }
                 }, 300);
             } else {

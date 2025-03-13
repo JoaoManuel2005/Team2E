@@ -91,7 +91,19 @@
         </div>
         
         <div class="auth-section">
-            {% if user.is_authenticated %}
+            {% if operator_logged_in %}
+                <h3 class="auth-title">Welcome, Operator!</h3>
+                <p>You are logged in as operator of <strong>{{ operator_name }}</strong></p>
+                <a href="{% url 'management' %}" class="btn btn-primary">
+                    <span class="material-icons" style="font-size: 16px; margin-right: 4px; vertical-align: middle;">dashboard</span>
+                    Management Dashboard
+                </a>
+                <p>or</p>
+                <a href="{% url 'logout' %}" class="btn btn-outline">
+                    <span class="material-icons" style="font-size: 16px; margin-right: 4px; vertical-align: middle;">logout</span>
+                    Logout
+                </a>
+            {% elif user.is_authenticated %}
                 <h3 class="auth-title">Welcome back!</h3>
                 <p>You are logged in as <strong>{{ user.username }}</strong></p>
                 <a href="{% url 'myaccount' %}" class="btn btn-primary">
@@ -137,6 +149,16 @@
         </section>
     </div>
 </div>
+
+{% if not user.is_authenticated and not operator_logged_in %}
+<div class="operator-section" style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
+    <p>Are you an accommodation operator?</p>
+    <a href="{% url 'operator_login' %}" class="btn btn-outline">
+        <span class="material-icons">business</span>
+        Operator Log In
+    </a>
+</div>
+{% endif %}
 
 <div class="results-list"></div>
 {% endblock %}

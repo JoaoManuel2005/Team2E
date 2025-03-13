@@ -22,10 +22,20 @@ def index(request):
 def home_view(request):
     trending_accommodations = Accommodation.objects.order_by('-view_count')[:5]
     top_rated_accommodations = Accommodation.objects.order_by('-average_rating')[:5]
+    
+    # Check if an operator is logged in
+    operator_id = request.session.get('operator_id')
+    operator_name = request.session.get('operator_name')
+    operator_logged_in = bool(operator_id and operator_name)
+    
+    # If both user and operator are logged in, prioritize the most recent login
+    # You can add logic here if needed to determine which login is more recent
+    
     return render(request, 'romaccom/home.html', {
         'trending_accommodations': trending_accommodations,
         'top_rated_accommodations': top_rated_accommodations,
-        'glasgow_postcodes' : GLASGOW_POSTCODES,
+        'operator_logged_in': operator_logged_in,
+        'operator_name': operator_name
     })
 
 def search_results_view(request):
@@ -114,6 +124,10 @@ def operator_register_view(request):
 
 # User Login
 def login_view(request):
+    # Check if operator is logged in
+    if 'operator_id' in request.session:
+        return render(request, 'romaccom/login.html', {'error': 'Please log out as operator first'})
+        
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -127,7 +141,15 @@ def login_view(request):
 
 # User Logout
 def logout_view(request):
+    # Clear Django auth
     logout(request)
+    
+    # Clear operator session data
+    if 'operator_id' in request.session:
+        request.session.pop('operator_id', None)
+    if 'operator_name' in request.session:
+        request.session.pop('operator_name', None)
+    
     return redirect('home')
 
 # User Account
@@ -226,11 +248,16 @@ def write_review_view(request, accom_id):
 #The operator login page gracefully handles cases where the accommodation might not exist
 #The back link works properly in all cases
 def operator_login_view(request):
+    # Check if user is logged in
+    if request.user.is_authenticated:
+        return render(request, 'romaccom/operator-login.html', {'error': 'Please log out as user first'})
+        
     # Get accommodation ID from the URL parameters
     accom_id = request.GET.get('accommodation_id')
     error = None
     accommodation = None
     
+    # If accommodation ID is provided, try to load that accommodation
     if accom_id:
         try:
             accommodation = Accommodation.objects.get(id=accom_id)
@@ -242,28 +269,36 @@ def operator_login_view(request):
         password = request.POST.get('password')
         post_accom_id = request.POST.get('accommodation_id')
         
-        if post_accom_id:
-            try:
-                accommodation = Accommodation.objects.get(id=post_accom_id)
-                # Look up operator by name and password first
-                operator = Operator.objects.filter(name=property_name, password=password).first()
-                
-                # If operator exists, check if they're associated with this accommodation
-                if operator and operator in accommodation.operators.all():
-                    # Store operator info in session
-                    request.session['operator_id'] = operator.id
-                    request.session['operator_name'] = operator.name
-                    return redirect('operator_dashboard')
-                else:
-                    error = "Invalid property name or password for this accommodation"
-            except Accommodation.DoesNotExist:
-                error = "Accommodation not found"
+        # Find the operator
+        operator = Operator.objects.filter(name=property_name, password=password).first()
+        
+        if not operator:
+            error = "Invalid property name or password"
         else:
-            error = "No accommodation selected"
+            if post_accom_id:
+                # Specific accommodation login - verify operator manages this accommodation
+                try:
+                    accommodation = Accommodation.objects.get(id=post_accom_id)
+                    if operator in accommodation.operators.all():
+                        # Store operator info in session
+                        request.session['operator_id'] = operator.id
+                        request.session['operator_name'] = operator.name
+                        return redirect('operator_dashboard')
+                    else:
+                        error = "You are not authorized to manage this accommodation"
+                except Accommodation.DoesNotExist:
+                    error = "Accommodation not found"
+            else:
+                # General operator login - no specific accommodation
+                # Store operator info in session
+                request.session['operator_id'] = operator.id
+                request.session['operator_name'] = operator.name
+                return redirect('management')
     
     return render(request, 'romaccom/operator-login.html', {
         'accommodation': accommodation,
-        'error': error
+        'error': error,
+        'from_homepage': not accom_id  # Pass flag to template to adjust UI
     })
 
 # Operator Dashboard

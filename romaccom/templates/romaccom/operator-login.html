@@ -22,6 +22,13 @@
                 </div>
                 <h2 class="property-name">{{ accommodation.name }}</h2>
             </div>
+        {% elif from_homepage %}
+            <div class="property-info">
+                <div class="property-icon">
+                    <span class="material-icons">business</span>
+                </div>
+                <h2 class="property-name">Property Management</h2>
+            </div>
         {% else %}
             <div class="property-info">
                 <div class="property-icon">
@@ -37,9 +44,9 @@
         </div>
         {% endif %}
         
-        <form method="post" action="{% url 'operator_login' %}">
+        <form method="post" action="{% url 'operator_login' %}{% if accommodation %}?accommodation_id={{ accommodation.id }}{% endif %}">
             {% csrf_token %}
-            <!-- Hidden input to pass the accommodation ID -->
+            <!-- Hidden input to pass the accommodation ID if available -->
             {% if accommodation %}
                 <input type="hidden" name="accommodation_id" value="{{ accommodation.id }}">
             {% endif %}

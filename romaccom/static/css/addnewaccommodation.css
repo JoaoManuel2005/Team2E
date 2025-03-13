@@ -1,0 +1,19 @@
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.section-description {
+    color: var(--md-on-surface-variant);
+    margin-bottom: 20px;
+}
+
+.form-hint {
+    font-size: 0.8rem;
+    color: var(--md-on-surface-variant);
+    margin-top: 4px;
+}

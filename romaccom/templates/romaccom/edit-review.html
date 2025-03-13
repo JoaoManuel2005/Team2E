@@ -1,0 +1,79 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}Edit Review - {{ accommodation.name }} - RomAccom{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/edit-review.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1 class="page-title">Edit Your Review</h1>
+    
+    <div class="accommodation-info">
+        <h2>{{ accommodation.name }}</h2>
+        <p>{{ accommodation.address }}, {{ accommodation.postcode }}</p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="review-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_title">Title (optional):</label>
+            {{ form.title }}
+        </div>
+        
+        <div class="form-group">
+            <label for="id_rating">Rating:</label>
+            <div class="rating-container">
+                <input type="radio" id="star5" name="rating" value="5" {% if form.rating.value == 5 %}checked{% endif %}>
+                <label for="star5" class="material-icons">star</label>
+                
+                <input type="radio" id="star4" name="rating" value="4" {% if form.rating.value == 4 %}checked{% endif %}>
+                <label for="star4" class="material-icons">star</label>
+                
+                <input type="radio" id="star3" name="rating" value="3" {% if form.rating.value == 3 %}checked{% endif %}>
+                <label for="star3" class="material-icons">star</label>
+                
+                <input type="radio" id="star2" name="rating" value="2" {% if form.rating.value == 2 %}checked{% endif %}>
+                <label for="star2" class="material-icons">star</label>
+                
+                <input type="radio" id="star1" name="rating" value="1" {% if form.rating.value == 1 %}checked{% endif %}>
+                <label for="star1" class="material-icons">star</label>
+            </div>
+            {{ form.rating.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="id_review_text">Your Review:</label>
+            {{ form.review_text }}
+        </div>
+        
+        <div class="form-group">
+            <input type="file" name="images" id="images" accept="image/*">
+            <label for="images">Choose an image to upload</label>
+            <div class="file-upload-info">Uploading a new image will replace the existing one</div>
+        </div>
+
+        {% if review.images.all %}
+            <div class="current-images">
+                <h3>Current Image:</h3>
+                <div class="review-images">
+                    {% for image in review.images.all %}
+                        <div class="image-container">
+                            <img src="{{ image.image.url }}" alt="Review image" class="review-image">
+                        </div>
+                    {% endfor %}
+                </div>
+                <p class="image-note">Note: Uploading a new image will replace this image.</p>
+            </div>
+        {% endif %}
+        
+        <div class="form-actions">
+            <a href="{% url 'myreviews' %}" class="btn btn-cancel">Cancel</a>
+            <button type="submit" class="btn btn-submit">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

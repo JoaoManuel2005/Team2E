@@ -1,0 +1,271 @@
+.page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--md-space-3);
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: var(--md-on-surface);
+    margin-bottom: var(--md-space-4);
+}
+
+.accommodation-info {
+    background-color: var(--md-surface);
+    border-radius: var(--md-radius-medium);
+    padding: var(--md-space-3);
+    box-shadow: var(--md-elevation-1);
+    margin-bottom: var(--md-space-4);
+}
+
+.accommodation-info h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: var(--md-space-1);
+    color: var(--md-primary);
+}
+
+.accommodation-info p {
+    color: var(--md-on-surface-variant);
+    font-size: 0.9rem;
+}
+
+.review-form {
+    background-color: var(--md-surface);
+    border-radius: var(--md-radius-medium);
+    padding: var(--md-space-4);
+    box-shadow: var(--md-elevation-1);
+}
+
+.form-group {
+    margin-bottom: var(--md-space-4);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--md-space-2);
+    font-weight: 500;
+    color: var(--md-on-surface);
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: var(--md-space-2);
+    border: 1px solid var(--md-outline);
+    border-radius: var(--md-radius-small);
+    background-color: var(--md-surface);
+    color: var(--md-on-surface);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 2px rgba(103, 80, 164, 0.2);
+}
+
+
+.rating-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+/* For manual star implementation */
+.rating-container input[type="radio"] {
+    display: none;
+}
+
+.rating-container label {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #e0e0e0;
+    padding: 0 var(--md-space-1);
+    transition: color 0.2s ease;
+}
+
+.rating-container label:hover,
+.rating-container label:hover ~ label,
+.rating-container input:checked ~ label {
+    color: #FFC107;
+}
+
+/* For Django's rendered form */
+#div_id_rating {
+    margin-bottom: var(--md-space-3);
+}
+
+#div_id_rating .form-check {
+    display: none; 
+}
+
+#div_id_rating .form-check-label {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #e0e0e0;
+    padding: 0 var(--md-space-1);
+    transition: color 0.2s ease;
+    display: inline-block;
+}
+
+#div_id_rating .form-check-label:hover,
+#div_id_rating .form-check-label:hover ~ .form-check-label,
+#div_id_rating .form-check-input:checked ~ .form-check-label {
+    color: #FFC107;
+}
+
+#div_id_rating .form-check-label:not(:empty)::before {
+    content: 'star';
+    font-family: 'Material Icons';
+    display: block;
+}
+
+.form-group input[type="file"] {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.form-group input[type="file"] + label {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--md-space-2) var(--md-space-3);
+    background-color: var(--md-surface-variant);
+    color: var(--md-on-surface-variant);
+    border-radius: var(--md-radius-medium);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: var(--md-elevation-1);
+}
+
+.form-group input[type="file"] + label::before {
+    content: 'add_photo_alternate';
+    font-family: 'Material Icons';
+    margin-right: var(--md-space-2);
+    font-size: 1.2rem;
+}
+
+.form-group input[type="file"] + label:hover {
+    background-color: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+}
+
+.form-group input[type="file"]:focus + label {
+    outline: 1px solid var(--md-primary);
+    outline-offset: 2px;
+}
+
+.file-upload-info {
+    margin-top: var(--md-space-2);
+    font-size: 0.85rem;
+    color: var(--md-on-surface-variant);
+}
+
+.current-images {
+    margin-bottom: var(--md-space-4);
+    padding: var(--md-space-3);
+    background-color: var(--md-surface-variant);
+    border-radius: var(--md-radius-medium);
+}
+
+.current-images h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: var(--md-space-2);
+    color: var(--md-on-surface-variant);
+}
+
+.review-images {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--md-space-2);
+}
+
+.image-container {
+    border-radius: var(--md-radius-small);
+    overflow: hidden;
+    box-shadow: var(--md-elevation-1);
+    aspect-ratio: 1/1;
+    width: 200px;
+    height: 200px;
+}
+
+.review-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-note {
+    font-size: 0.9rem;
+    color: var(--md-on-surface-variant);
+    font-style: italic;
+    margin-top: var(--md-space-2);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--md-space-3);
+    margin-top: var(--md-space-4);
+    padding-top: var(--md-space-3);
+    border-top: 1px solid var(--md-outline-variant);
+}
+
+.btn {
+    padding: var(--md-space-2) var(--md-space-4);
+    border-radius: var(--md-radius-extra-large);
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    min-width: 100px;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    color: var(--md-on-surface-variant);
+    border: 1px solid var(--md-outline);
+}
+
+.btn-cancel:hover {
+    background-color: var(--md-surface-variant);
+}
+
+.btn-submit {
+    background-color: var(--md-primary);
+    color: var(--md-on-primary);
+    box-shadow: var(--md-elevation-1);
+}
+
+.btn-submit:hover {
+    box-shadow: var(--md-elevation-2);
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}

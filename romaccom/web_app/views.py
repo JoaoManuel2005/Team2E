@@ -516,10 +516,14 @@ def edit_review_view(request, review_id):
             updated_review = form.save(commit=False)
             updated_review.save()
             
-            # Handle new images if any
+            # Handle new image if any
             new_images = request.FILES.getlist('images')
-            for img in new_images:
-                Image.objects.create(review=review, image=img)
+            if new_images:
+                # Delete existing images
+                review.images.all().delete()
+                
+                # Add only the first image (enforcing one image max)
+                Image.objects.create(review=review, image=new_images[0])
                 
             # Update accommodation rating after review changes
             accommodation.update_average_rating()

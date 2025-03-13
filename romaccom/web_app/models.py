@@ -43,6 +43,7 @@ class Accommodation(models.Model):
     operators = models.ManyToManyField(Operator, related_name='accommodations')
     average_rating = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(5)])
     view_count = models.PositiveIntegerField(default=0)
+    description = models.TextField(blank=True)
 
     def update_average_rating(self):
         reviews = self.reviews.all()
@@ -72,10 +73,19 @@ class Review(models.Model):
     def __str__(self):
         return f"Review by {self.user.username} on {self.accommodation.name}"
 
-# Image Model
+# Image Model for reviews
 class Image(models.Model):
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='review_images/', default='default.jpg')
 
     def __str__(self):
         return f"Image for Review {self.review.id}"
+
+# Add a new Image model for accommodations
+class AccommodationImage(models.Model):
+    accommodation = models.ForeignKey(Accommodation, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='accommodation_images/', default='default.jpg')
+    is_main = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"Image for {self.accommodation.name}"

@@ -143,5 +143,15 @@
 {% endblock %}
 
 {% block scripts %}
+    <script>
+        // Define variables that will be used in the external JS file
+        const accommodationId = {{ accommodation.id }};
+        const uploadImageUrl = "{% url 'upload_accommodation_images' %}";
+        const updateAccommodationUrl = "{% url 'update_accommodation' %}";  // Use URL template tag instead of hardcoded path
+        const deleteAccommodationUrl = "{% url 'delete_accommodation' %}";
+        const setMainImageUrl = "{% url 'set_main_image' %}";
+        const deleteImageUrl = "{% url 'delete_accommodation_image' %}";
+        const operatorDashboardUrl = "{% url 'operator_dashboard' %}";
+    </script>
     <script src="{% static 'js/operator-dashboard.js' %}"></script>
 {% endblock %}

@@ -34,8 +34,8 @@
     
     <div class="main-content">
         <div class="accom-image-container">
-            {% if accommodation.image %}
-                <img src="{{ accommodation.image.url }}" alt="{{ accommodation.name }}" class="accom-image">
+            {% if main_image %}
+                <img src="{{ main_image.image.url }}" alt="{{ accommodation.name }}" class="accom-image">
             {% else %}
                 <img src="{% static 'images/default-accommodation.jpg' %}" alt="{{ accommodation.name }}" class="accom-image">
             {% endif %}

@@ -5,6 +5,7 @@ from .models import Accommodation, Review, Image, Operator, UserProfile
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from .models import User
+from django.urls import reverse
 
 GLASGOW_POSTCODES = ["G1", "G2", "G3", "G4", "G5", "G11", "G12", "G13", "G14", "G15", "G20", "G21", "G22", "G23", "G31", "G32", "G33", "G34", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G51", "G52", "G53", "G61", "G62", "G64", "G65", "G66", "G67", "G68", "G69", "G70"]
 
@@ -157,8 +158,23 @@ def accom_list_view(request):
 
 # Accommodation Details Page
 def accom_page_view(request, accom_id):
-    accommodation = Accommodation.objects.get(id=accom_id)
-    return render(request, 'romaccom/accomdetail.html', {'accommodation': accommodation})
+    # Use get_object_or_404 instead of get for better error handling
+    accommodation = get_object_or_404(Accommodation, id=accom_id)
+    
+    # Increment view count
+    accommodation.increment_view_count()  # Using your model method
+    
+    # Get reviews for this accommodation
+    reviews = Review.objects.filter(accommodation=accommodation).order_by('-created_at')
+    
+    # Get main image
+    main_image = accommodation.images.filter(is_main=True).first()
+    
+    return render(request, 'romaccom/accomdetail.html', {
+        'accommodation': accommodation,
+        'reviews': reviews,
+        'main_image': main_image
+    })
 
 # Accommodation Reviews
 def accom_reviews_view(request, accom_id, review_id):
@@ -179,7 +195,7 @@ def write_review_view(request, accom_id):
     
     # Check if the user already has a review for this accommodation
     existing_review = Review.objects.filter(user=request.user, accommodation=accommodation).first()
-    if existing_review:
+    if (existing_review):
         # If a review exists, redirect to the edit page
         return redirect('edit_review', review_id=existing_review.id)
 
@@ -258,7 +274,23 @@ def operator_dashboard_view(request):
     
     try:
         operator = Operator.objects.get(id=operator_id)
-        # Get the first accommodation managed by this operator
+        
+        # Check if accommodation ID is provided in query params
+        accom_id = request.GET.get('accommodation_id')
+        if accom_id:
+            try:
+                accommodation = Accommodation.objects.get(id=accom_id)
+                if operator in accommodation.operators.all():
+                    return render(request, 'romaccom/operator-dashboard.html', {
+                        'accommodation': accommodation,
+                        'operator': operator
+                    })
+                else:
+                    return redirect('management')
+            except Accommodation.DoesNotExist:
+                return redirect('management')
+        
+        # Get the first accommodation managed by this operator if none specified
         accommodation = operator.accommodations.first()
         
         if accommodation:
@@ -267,11 +299,8 @@ def operator_dashboard_view(request):
                 'operator': operator
             })
         else:
-            # Handle case where operator doesn't manage any accommodations
-            return render(request, 'romaccom/operator-dashboard.html', {
-                'error': 'No accommodations found for this operator',
-                'operator': operator
-            })
+            # Redirect to management page if no accommodations found
+            return redirect('management')
             
     except Operator.DoesNotExist:
         # Clear invalid session data
@@ -382,7 +411,8 @@ def upload_accommodation_images_view(request):
             accommodation = Accommodation.objects.get(id=accommodation_id)
             
             for img in images:
-                Image.objects.create(
+                # Use AccommodationImage instead of Image
+                AccommodationImage.objects.create(
                     accommodation=accommodation,
                     image=img,
                     is_main=False  # Set as not main by default
@@ -397,6 +427,11 @@ def upload_accommodation_images_view(request):
 @csrf_exempt
 def update_accommodation_view(request):
     if request.method == 'POST':
+        # Check if user is an operator
+        operator_id = request.session.get('operator_id')
+        if not operator_id:
+            return JsonResponse({'success': False, 'error': 'Authentication required'}, status=403)
+        
         accommodation_id = request.POST.get('accommodation_id')
         name = request.POST.get('name')
         address = request.POST.get('address')
@@ -405,7 +440,20 @@ def update_accommodation_view(request):
         map_link = request.POST.get('map_link')
         
         try:
+            # Get the operator
+            operator = Operator.objects.get(id=operator_id)
             accommodation = Accommodation.objects.get(id=accommodation_id)
+            
+            # Verify the operator is associated with this accommodation
+            if operator not in accommodation.operators.all():
+                return JsonResponse({'success': False, 'error': 'Not authorized to manage this accommodation'}, status=403)
+            
+            # Debug print to see what values are being saved
+            print(f"Updating accommodation {accommodation_id}")
+            print(f"Name: {name}")
+            print(f"Description: {description}")
+            
+            # Update accommodation details
             accommodation.name = name
             accommodation.address = address
             accommodation.postcode = postcode
@@ -413,20 +461,67 @@ def update_accommodation_view(request):
             accommodation.map_link = map_link
             accommodation.save()
             
+            # Debug print after saving
+            print(f"After save - Name: {accommodation.name}")
+            print(f"After save - Description: {accommodation.description}")
+            
             return JsonResponse({'success': True})
+        except Operator.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Operator not found'}, status=404)
+        except Accommodation.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Accommodation not found'}, status=404)
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
 @csrf_exempt
 def delete_accommodation_view(request):
     if request.method == 'POST':
+        # Check if user is an operator
+        operator_id = request.session.get('operator_id')
+        if not operator_id:
+            return JsonResponse({'success': False, 'error': 'Authentication required'}, status=403)
+        
         try:
             data = json.loads(request.body)
             accommodation_id = data.get('accommodation_id')
+            
+            # Get the operator and accommodation
+            operator = Operator.objects.get(id=operator_id)
             accommodation = Accommodation.objects.get(id=accommodation_id)
+            
+            # Verify the operator is associated with this accommodation
+            if operator not in accommodation.operators.all():
+                return JsonResponse({'success': False, 'error': 'Not authorized to delete this accommodation'}, status=403)
+            
+            # Delete the accommodation - this will cascade delete related objects
             accommodation.delete()
+            
+            # Clear accommodation from session if needed
+            if 'current_accommodation' in request.session:
+                request.session.pop('current_accommodation', None)
+            
+            return JsonResponse({'success': True, 'redirect_url': reverse('management')})
+        except Operator.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Operator not found'}, status=404)
+        except Accommodation.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Accommodation not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+@csrf_exempt
+def delete_accommodation_image_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            image_id = data.get('image_id')
+            image = Image.objects.get(id=image_id)
+            image.delete()
             
             return JsonResponse({'success': True})
         except Exception as e:
@@ -442,28 +537,12 @@ def set_main_image_view(request):
             image_id = data.get('image_id')
             accommodation_id = data.get('accommodation_id')
             
-            # Reset all images to not main
-            Image.objects.filter(accommodation_id=accommodation_id).update(is_main=False)
+            # Use AccommodationImage instead of Image
+            AccommodationImage.objects.filter(accommodation_id=accommodation_id).update(is_main=False)
             
-            # Set selected image as main
-            image = Image.objects.get(id=image_id)
+            image = AccommodationImage.objects.get(id=image_id)
             image.is_main = True
             image.save()
-            
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-@csrf_exempt
-def delete_accommodation_image_view(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            image_id = data.get('image_id')
-            image = Image.objects.get(id=image_id)
-            image.delete()
             
             return JsonResponse({'success': True})
         except Exception as e:
@@ -545,3 +624,23 @@ def edit_review_view(request, review_id):
         'review': review,
         'accommodation': accommodation
     })
+
+def management_view(request):
+    operator_id = request.session.get('operator_id')
+    if not operator_id:
+        return redirect('operator_login')
+    
+    try:
+        operator = Operator.objects.get(id=operator_id)
+        # Get all accommodations managed by this operator
+        accommodations = operator.accommodations.all()
+        
+        return render(request, 'romaccom/management.html', {
+            'operator': operator,
+            'accommodations': accommodations
+        })
+    except Operator.DoesNotExist:
+        # Clear invalid session data
+        request.session.pop('operator_id', None)
+        request.session.pop('operator_name', None)
+        return redirect('operator_login')

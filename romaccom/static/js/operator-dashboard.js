@@ -33,14 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function uploadImages(files) {
         const formData = new FormData();
-        formData.append('accommodation_id', '{{ accommodation.id }}');
+        formData.append('accommodation_id', accommodationId); // Use global var
         
         for (let i = 0; i < files.length; i++) {
             formData.append('images', files[i]);
         }
         
         // Send AJAX request to upload images
-        fetch('{% url "upload_accommodation_images" %}', {
+        fetch(uploadImageUrl, { // Use global var
             method: 'POST',
             body: formData,
             headers: {
@@ -67,24 +67,49 @@ document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('accom-info-form');
         const formData = new FormData(form);
         
-        fetch('{% url "update_accommodation" %}', {
+        // Log form data for debugging
+        console.log("Submitting form data:");
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+        
+        // Use the global variable for URL
+        fetch(updateAccommodationUrl, {
             method: 'POST',
             body: formData,
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
-            }
+            },
+            credentials: 'same-origin' // Important for CSRF
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
+                // Show success message
                 alert('Accommodation information updated successfully!');
+                
+                // Get the view public page link more reliably
+                const publicPageLink = document.querySelector('.dashboard-actions a.btn-outline');
+                
+                if (publicPageLink) {
+                    // Open in new tab with cache buster
+                    window.open(publicPageLink.href + '?t=' + new Date().getTime(), '_blank');
+                } else {
+                    // Fallback - just reload the current page
+                    location.reload();
+                }
             } else {
-                alert('Error updating accommodation: ' + data.error);
+                alert('Error updating accommodation: ' + (data.error || 'Unknown error'));
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while updating the accommodation information.');
+            alert('An error occurred while updating the accommodation information: ' + error.message);
         });
     });
     
@@ -108,10 +133,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     confirmDelete.addEventListener('click', function() {
-        fetch('{% url "delete_accommodation" %}', {
+        fetch(deleteAccommodationUrl, { // Use global var
             method: 'POST',
             body: JSON.stringify({
-                accommodation_id: {{ accommodation.id }}
+                accommodation_id: accommodationId // Use global var
             }),
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
@@ -121,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.href = '{% url "operator_dashboard" %}';
+                window.location.href = operatorDashboardUrl; // Use global var
             } else {
                 alert('Error deleting accommodation: ' + data.error);
             }
@@ -137,11 +162,11 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const imageId = this.getAttribute('data-image-id');
             
-            fetch('{% url "set_main_image" %}', {
+            fetch(setMainImageUrl, { // Use global var
                 method: 'POST',
                 body: JSON.stringify({
                     image_id: imageId,
-                    accommodation_id: {{ accommodation.id }}
+                    accommodation_id: accommodationId // Use global var
                 }),
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
@@ -169,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm('Are you sure you want to delete this image?')) {
                 const imageId = this.getAttribute('data-image-id');
                 
-                fetch('{% url "delete_accommodation_image" %}', {
+                fetch(deleteImageUrl, { // Use global var
                     method: 'POST',
                     body: JSON.stringify({
                         image_id: imageId

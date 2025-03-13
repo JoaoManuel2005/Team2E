@@ -151,6 +151,10 @@
     border-radius: var(--md-radius-medium);
     box-shadow: var(--md-elevation-1);
     padding: var(--md-space-3);
+    margin-top: 2rem;
+    border-radius: var(--md-radius-large);
+    background-color: rgba(179, 38, 30, 0.05);
+    border: 1px solid var(--md-error);
 }
 
 .actions-title {
@@ -160,6 +164,15 @@
     margin-bottom: var(--md-space-3);
     padding-bottom: var(--md-space-2);
     border-bottom: 1px solid var(--md-outline-variant);
+    color: var(--md-error);
+    display: flex;
+    align-items: center;
+}
+
+.actions-title:before {
+    content: "warning";
+    font-family: 'Material Icons';
+    margin-right: var(--md-space-2);
 }
 
 .action-btn {
@@ -170,7 +183,7 @@
     text-decoration: none;
     font-weight: 500;
     margin-right: var(--md-space-2);
-    transition: background-color 0.3s;
+    transition: background-color 0.2s;
 }
 
 .btn-primary {
@@ -184,11 +197,44 @@
 
 .btn-danger {
     background-color: var(--md-error);
-    color: var(--md-on-error);
+    color: white; 
+    border: 1px solid var(--md-error-container);
 }
 
 .btn-danger:hover {
     background-color: var(--md-error-hover);
+    box-shadow: var(--md-elevation-2);
+}
+
+.btn-delete {
+    background-color: #d32f2f;
+    color: white;
+    border: 1px solid #b71c1c;
+    box-shadow: 0 2px 4px rgba(211, 47, 47, 0.3);
+    margin-left: 10px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    padding: var(--md-space-2) var(--md-space-3); 
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+}
+
+.btn-delete:hover {
+    background-color: var(--md-error-hover);
+    box-shadow: var(--md-elevation-2);
+    transform: translateY(-1px);
+}
+
+.btn-delete:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(211, 47, 47, 0.4);
+}
+
+.btn-delete .material-icons {
+    color: rgba(255, 255, 255, 0.9);
+    margin-right: 8px;
+    vertical-align: middle;
 }
 
 .action-btn .material-icons {
@@ -206,8 +252,7 @@
         width: 100%;
     }
 }
-
-/* Privacy switch styles - made bigger */
+/* privacy toggle style */
 .privacy-card {
     display: flex;
     align-items: center;

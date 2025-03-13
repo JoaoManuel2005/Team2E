@@ -18,6 +18,7 @@ urlpatterns = [
     path('user/myaccount/', views.my_account_view, name='myaccount'),
     path('user/<str:username>/', views.user_profile_view, name='user_profile'),
     path('user/myaccount/myreviews/', views.my_reviews_view, name='myreviews'),
+    path('user/myaccount/edit-review/<int:review_id>/', views.edit_review_view, name='edit_review'),
     # path('user/myaccount/privacy-settings/', views.privacy_settings_view, name='privacy_settings'),
 
     path('search/', views.search_view, name='search'),
@@ -44,4 +45,5 @@ urlpatterns = [
     path('api/accommodation/delete/', views.delete_accommodation_view, name='delete_accommodation'),
     path('api/accommodation/set-main-image/', views.set_main_image_view, name='set_main_image'),
     path('api/accommodation/delete-image/', views.delete_accommodation_image_view, name='delete_accommodation_image'),
+    path('delete_review/', views.delete_review, name='delete_review'),
 ]

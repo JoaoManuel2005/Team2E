@@ -461,3 +461,74 @@ def delete_accommodation_image_view(request):
             return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from .models import Review
+
+@login_required
+@require_POST
+def delete_review(request):
+    try:
+        data = json.loads(request.body)
+        review_id = data.get('review_id')
+        
+        # Get the review and verify ownership
+        review = Review.objects.get(id=review_id)
+        
+        # Security check - only allow deletion of own reviews
+        if review.user != request.user:
+            return JsonResponse({'success': False, 'error': 'You are not authorized to delete this review'}, status=403)
+        
+        # Get the accommodation to update rating later
+        accommodation = review.accommodation
+        
+        # Delete the review
+        review.delete()
+        
+        # Update the accommodation's average rating
+        if accommodation:
+            accommodation.update_average_rating()
+        
+        return JsonResponse({'success': True})
+    
+    except Review.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Review not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@login_required
+def edit_review_view(request, review_id):
+    # Get the review and check ownership
+    review = get_object_or_404(Review, id=review_id)
+    
+    # Security check - only allow editing own reviews
+    if review.user != request.user:
+        return redirect('myreviews')
+    
+    accommodation = review.accommodation
+    
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            updated_review = form.save(commit=False)
+            updated_review.save()
+            
+            # Handle new images if any
+            new_images = request.FILES.getlist('images')
+            for img in new_images:
+                Image.objects.create(review=review, image=img)
+                
+            # Update accommodation rating after review changes
+            accommodation.update_average_rating()
+            return redirect('accom_review_detail', accom_id=accommodation.id, review_id=review.id)
+    else:
+        form = ReviewForm(instance=review)
+    
+    return render(request, 'romaccom/edit-review.html', {
+        'form': form,
+        'review': review,
+        'accommodation': accommodation
+    })

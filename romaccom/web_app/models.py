@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+import re
+
+GLASGOW_POSTCODES = ["G1", "G2", "G3", "G4", "G5", "G11", "G12", "G13", "G14", "G15", "G20", "G21", "G22", "G23", "G31", "G32", "G33", "G34", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G51", "G52", "G53", "G61", "G62", "G64", "G65", "G66", "G67", "G68", "G69", "G70"]
+
+def validate_glasgow_postcode(value):
+    if not any(value == pc for pc in GLASGOW_POSTCODES):
+        raise ValidationError(f"{value} is not a valid Glasgow postcode.")
+
+def validate_uk_address(value):
+    if not re.match(r'^\d+\s[A-Za-z\s]+$', value):  # Ex: "123 Main Street"
+        raise ValidationError("Address must start with a number followed by a street name.")
 
 # Custom User Model
 class User(AbstractUser):
@@ -37,8 +49,8 @@ class Operator(models.Model):
 # Accommodation Model
 class Accommodation(models.Model):
     name = models.CharField(max_length=100)
-    address = models.CharField(max_length=255)
-    postcode = models.CharField(max_length=10)
+    address = models.CharField(max_length=255, validators=[validate_uk_address])
+    postcode = models.CharField(max_length=10, validators=[validate_glasgow_postcode])
     map_link = models.URLField(max_length=500, blank=True)
     operators = models.ManyToManyField(Operator, related_name='accommodations')
     average_rating = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(5)])

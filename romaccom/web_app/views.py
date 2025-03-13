@@ -6,10 +6,11 @@ from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from .models import User
+from .models import User, validate_glasgow_postcode, validate_uk_address
 from django.urls import reverse
 import json
 import logging
+from django.core.exceptions import ValidationError
 
 GLASGOW_POSTCODES = ["G1", "G2", "G3", "G4", "G5", "G11", "G12", "G13", "G14", "G15", "G20", "G21", "G22", "G23", "G31", "G32", "G33", "G34", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G51", "G52", "G53", "G61", "G62", "G64", "G65", "G66", "G67", "G68", "G69", "G70"]
 
@@ -383,14 +384,20 @@ def create_accommodation_view(request):
         map_link = request.POST.get('map_link')
         
         # Validation
-        if not name or not address or not postcode or not map_link:
-            return JsonResponse({
-                'success': False, 
-                'error': 'Please fill in all required fields'
-            }, status=400)
+        missing_fields = []
+        if not name: missing_fields.append("name")
+        if not address: missing_fields.append("address")
+        if not postcode: missing_fields.append("postcode")
+        if not map_link: missing_fields.append("map_link")
+
+        if missing_fields:
+            return JsonResponse({'success': False, 'error': f"Missing required fields: {', '.join(missing_fields)}"}, status=400)
         
         try:
             # Get the operator
+            validate_uk_address(address)
+            validate_glasgow_postcode(postcode)            
+
             operator = Operator.objects.get(id=operator_id)
             
             # Create the accommodation
@@ -416,9 +423,13 @@ def create_accommodation_view(request):
                 'redirect_url': redirect_url
             })
             
+        except ValidationError as e:
+            print(f"Validation Error: {str(e)}")
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
         except Operator.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Operator not found'}, status=404)
         except Exception as e:
+            print(f"Unexpected Error: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)

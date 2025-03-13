@@ -193,8 +193,12 @@ def accom_page_view(request, accom_id):
     # Get reviews for this accommodation
     reviews = Review.objects.filter(accommodation=accommodation).order_by('-created_at')
     
-    # Get main image
+    # Get main image or fallback to any image
     main_image = accommodation.images.filter(is_main=True).first()
+    
+    # If no main image is set, just use the first image
+    if not main_image:
+        main_image = accommodation.images.first()
     
     return render(request, 'romaccom/accomdetail.html', {
         'accommodation': accommodation,

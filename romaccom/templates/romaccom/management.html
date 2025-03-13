@@ -1,0 +1,95 @@
+{% extends 'romaccom/base.html' %}
+{% load static %}
+
+{% block title %}Manage Accommodations - RomAccom{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/management.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="management-container">
+    <div class="management-header">
+        <h1 class="page-title">Manage Your Accommodations</h1>
+        <p class="operator-name">Operator: {{ operator.name }}</p>
+    </div>
+    
+    <div class="management-actions">
+        <a href="{% url 'add_accommodation' %}" class="management-btn btn-primary">
+            <span class="material-icons">add</span>
+            Add New Accommodation
+        </a>
+    </div>
+    
+    {% if accommodations %}
+        <div class="accommodations-list">
+            {% for accommodation in accommodations %}
+                <div class="accommodation-card">
+                    <div class="accommodation-info">
+                        <h2 class="accommodation-name">{{ accommodation.name }}</h2>
+                        <p class="accommodation-address">{{ accommodation.address }}, {{ accommodation.postcode }}</p>
+                        
+                        <div class="accommodation-stats">
+                            <div class="stat">
+                                <span class="material-icons">star</span>
+                                <span class="stat-value">{{ accommodation.average_rating|floatformat:1 }}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="material-icons">visibility</span>
+                                <span class="stat-value">{{ accommodation.view_count }}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="material-icons">comment</span>
+                                <span class="stat-value">{{ accommodation.review_set.count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accommodation-actions">
+                        <a href="{% url 'accommodation_detail' accommodation.id %}" class="management-btn btn-outline">
+                            <span class="material-icons">visibility</span>
+                            View Public Page
+                        </a>
+                        <a href="{% url 'operator_dashboard' %}?accommodation_id={{ accommodation.id }}" class="management-btn btn-primary">
+                            <span class="material-icons">edit</span>
+                            Manage
+                        </a>
+                        <button class="management-btn btn-danger delete-accommodation" data-id="{{ accommodation.id }}" data-name="{{ accommodation.name }}">
+                            <span class="material-icons">delete</span>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-accommodations">
+            <span class="material-icons" style="font-size: 48px;">home_work</span>
+            <h3>You don't have any accommodations yet</h3>
+            <p>Click the "Add New Accommodation" button to get started.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirm-modal" style="display: none;">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Delete Accommodation?</h3>
+            <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to permanently delete <strong id="accommodation-name"></strong>?</p>
+            <p>This action cannot be undone. All reviews and images associated with this accommodation will be permanently deleted.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="management-btn btn-outline" id="cancel-delete">Cancel</button>
+            <button class="management-btn btn-danger" id="confirm-delete">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/management.js' %}"></script>
+{% endblock %}

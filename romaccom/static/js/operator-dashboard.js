@@ -146,7 +146,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.href = operatorDashboardUrl; // Use global var
+                // Use the redirect URL provided by the server
+                window.location.href = data.redirect_url || operatorDashboardUrl;
             } else {
                 alert('Error deleting accommodation: ' + data.error);
             }

@@ -200,10 +200,28 @@ def accom_page_view(request, accom_id):
     if not main_image:
         main_image = accommodation.images.first()
     
+    # Check if an operator is logged in
+    operator_id = request.session.get('operator_id')
+    operator_logged_in = False
+    operator_manages_accommodation = False
+    
+    if operator_id:
+        try:
+            operator = Operator.objects.get(id=operator_id)
+            operator_logged_in = True
+            # Check if this operator manages this specific accommodation
+            if operator in accommodation.operators.all():
+                operator_manages_accommodation = True
+        except Operator.DoesNotExist:
+            # Invalid operator ID in session
+            pass
+    
     return render(request, 'romaccom/accomdetail.html', {
         'accommodation': accommodation,
         'reviews': reviews,
-        'main_image': main_image
+        'main_image': main_image,
+        'operator_logged_in': operator_logged_in,
+        'operator_manages_accommodation': operator_manages_accommodation
     })
 
 # Accommodation Reviews

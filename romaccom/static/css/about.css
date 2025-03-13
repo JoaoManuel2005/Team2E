@@ -1,0 +1,23 @@
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.about-text {
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+.about-slogan {
+    font-style: italic;
+    color: #6750A4;
+    font-size: 1.2rem;
+    margin: 30px 0;
+    text-align: center;
+}

@@ -1,0 +1,36 @@
+.contact-info {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--md-space-4);
+    background-color: var(--md-surface);
+    border-radius: var(--md-radius-medium);
+    box-shadow: var(--md-elevation-1);
+}
+
+.contact-section {
+    margin-bottom: var(--md-space-4);
+}
+
+.contact-heading {
+    font-size: 1.5rem;
+    margin-bottom: var(--md-space-3);
+    padding-bottom: var(--md-space-2);
+    border-bottom: 1px solid var(--md-outline-variant);
+    color: var(--md-primary);
+    display: flex;
+    align-items: center;
+}
+
+.contact-heading .material-icons {
+    margin-right: var(--md-space-2);
+}
+
+.contact-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--md-on-surface-variant);
+}
+
+.address {
+    white-space: pre-line;
+}

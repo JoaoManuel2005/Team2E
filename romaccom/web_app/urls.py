@@ -39,6 +39,7 @@ urlpatterns = [
     path('operator/dashboard/addnewaccommodation/', views.add_accommodation_view, name='add_accommodation'),
     path('operator/dashboard/manageaccommodationinfo/', views.manage_accom_info_view, name='manage_accom_info'),
     path('user/myaccount/update-privacy/', views.update_privacy_view, name='update-privacy'),
+    path('user/myaccount/delete/', views.delete_account, name='delete_account'),
     path('operator/management/', views.management_view, name='management'),
 
     path('api/accommodation/upload-images/', views.upload_accommodation_images_view, name='upload_accommodation_images'),

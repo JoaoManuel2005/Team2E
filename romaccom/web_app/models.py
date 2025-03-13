@@ -63,6 +63,7 @@ class Review(models.Model):
     title = models.CharField(max_length=255, blank=True, help_text="Optional review title")
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     review_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)  # Use auto_now_add=True
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

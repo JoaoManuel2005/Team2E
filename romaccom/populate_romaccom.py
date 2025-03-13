@@ -2,6 +2,8 @@ import os
 import django
 import random
 from faker import Faker
+from django.utils import timezone
+from datetime import timedelta
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "romaccom.settings")
 django.setup()
@@ -78,6 +80,14 @@ def create_accommodations(operators, n=30):
     return accommodations
 
 def create_reviews(users, accommodations, n=50):
+    # Generate a random date in the past year
+    def random_date():
+        # Get current time
+        now = timezone.now()
+        # Random number of days ago (up to 365)
+        days_ago = random.randint(1, 365)
+        return now - timedelta(days=days_ago)
+
     # 5 Star Reviews for aparto
     aparto_accom = accommodations[0]
     
@@ -116,7 +126,8 @@ def create_reviews(users, accommodations, n=50):
             accommodation=accommodation,
             rating=rating,
             title=fake.sentence(nb_words=4),
-            review_text=review_text
+            review_text=review_text,
+            created_at=random_date()  # Add the random date
         )
 
 def populate():

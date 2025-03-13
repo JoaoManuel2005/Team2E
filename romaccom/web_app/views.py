@@ -139,6 +139,7 @@ def user_profile_view(request, username):
     return render(request, 'romaccom/account.html', {'profile_user': profile_user})
 
 # User Reviews
+@login_required
 def my_reviews_view(request):
     user_reviews = Review.objects.filter(user=request.user).select_related('accommodation')
     return render(request, 'romaccom/myreviews.html', {'reviews': user_reviews})

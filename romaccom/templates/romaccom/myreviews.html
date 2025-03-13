@@ -55,11 +55,11 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        <!--
+                        
                         <div class="review-date">
-                            Reviewed on {{ review.id|date:"F j, Y" }}
+                            Reviewed on {{ review.created_at|date:"F j, Y" }}
                         </div>
-                        -->
+                        
                         <div class="review-actions">
                             <a href="{% url 'edit_review' review.id %}" class="review-btn btn-edit">
                                 <span class="material-icons">edit</span>

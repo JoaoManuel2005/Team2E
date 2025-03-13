@@ -141,7 +141,7 @@ textarea.form-control {
 .cancel-link:hover {
     text-decoration: underline;
 }
-
+/* Below is to refine the look of file upload button */
 /* Hide the default file input */
 input[type="file"] {
     position: absolute;

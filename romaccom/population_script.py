@@ -13,10 +13,11 @@ from web_app.models import User, Operator, Accommodation, Review, AccommodationI
 
 fake = Faker()
 
-IMAGE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "populate_images")
-OPERATOR_LOGOS_DIR = os.path.join(IMAGE_DIR, "operator_logos")
-ACCOMMODATION_IMAGES_DIR = os.path.join(IMAGE_DIR, "accommodation_images")
-REVIEW_IMAGES_DIR = os.path.join(IMAGE_DIR, "review_images")
+BASE_MEDIA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "media", "populate_images")
+OPERATOR_LOGOS_DIR = os.path.join(BASE_MEDIA_DIR, "operator_logos")
+ACCOMMODATION_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "accommodation_images")
+REVIEW_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "review_images")
+
 
 def get_random_image(directory):
     """Returns a random image file path from a given directory."""
@@ -48,7 +49,7 @@ def create_operators(n=5):
     if logo_filename:
         aparto_profile = OperatorProfile.objects.create(
             operator=aparto_operator,
-            logo=f"operator_logos/{logo_filename}"
+            logo=f"populate_images/operator_logos/{logo_filename}"  # Correct path for Django media
         )
 
     operators.append(aparto_operator)
@@ -66,7 +67,7 @@ def create_operators(n=5):
         if logo_filename:
             OperatorProfile.objects.create(
                 operator=operator,
-                logo=f"operator_logos/{logo_filename}"
+                logo=f"populate_images/operator_logos/{logo_filename}"
             )
 
         operators.append(operator)
@@ -114,7 +115,7 @@ def create_accommodations(operators, n=30):
             if image_filename:
                 AccommodationImage.objects.create(
                     accommodation=accommodation,
-                    image=f"accommodation_images/{image_filename}",
+                    image=f"populate_images/accommodation_images/{image_filename}",
                     is_main=False
                 )
 
@@ -154,7 +155,7 @@ def create_reviews(users, accommodations, n=50):
         if image_filename:
             Image.objects.create(
                 review=review,
-                image=f"review_images/{image_filename}"
+                image=f"populate_images/review_images/{image_filename}"
             )
 
     # Create a mix of good and bad reviews for other accommodations
@@ -183,7 +184,7 @@ def create_reviews(users, accommodations, n=50):
         if image_filename:
             Image.objects.create(
                 review=review,
-                image=f"review_images/{image_filename}"
+                image=f"populate_images/review_images/{image_filename}"
             )
 
 def populate():

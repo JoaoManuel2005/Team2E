@@ -144,11 +144,33 @@
     </div>
     
     <div class="operator-section">
-        <p>Are you the operator of this accommodation?</p>
-        <a href="{% url 'operator_login' %}?accommodation_id={{ accommodation.id }}" class="btn btn-outline">
-            <span class="material-icons">business</span>
-            Operator Log In
-        </a>
+        {% if operator_logged_in %}
+            {% if operator_manages_accommodation %}
+                <p>You are logged in as the operator of this accommodation.</p>
+                <a href="{% url 'operator_dashboard' %}?accommodation_id={{ accommodation.id }}" class="btn btn-primary">
+                    <span class="material-icons">dashboard</span>
+                    Manage This Accommodation
+                </a>
+            {% else %}
+                <p>You are logged in as an operator but don't manage this accommodation.</p>
+                <div class="action-buttons">
+                    <a href="{% url 'management' %}" class="btn btn-outline">
+                        <span class="material-icons">list</span>
+                        My Accommodations
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-outline">
+                        <span class="material-icons">logout</span>
+                        Log Out
+                    </a>
+                </div>
+            {% endif %}
+        {% else %}
+            <p>Are you the operator of this accommodation?</p>
+            <a href="{% url 'operator_login' %}?accommodation_id={{ accommodation.id }}" class="btn btn-outline">
+                <span class="material-icons">business</span>
+                Operator Log In
+            </a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

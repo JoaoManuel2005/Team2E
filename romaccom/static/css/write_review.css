@@ -141,3 +141,55 @@ textarea.form-control {
 .cancel-link:hover {
     text-decoration: underline;
 }
+
+/* Hide the default file input */
+input[type="file"] {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+/* Style the custom file upload button */
+input[type="file"] + label {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--md-space-2) var(--md-space-3);
+    background-color: var(--md-surface-variant);
+    color: var(--md-on-surface-variant);
+    border-radius: var(--md-radius-medium);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: var(--md-elevation-1);
+    margin-top: var(--md-space-1);
+}
+
+/* Add Material Icon to the button */
+input[type="file"] + label::before {
+    content: 'add_photo_alternate';
+    font-family: 'Material Icons';
+    margin-right: var(--md-space-2);
+    font-size: 1.2rem;
+}
+
+/* Hover state */
+input[type="file"] + label:hover {
+    background-color: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+}
+
+/* Focus state for accessibility */
+input[type="file"]:focus + label {
+    outline: 1px solid var(--md-primary);
+    outline-offset: 2px;
+}
+
+/* File upload info text */
+.file-upload-info {
+    margin-top: var(--md-space-2);
+    font-size: 0.85rem;
+    color: var(--md-on-surface-variant);
+}

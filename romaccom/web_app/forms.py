@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import UserProfile, Review, Image
+from .models import UserProfile, Review, Image, OperatorProfile
 
 User = get_user_model()
 
@@ -28,3 +28,8 @@ class ReviewForm(forms.ModelForm):
         widgets = {
             'review_text': forms.Textarea(attrs={'rows': 4}),
         }
+
+class OperatorProfileForm(forms.ModelForm):
+    class Meta:
+        model = OperatorProfile
+        fields = ['description', 'website', 'logo']

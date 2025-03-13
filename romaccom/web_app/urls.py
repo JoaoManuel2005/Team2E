@@ -41,6 +41,7 @@ urlpatterns = [
     path('user/myaccount/update-privacy/', views.update_privacy_view, name='update-privacy'),
     path('operator/management/', views.management_view, name='management'),
     path("operator/<int:operator_id>/", views.operator_profile_view, name="operator_profile"),
+    path("operator/edit-profile/", views.edit_operator_profile_view, name="edit_operator_profile"),
 
     path('api/accommodation/upload-images/', views.upload_accommodation_images_view, name='upload_accommodation_images'),
     path('api/accommodation/update/', views.update_accommodation_view, name='update_accommodation'),

@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout 
 from .models import Accommodation, Review, Image, Operator, UserProfile, AccommodationImage
-from .forms import ReviewForm
+from .forms import ReviewForm, OperatorProfileForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from .models import User, validate_glasgow_postcode, validate_uk_address
+from .models import User, Operator, OperatorProfile, validate_glasgow_postcode, validate_uk_address
 from django.urls import reverse
 import json
 import logging
@@ -757,4 +757,26 @@ def operator_profile_view(request, operator_id):
     return render(request, "romaccom/operator_profile.html", {
         "operator": operator,
         "profile": profile
+    })
+
+def edit_operator_profile_view(request):
+    operator_id = request.session.get('operator_id')
+
+    if not operator_id:
+        return redirect('operator_login')
+
+    operator = get_object_or_404(Operator, id=operator_id)
+    profile, created = OperatorProfile.objects.get_or_create(operator=operator)
+
+    if request.method == "POST":
+        form = OperatorProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('management')  # Redirect back to the dashboard
+    else:
+        form = OperatorProfileForm(instance=profile)
+
+    return render(request, 'romaccom/edit_operator_profile.html', {
+        'form': form,
+        'operator': operator
     })

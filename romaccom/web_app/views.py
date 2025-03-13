@@ -184,9 +184,11 @@ def write_review_view(request, accom_id):
             review.accommodation = accommodation  
             review.save()  
 
+            # Handle image upload - only save the first image
             images = request.FILES.getlist('images')
-            for img in images:
-                Image.objects.create(review=review, image=img)
+            if images:
+                # Only save the first image
+                Image.objects.create(review=review, image=images[0])
 
             accommodation.update_average_rating() 
             return redirect('accom_page_view', accom_id=accommodation.id)  

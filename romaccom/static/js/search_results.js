@@ -1,15 +1,18 @@
-// Update your JavaScript (keep existing AJAX functionality)
 document.addEventListener("DOMContentLoaded", function() {
     const searchForm = document.getElementById("search-form");
     const queryInput = document.getElementById("query-input");
     const postcodeDropdown = document.getElementById("postcode-dropdown");
     const resultsContainer = document.querySelector(".results-list");
-    
-    // For AJAX updates
+
+    // Get the search URL from the data attribute in search_results.html
+    // fixes problems of not inline js
+    const searchUrl = searchForm.getAttribute("data-search-url");
+
+    // Function to fetch and display results
     function fetchResults() {
         let query = queryInput.value.trim();
         let postcode = postcodeDropdown.value;
-        let url = "{% url 'search_results' %}?query=" + encodeURIComponent(query) + "&postcode=" + encodeURIComponent(postcode);
+        let url = `${searchUrl}?query=${encodeURIComponent(query)}&postcode=${encodeURIComponent(postcode)}`;
 
         fetch(url, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -26,14 +29,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // Trigger AJAX on input and change but add delay
     let debounceTimer;
     const debounceDelay = 300; // milliseconds
-    
+
     queryInput.addEventListener("input", function() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(fetchResults, debounceDelay);
     });
-    
+
     postcodeDropdown.addEventListener("change", fetchResults);
-    
+
     // Handle form submission
     searchForm.addEventListener("submit", function(e) {
         if (queryInput.value.trim().length < 1) {

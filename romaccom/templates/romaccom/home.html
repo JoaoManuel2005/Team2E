@@ -57,7 +57,10 @@
                     <span class="search-icon">
                         <span class="material-icons">search</span>
                     </span>
-                    <input type="text" name="query" id="search-input" class="search-input" placeholder="Discover student accommodations in Glasgow" autocomplete="off">
+                    <input type="text" name="query" id="search-input" class="search-input" 
+                    placeholder="Discover student accommodations in Glasgow" 
+                    autocomplete="off"
+                    data-search-url="{% url 'search_results' %}">
                     <div class="search-suggestions" id="search-suggestions"></div>
                 </div>
                 

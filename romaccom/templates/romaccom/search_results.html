@@ -24,7 +24,8 @@
 
 <!-- New search bar for modifying search -->
 <div class="search-container">
-    <form id="search-form" method="GET" action="{% url 'search_results' %}" class="search-form">
+    <form id="search-form" method="GET" action="{% url 'search_results' %}" 
+    class="search-form" data-search-url="{% url 'search_results' %}">
         <div class="search-input-container">
             <span class="search-icon">
                 <span class="material-icons">search</span>

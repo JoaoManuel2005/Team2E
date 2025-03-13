@@ -698,6 +698,45 @@ def delete_review(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
+@csrf_exempt
+@login_required
+@require_POST
+def delete_account(request):
+    try:
+        # Get the current user
+        user = request.user
+        logger.info(f"Attempting to delete user: {user.username}")
+        
+        # Verify the user is authenticated
+        if not user.is_authenticated:
+            logger.warning("Unauthenticated deletion attempt")
+            return JsonResponse({
+                'success': False,
+                'error': 'User not authenticated'
+            }, status=401)
+        
+        # Log out the user first to prevent any session issues
+        logger.info("Logging out user before deletion")
+        logout(request)
+        
+        # Delete the user - this will cascade delete associated reviews
+        logger.info("Deleting user account")
+        user.delete()
+        logger.info("User account deleted successfully")
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Account and associated reviews deleted successfully',
+            'redirect_url': '/'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error deleting account: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'An error occurred while deleting your account'
+        }, status=500)
+
 @login_required
 def edit_review_view(request, review_id):
     # Get the review and check ownership

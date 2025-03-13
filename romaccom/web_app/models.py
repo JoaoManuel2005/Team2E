@@ -45,6 +45,16 @@ class Operator(models.Model):
 
     def __str__(self):
         return self.name
+    
+class OperatorProfile(models.Model):
+    operator = models.OneToOneField(Operator, on_delete=models.CASCADE, related_name="profile")
+    description = models.TextField(blank=True, help_text="Tell people about your business")
+    website = models.URLField(blank=True)
+    logo = models.ImageField(upload_to="operator_logos/", blank=True)
+
+    def __str__(self):
+        return f"{self.operator.name}'s Profile"
+
 
 # Accommodation Model
 class Accommodation(models.Model):

@@ -749,3 +749,12 @@ def management_view(request):
         'accommodations': accommodations,
         'operator': operator  # Add this line to pass the operator to the template
     })
+
+def operator_profile_view(request, operator_id):
+    operator = get_object_or_404(Operator, id=operator_id)
+    profile = getattr(operator, "profile", None)  # Get operator's profile if exists
+    
+    return render(request, "romaccom/operator_profile.html", {
+        "operator": operator,
+        "profile": profile
+    })

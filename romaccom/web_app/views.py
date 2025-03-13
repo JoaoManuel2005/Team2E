@@ -672,4 +672,7 @@ def management_view(request):
     # This should get only the accommodations for this operator
     accommodations = operator.accommodations.all()
     
-    return render(request, 'romaccom/management.html', {'accommodations': accommodations})
+    return render(request, 'romaccom/management.html', {
+        'accommodations': accommodations,
+        'operator': operator  # Add this line to pass the operator to the template
+    })

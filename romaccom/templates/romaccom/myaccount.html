@@ -75,10 +75,15 @@
                 <p>Set your account to private</p>
             </div>
             <div class="switch-container">
-                <label class="switch">
-                    <input type="checkbox" id="privacy-toggle" {% if not user.profile_visibility %}checked{% endif %}>
-                    <span class="slider"></span>
-                </label>
+                <form id="privacy-form">
+                    {% csrf_token %}
+                    <label class="switch">
+                        <input type="checkbox" id="privacy-toggle"
+                               data-privacy-url="{% url 'update-privacy' %}"
+                               {% if not user.profile_visibility %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </form>
             </div>
         </div>
         

@@ -1,14 +1,23 @@
-// Add JavaScript to handle the toggle switch
 document.addEventListener('DOMContentLoaded', function() {
     const privacyToggle = document.getElementById('privacy-toggle');
-    
+
+    if (!privacyToggle) {
+        console.error("Privacy toggle not found.");
+        return;
+    }
+
+    // Get the correct URL from the data attribute in myaccount.html
+    const updatePrivacyUrl = privacyToggle.getAttribute('data-privacy-url');
+
+    // Correctly get CSRF token from the hidden input field
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
     privacyToggle.addEventListener('change', function() {
-        // Send AJAX request to update privacy setting
-        fetch('{% url "update-privacy" %}', {
+        fetch(updatePrivacyUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': csrfToken  // Use correct CSRF token
             },
             body: JSON.stringify({
                 'private': this.checked
@@ -17,18 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update the visibility indicator
                 location.reload();
             } else {
                 alert('Failed to update privacy settings');
-                // Revert the toggle if update failed
                 this.checked = !this.checked;
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred while updating privacy settings');
-            // Revert the toggle if update failed
             this.checked = !this.checked;
         });
     });

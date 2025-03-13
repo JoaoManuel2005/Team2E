@@ -61,55 +61,67 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('An error occurred while uploading images.');
         });
     }
+
+    function validateForm() {
+        const name = document.getElementById('accom-name').value.trim();
+        const address = document.getElementById('accom-address').value.trim();
+        const postcode = document.getElementById('accom-postcode').value.trim();
+
+        const nameRegex = /^[A-Za-z0-9\s]+$/;
+        const addressRegex = /^\d+\s[A-Za-z\s]+$/;
+        const postcodeRegex = /^(G1|G2|G3|G4|G5|G11|G12|G13|G14|G15|G20|G21|G22|G23|G31|G32|G33|G34|G40|G41|G42|G43|G44|G45|G46|G51|G52|G53|G61|G62|G64|G65|G66|G67|G68|G69|G70)$/;
+
+        if (!nameRegex.test(name)) {
+            alert("Invalid accommodation name. Only letters and numbers are allowed.");
+            return false;
+        }
+
+        if (!addressRegex.test(address)) {
+            alert("Invalid address. It must start with a number followed by a street name.");
+            return false;
+        }
+
+        if (!postcodeRegex.test(postcode)) {
+            alert("Invalid postcode. Only enter the first part of a Glasgow postcode (e.g., G1, G12).");
+            return false;
+        }
+
+        return true;
+    }
     
     // Save changes functionality
     document.getElementById('save-changes-btn').addEventListener('click', function() {
+        if (!validateForm()) {
+            return;
+        }
+
         const form = document.getElementById('accom-info-form');
         const formData = new FormData(form);
-        
-        // Log form data for debugging
-        console.log("Submitting form data:");
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-        
-        // Use the global variable for URL
+
         fetch(updateAccommodationUrl, {
             method: 'POST',
             body: formData,
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            credentials: 'same-origin' // Important for CSRF
+            credentials: 'same-origin'
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status !== 200) {
+                throw new Error(body.error || `Unknown error (HTTP ${status})`);
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Show success message
-                alert('Accommodation information updated successfully!');
-                
-                // Get the view public page link more reliably
-                const publicPageLink = document.querySelector('.dashboard-actions a.btn-outline');
-                
-                if (publicPageLink) {
-                    // Open in new tab with cache buster
-                    window.open(publicPageLink.href + '?t=' + new Date().getTime(), '_blank');
-                } else {
-                    // Fallback - just reload the current page
-                    location.reload();
-                }
+
+            if (body.success) {
+                alert('Accommodation updated successfully!');
+                window.location.reload();
             } else {
-                alert('Error updating accommodation: ' + (data.error || 'Unknown error'));
+                throw new Error(body.error || 'Unknown error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while updating the accommodation information: ' + error.message);
+            alert('An error occurred: ' + error.message);
         });
     });
     

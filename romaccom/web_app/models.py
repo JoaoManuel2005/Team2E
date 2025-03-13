@@ -9,7 +9,7 @@ GLASGOW_POSTCODES = ["G1", "G2", "G3", "G4", "G5", "G11", "G12", "G13", "G14", "
 
 def validate_glasgow_postcode(value):
     if not any(value == pc for pc in GLASGOW_POSTCODES):
-        raise ValidationError(f"{value} is not a valid Glasgow postcode.")
+        raise ValidationError(f"{value} is not a valid Glasgow postcode. Use only the first part (e.g., G1, G2, G12)")
 
 def validate_uk_address(value):
     if not re.match(r'^\d+\s[A-Za-z\s]+$', value):  # Ex: "123 Main Street"

@@ -47,4 +47,5 @@ urlpatterns = [
     path('api/accommodation/set-main-image/', views.set_main_image_view, name='set_main_image'),
     path('api/accommodation/delete-image/', views.delete_accommodation_image_view, name='delete_accommodation_image'),
     path('delete_review/', views.delete_review, name='delete_review'),
+    path('api/accommodation/create/', views.create_accommodation_view, name='create_accommodation'),
 ]

@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout 
-from .models import Accommodation, Review, Image, Operator, UserProfile
+from .models import Accommodation, Review, Image, Operator, UserProfile, AccommodationImage
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from .models import User
 from django.urls import reverse
+import json
+import logging
 
 GLASGOW_POSTCODES = ["G1", "G2", "G3", "G4", "G5", "G11", "G12", "G13", "G14", "G15", "G20", "G21", "G22", "G23", "G31", "G32", "G33", "G34", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G51", "G52", "G53", "G61", "G62", "G64", "G65", "G66", "G67", "G68", "G69", "G70"]
 
@@ -349,52 +353,81 @@ def my_listings_view(request):
 
 # Add New Accommodation
 def add_accommodation_view(request):
-    return render(request, 'romaccom/addnewaccommodation.html')
+    operator_id = request.session.get('operator_id')
+    if not operator_id:
+        return redirect('operator_login')
+    
+    try:
+        operator = Operator.objects.get(id=operator_id)
+        return render(request, 'romaccom/addnewaccommodation.html', {
+            'operator': operator
+        })
+    except Operator.DoesNotExist:
+        # Clear invalid session data
+        request.session.pop('operator_id', None)
+        request.session.pop('operator_name', None)
+        return redirect('operator_login')
+
+@csrf_exempt
+def create_accommodation_view(request):
+    if request.method == 'POST':
+        # Check if user is an operator
+        operator_id = request.session.get('operator_id')
+        if not operator_id:
+            return JsonResponse({'success': False, 'error': 'Authentication required'}, status=403)
+        
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        postcode = request.POST.get('postcode')
+        description = request.POST.get('description', '')  # Optional
+        map_link = request.POST.get('map_link')
+        
+        # Validation
+        if not name or not address or not postcode or not map_link:
+            return JsonResponse({
+                'success': False, 
+                'error': 'Please fill in all required fields'
+            }, status=400)
+        
+        try:
+            # Get the operator
+            operator = Operator.objects.get(id=operator_id)
+            
+            # Create the accommodation
+            accommodation = Accommodation.objects.create(
+                name=name,
+                address=address,
+                postcode=postcode,
+                description=description,
+                map_link=map_link,
+                average_rating=0.0,
+                view_count=0
+            )
+            
+            # Associate with the operator
+            accommodation.operators.add(operator)
+            
+            # Generate URL to redirect to operator dashboard for this accommodation
+            redirect_url = reverse('operator_dashboard') + f'?accommodation_id={accommodation.id}'
+            
+            return JsonResponse({
+                'success': True,
+                'accommodation_id': accommodation.id,
+                'redirect_url': redirect_url
+            })
+            
+        except Operator.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Operator not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
 # Manage Accommodation Info
 def manage_accom_info_view(request):
     return render(request, 'romaccom/manageaccommodationinfo.html')
 
-import json
-import logging
-from django.views.decorators.csrf import csrf_exempt
-
 logger = logging.getLogger(__name__)
-
-# @csrf_exempt
-# def update_privacy_view(request):
-#     if request.method == 'POST' and request.user.is_authenticated:
-#         try:
-#             logger.info(f"Updating privacy for user: {request.user.username}")
-#             data = json.loads(request.body)
-#             private = data.get('private', False)
-#             logger.info(f"Received private value: {private}")
-            
-#             request.user.profile_visibility = not private
-#             request.user.save()
-#             logger.info(f"Successfully updated privacy to: {request.user.profile_visibility}")
-            
-#             return JsonResponse({
-#                 'success': True,
-#                 'new_visibility': request.user.profile_visibility
-#             })
-#         except json.JSONDecodeError as e:
-#             logger.error(f"JSON decode error: {str(e)}")
-#             return JsonResponse({
-#                 'success': False,
-#                 'error': 'Invalid JSON data'
-#             }, status=400)
-#         except Exception as e:
-#             logger.error(f"Error updating privacy: {str(e)}", exc_info=True)
-#             return JsonResponse({
-#                 'success': False,
-#                 'error': str(e)
-#             }, status=500)
-#     logger.warning("Invalid request method or unauthenticated user")
-#     return JsonResponse({
-#         'success': False,
-#         'error': 'Invalid request'
-#     }, status=400)
 
 @csrf_exempt
 @login_required
@@ -426,8 +459,8 @@ def update_privacy_view(request):
             logger.error(f"Error updating privacy: {str(e)}", exc_info=True)
             return JsonResponse({
                 'success': False,
-                'error': str(e)
-            }, status=500)
+                'error': str(e)}
+            , status=500)
 
     logger.warning("Invalid request method or unauthenticated user")
     return JsonResponse({
@@ -587,12 +620,6 @@ def set_main_image_view(request):
             return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-import json
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from .models import Review
 
 @login_required
 @require_POST

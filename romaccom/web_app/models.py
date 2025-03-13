@@ -9,7 +9,7 @@ GLASGOW_POSTCODES = ["G1", "G2", "G3", "G4", "G5", "G11", "G12", "G13", "G14", "
 
 def validate_glasgow_postcode(value):
     if not any(value == pc for pc in GLASGOW_POSTCODES):
-        raise ValidationError(f"{value} is not a valid Glasgow postcode.")
+        raise ValidationError(f"{value} is not a valid Glasgow postcode. Use only the first part (e.g., G1, G2, G12)")
 
 def validate_uk_address(value):
     if not re.match(r'^\d+\s[A-Za-z\s]+$', value):  # Ex: "123 Main Street"
@@ -45,6 +45,16 @@ class Operator(models.Model):
 
     def __str__(self):
         return self.name
+    
+class OperatorProfile(models.Model):
+    operator = models.OneToOneField(Operator, on_delete=models.CASCADE, related_name="profile")
+    description = models.TextField(blank=True, help_text="Tell people about your business")
+    website = models.URLField(blank=True)
+    logo = models.ImageField(upload_to="operator_logos/", blank=True)
+
+    def __str__(self):
+        return f"{self.operator.name}'s Profile"
+
 
 # Accommodation Model
 class Accommodation(models.Model):

@@ -171,6 +171,14 @@
                 Operator Log In
             </a>
         {% endif %}
+        <h3>Managed by:</h3>
+        {% for operator in accommodation.operators.all %}
+            <p>
+                <a href="{% url 'operator_profile' operator.id %}" class="operator-link">
+                    {{ operator.name }}
+                </a>
+            </p>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

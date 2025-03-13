@@ -539,8 +539,19 @@ def update_accommodation_view(request):
         postcode = request.POST.get('postcode')
         description = request.POST.get('description')
         map_link = request.POST.get('map_link')
+
+        missing_fields = []
+        if not name: missing_fields.append("name")
+        if not address: missing_fields.append("address")
+        if not postcode: missing_fields.append("postcode")
+
+        if missing_fields:
+            return JsonResponse({'success': False, 'error': f"Missing required fields: {', '.join(missing_fields)}"}, status=400)
         
         try:
+            validate_uk_address(address)
+            validate_glasgow_postcode(postcode)
+
             # Get the operator
             operator = Operator.objects.get(id=operator_id)
             accommodation = Accommodation.objects.get(id=accommodation_id)
@@ -567,6 +578,8 @@ def update_accommodation_view(request):
             print(f"After save - Description: {accommodation.description}")
             
             return JsonResponse({'success': True})
+        except ValidationError as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
         except Operator.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Operator not found'}, status=404)
         except Accommodation.DoesNotExist:
@@ -774,4 +787,13 @@ def management_view(request):
     return render(request, 'romaccom/management.html', {
         'accommodations': accommodations,
         'operator': operator  # Add this line to pass the operator to the template
+    })
+
+def operator_profile_view(request, operator_id):
+    operator = get_object_or_404(Operator, id=operator_id)
+    profile = getattr(operator, "profile", None)  # Get operator's profile if exists
+    
+    return render(request, "romaccom/operator_profile.html", {
+        "operator": operator,
+        "profile": profile
     })

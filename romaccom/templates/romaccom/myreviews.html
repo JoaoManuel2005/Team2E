@@ -17,7 +17,7 @@
     {% if user.reviews.all %}
         <div class="reviews-list">
             {% for review in user.reviews.all %}
-                <div class="review-card">
+                <div class="review-card" data-review-id="{{ review.id }}">
                     <div class="accom-header">
                         <h2 class="accom-name">
                             <a href="{% url 'accommodation_detail' review.accommodation.id %}">
@@ -61,11 +61,11 @@
                         </div>
                         
                         <div class="review-actions">
-                            <a href="#" class="review-btn btn-edit">
+                            <a href="{% url 'edit_review' review.id %}" class="review-btn btn-edit">
                                 <span class="material-icons">edit</span>
                                 Edit
                             </a>
-                            <a href="#" class="review-btn btn-delete">
+                            <a href="#" class="review-btn btn-delete" data-review-id="{{ review.id }}">
                                 <span class="material-icons">delete</span>
                                 Delete
                             </a>
@@ -85,4 +85,8 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/myreviews.js' %}"></script>
 {% endblock %}

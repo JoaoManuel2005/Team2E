@@ -74,7 +74,9 @@ def create_accommodations(operators, n=30):
             average_rating=random.uniform(2.5, 5.0),
             view_count=random.randint(50, 1000)  # Some should be highly viewed
         )
-        accommodation.operators.set(random.sample(operators, random.randint(1, len(operators))))
+        # When creating random accommodations, exclude the real operator
+        other_operators = [op for op in operators if op != operators[0]]  # Exclude aparto operator
+        accommodation.operators.set(random.sample(other_operators, random.randint(1, len(other_operators))))
         accommodations.append(accommodation)
 
     return accommodations

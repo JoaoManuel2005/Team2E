@@ -502,13 +502,16 @@ def delete_accommodation_view(request):
             if 'current_accommodation' in request.session:
                 request.session.pop('current_accommodation', None)
             
-            return JsonResponse({'success': True, 'redirect_url': reverse('management')})
+            # Always include the redirect URL to the management page
+            return JsonResponse({
+                'success': True, 
+                'redirect_url': reverse('management')
+            })
+            
         except Operator.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Operator not found'}, status=404)
         except Accommodation.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Accommodation not found'}, status=404)
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
@@ -630,17 +633,8 @@ def management_view(request):
     if not operator_id:
         return redirect('operator_login')
     
-    try:
-        operator = Operator.objects.get(id=operator_id)
-        # Get all accommodations managed by this operator
-        accommodations = operator.accommodations.all()
-        
-        return render(request, 'romaccom/management.html', {
-            'operator': operator,
-            'accommodations': accommodations
-        })
-    except Operator.DoesNotExist:
-        # Clear invalid session data
-        request.session.pop('operator_id', None)
-        request.session.pop('operator_name', None)
-        return redirect('operator_login')
+    operator = Operator.objects.get(id=operator_id)
+    # This should get only the accommodations for this operator
+    accommodations = operator.accommodations.all()
+    
+    return render(request, 'romaccom/management.html', {'accommodations': accommodations})

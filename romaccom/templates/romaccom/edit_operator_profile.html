@@ -3,6 +3,15 @@
 
 {% block title %}Edit Operator Profile{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/management.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/operator_profile.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/operator_profile.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="operator-profile-edit-container">
     <h1>Edit Your Profile</h1>
@@ -13,23 +22,45 @@
         <div class="form-group">
             <label for="id_description">Description</label>
             {{ form.description }}
+            {% if form.description.help_text %}
+                <div class="help-text">{{ form.description.help_text }}</div>
+            {% endif %}
+            {{ form.description.errors }}
         </div>
 
         <div class="form-group">
             <label for="id_website">Website</label>
             {{ form.website }}
+            {% if form.website.help_text %}
+                <div class="help-text">{{ form.website.help_text }}</div>
+            {% endif %}
+            {{ form.website.errors }}
         </div>
 
         <div class="form-group">
             <label for="id_logo">Profile Logo</label>
             {{ form.logo }}
+            <label for="id_logo" class="custom-file-upload">
+                <span class="material-icons">upload_file</span>
+                Choose Logo
+            </label>
+            <div class="selected-file" id="file-name-display" style="display: none;">
+                <span class="material-icons">description</span>
+                <span id="file-name">No file selected</span>
+            </div>
+            {% if form.logo.help_text %}
+                <div class="help-text">{{ form.logo.help_text }}</div>
+            {% endif %}
+            {{ form.logo.errors }}
             {% if operator.profile.logo %}
                 <img src="{{ operator.profile.logo.url }}" alt="Operator Logo" class="profile-logo-preview">
             {% endif %}
         </div>
 
-        <button type="submit" class="management-btn btn-primary">Save Changes</button>
-        <a href="{% url 'management' %}" class="management-btn btn-outline">Cancel</a>
+        <div class="form-actions">
+            <a href="{% url 'management' %}" class="management-btn btn-outline">Cancel</a>
+            <button type="submit" class="management-btn btn-primary">Save Changes</button>
+        </div>
     </form>
 </div>
 {% endblock %}

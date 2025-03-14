@@ -307,16 +307,68 @@ input[type="file"] {
     margin-bottom: 0.5rem;
 }
 
+/* Enhanced custom clear logo option */
 .clear-logo-option {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     margin-top: 0.75rem;
     cursor: pointer;
     font-weight: normal;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--md-surface-variant);
+    border-radius: 4px;
+    color: var(--md-on-surface-variant);
+    transition: background-color 0.2s, color 0.2s;
+    border: 1px solid var(--md-outline-variant);
+}
+
+.clear-logo-option:hover {
+    background-color: rgba(var(--md-error-rgb), 0.08);
+    color: var(--md-error);
+    border-color: var(--md-error);
+}
+
+.clear-logo-option::before {
+    content: "delete";
+    font-family: "Material Icons";
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
 }
 
 .clear-logo-option input[type="checkbox"] {
     width: auto;
     margin-right: 0.5rem;
     cursor: pointer;
+    accent-color: var(--md-error);
+    transform: scale(1.2);
+}
+
+/* Hide all Django-generated file field elements */
+.form-group div.file-upload {
+    display: none !important;
+}
+
+/* Hide any "Currently:" text */
+.form-group p:has(span.file-upload) {
+    display: none !important;
+}
+
+/* Hide Django's clear checkbox container */
+.form-group span.clearable-file-input {
+    display: none !important;
+}
+
+/* Hide any "Change:" text */
+.form-group label[for="id_logo"] + span {
+    display: none !important;
+}
+
+/* Ensure any hidden file inputs stay hidden */
+.form-group input[type="file"][name="logo"] {
+    display: none !important;
+}
+
+/* Hide any Django-generated file field wrapper */
+.form-group div:has(> input[type="file"][name="logo"]) {
+    display: none !important;
 }

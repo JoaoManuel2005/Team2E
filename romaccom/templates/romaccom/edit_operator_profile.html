@@ -15,7 +15,7 @@
 <div class="operator-profile-edit-container">
     <h1>Edit Your Profile</h1>
     
-    <form method="POST" enctype="multipart/form-data" class="profile-form">
+    <form method="POST" enctype="multipart/form-data" class="profile-form" id="profile-form">
         {% csrf_token %}
         
         <div class="form-group">
@@ -38,21 +38,37 @@
 
         <div class="form-group">
             <label for="id_logo">Profile Logo</label>
-            {{ form.logo }}
-            <label for="id_logo" class="custom-file-upload">
+            <!-- Hide original Django file input completely -->
+            <div style="display: none;">{{ form.logo }}</div>
+            
+            <!-- Custom file upload button -->
+            <label for="custom-logo-upload" class="custom-file-upload">
                 <span class="material-icons">upload_file</span>
                 Choose Logo
             </label>
+            <input type="file" id="custom-logo-upload" accept="image/*" style="display: none;">
+            
+            <!-- Custom file name display -->
             <div class="selected-file" id="file-name-display" style="display: none;">
                 <span class="material-icons">description</span>
                 <span id="file-name">No file selected</span>
             </div>
+            
             {% if form.logo.help_text %}
                 <div class="help-text">{{ form.logo.help_text }}</div>
             {% endif %}
             {{ form.logo.errors }}
+            
+            <!-- Current logo display -->
             {% if operator.profile.logo %}
-                <img src="{{ operator.profile.logo.url }}" alt="Operator Logo" class="profile-logo-preview">
+                <div class="current-logo-container">
+                    <div class="current-logo-label">Current logo:</div>
+                    <img src="{{ operator.profile.logo.url }}" alt="Operator Logo" class="profile-logo-preview">
+                    <label class="clear-logo-option">
+                        <input type="checkbox" id="clear-logo" name="clear-logo">
+                        Clear current logo
+                    </label>
+                </div>
             {% endif %}
         </div>
 
@@ -62,4 +78,54 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Custom file upload handling
+        const customFileInput = document.getElementById('custom-logo-upload');
+        const djangoFileInput = document.querySelector('input[name="logo"]');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const fileName = document.getElementById('file-name');
+        const clearLogoCheckbox = document.getElementById('clear-logo');
+        
+        // Handle custom file selection
+        customFileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                // Update UI
+                fileNameDisplay.style.display = 'flex';
+                fileName.textContent = this.files[0].name;
+                
+                // Update Django's file input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(this.files[0]);
+                djangoFileInput.files = dataTransfer.files;
+                
+                // Uncheck clear checkbox if it exists
+                if (clearLogoCheckbox) {
+                    clearLogoCheckbox.checked = false;
+                }
+            }
+        });
+        
+        // Handle clear checkbox
+        if (clearLogoCheckbox) {
+            clearLogoCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    // Clear both inputs
+                    customFileInput.value = '';
+                    djangoFileInput.value = '';
+                    fileNameDisplay.style.display = 'none';
+                    
+                    // Set Django's clear checkbox
+                    const djangoClearCheckbox = document.querySelector('input[name="logo-clear"]');
+                    if (djangoClearCheckbox) {
+                        djangoClearCheckbox.checked = true;
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -217,3 +217,106 @@ input[type="file"] {
     background-color: var(--md-primary-container);
     color: var(--md-on-primary-container);
 }
+
+/* Style for Django's file input elements */
+.form-group p:first-of-type {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--md-on-surface-variant);
+}
+
+/* Style for the "Clear" checkbox container */
+.form-group p:nth-of-type(2) {
+    display: inline-flex;
+    align-items: center;
+    margin: 0.75rem 0;
+}
+
+/* Style for the checkbox itself */
+.form-group p:nth-of-type(2) input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+/* Style for the "Clear" label */
+.form-group p:nth-of-type(2) label {
+    display: inline;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+/* Hide the "Change:" text */
+.form-group p:nth-of-type(3) {
+    display: none;
+}
+
+/* Ensure the actual file input remains hidden */
+.form-group input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+/* Style for "Currently:" text and filename */
+.form-group .currentfile {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--md-on-surface-variant);
+    display: block;
+}
+
+/* Style for the "Clear" checkbox container */
+.form-group .checkbox {
+    display: inline-flex;
+    align-items: center;
+    margin: 0.75rem 0;
+}
+
+/* Style for the checkbox itself */
+.form-group .checkbox input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+/* Style for the "Clear" label */
+.form-group .checkbox label {
+    display: inline;
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+/* Hide "Change:" text */
+.form-group label[for="id_logo"] + span {
+    display: none;
+}
+
+/* Custom logo display styles */
+.current-logo-container {
+    margin-top: 1rem;
+}
+
+.current-logo-label {
+    font-size: 0.9rem;
+    color: var(--md-on-surface-variant);
+    margin-bottom: 0.5rem;
+}
+
+.clear-logo-option {
+    display: flex;
+    align-items: center;
+    margin-top: 0.75rem;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.clear-logo-option input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}

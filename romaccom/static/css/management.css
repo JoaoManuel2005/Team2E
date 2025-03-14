@@ -51,7 +51,9 @@
 }
 
 .btn-primary:hover {
-    background-color: var(--md-primary-dark);
+    background-color: white;
+    color: var(--md-primary);
+    border: 1px solid var(--md-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
@@ -77,7 +79,6 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Add specific style for the delete accommodation button hover state */
 .delete-accommodation.btn-danger:hover {
     background-color: white;
     color: var(--md-error);
@@ -341,8 +342,130 @@
     border-top: 1px solid #eee;
 }
 
-/* Add specific styles for delete accommodation button text */
 .delete-accommodation .material-icons {
     font-size: 18px;
     margin-right: 8px;
+}
+
+/* Modal styling for account deletion */
+#confirm-delete-modal {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+#confirm-delete-modal .modal {
+    max-width: 450px;
+    animation: slideIn 0.3s ease-out;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 77, 77, 0.2);
+}
+
+#confirm-delete-modal .modal-header {
+    background-color: rgba(255, 77, 77, 0.08);
+    border-bottom: 1px solid rgba(255, 77, 77, 0.2);
+    border-radius: 10px 10px 0 0;
+}
+
+#confirm-delete-modal .modal-title {
+    color: var(--md-error);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+#confirm-delete-modal .modal-title::before {
+    content: "warning";
+    font-family: "Material Icons";
+    margin-right: 12px;
+    font-size: 1.4rem;
+}
+
+#confirm-delete-modal .modal-body {
+    padding: 1.8rem;
+}
+
+#confirm-delete-modal .modal-body p {
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+#confirm-delete-modal .modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+#confirm-delete-modal .modal-body strong {
+    color: var(--md-error);
+}
+
+#confirm-delete-modal .modal-footer {
+    padding: 1.2rem 1.8rem;
+    border-top: 1px solid #eee;
+}
+
+#confirm-delete-modal .modal-close {
+    transition: color 0.2s;
+}
+
+#confirm-delete-modal .modal-close:hover {
+    color: var(--md-error);
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Cancel and confirm buttons */
+#cancel-delete-account {
+    background-color: #f5f5f5;
+    color: #555;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+#cancel-delete-account:hover {
+    background-color: #e5e5e5;
+}
+
+#confirm-delete-account {
+    background-color: var(--md-error);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s, box-shadow 0.2s, border 0.2s;
+    border: 1px solid transparent; 
+}
+
+#confirm-delete-account:hover {
+    background-color: white;
+    color: var(--md-error);
+    border: 1px solid var(--md-error);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+.management-actions .btn-primary:hover {
+    background-color: white;
+    color: var(--md-primary);
+    border: 1px solid var(--md-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.accommodation-actions .btn-primary:hover {
+    background-color: white;
+    color: var(--md-primary);
+    border: 1px solid var(--md-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }

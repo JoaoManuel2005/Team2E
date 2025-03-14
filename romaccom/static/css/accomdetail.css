@@ -275,6 +275,51 @@
     border-top: 1px solid var(--md-outline-variant);
 }
 
+/* Operator Section Styling */
+.operator-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: var(--md-surface);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.operator-section h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--md-primary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--md-outline-variant);
+}
+
+.operator-section p {
+    margin: 0.5rem 0;
+}
+
+.operator-link {
+    color: var(--md-primary);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.operator-link:hover {
+    color: var(--md-tertiary);
+    text-decoration: underline;
+}
+
+.operator-link::before {
+    content: "business";
+    font-family: "Material Icons";
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
 @media (max-width: 768px) {
     .main-content {
         flex-direction: column;

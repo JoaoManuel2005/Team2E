@@ -1,0 +1,153 @@
+.operator-profile-edit-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.operator-profile-edit-container h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--md-primary);
+    margin-bottom: 1.5rem;
+}
+
+.profile-form {
+    background-color: var(--md-surface);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: var(--md-elevation-1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--md-on-surface);
+}
+
+.form-group input, 
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--md-outline);
+    border-radius: 4px;
+    background-color: var(--md-surface);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus, 
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 2px rgba(var(--md-primary-rgb), 0.2);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.profile-logo-preview {
+    display: block;
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--md-outline-variant);
+}
+
+
+.form-group input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+
+.custom-file-upload {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--md-primary);
+    color: white;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    border: 1px solid var(--md-primary);
+    margin-top: 0.5rem;
+}
+
+.custom-file-upload:hover {
+    background-color: white;
+    color: var(--md-primary);
+}
+
+.custom-file-upload .material-icons {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Hidden file input */
+input[type="file"] {
+    display: none;
+}
+
+/* Selected file display */
+.selected-file {
+    display: flex;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    background-color: var(--md-surface-variant);
+    border-radius: 4px;
+    color: var(--md-on-surface-variant);
+    font-size: 0.9rem;
+}
+
+.selected-file .material-icons {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Form actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Error messages */
+.errorlist {
+    list-style: none;
+    color: var(--md-error);
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+}
+
+.help-text {
+    color: var(--md-on-surface-variant);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .operator-profile-edit-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .profile-form {
+        padding: 1.5rem;
+    }
+}

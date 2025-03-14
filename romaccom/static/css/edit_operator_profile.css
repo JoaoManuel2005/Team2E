@@ -175,3 +175,45 @@ input[type="file"] {
         padding: 1.5rem;
     }
 }
+
+/* Add these button styles from management.css */
+.management-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+    height: 38px; 
+}
+
+.management-btn .material-icons {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.btn-primary {
+    background-color: var(--md-primary);
+    color: var(--md-on-primary);
+}
+
+.btn-primary:hover {
+    background-color: white;
+    color: var(--md-primary);
+    border: 1px solid var(--md-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--md-primary);
+    border: 1px solid var(--md-primary);
+}
+
+.btn-outline:hover {
+    background-color: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+}

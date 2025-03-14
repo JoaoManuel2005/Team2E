@@ -140,6 +140,13 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
+                        
+                        <div class="review-footer">
+                            <span class="review-date">
+                                <span class="material-icons">calendar_today</span>
+                                {{ review.created_at|date:"F j, Y" }}
+                            </span>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}

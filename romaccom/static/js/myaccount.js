@@ -1,4 +1,77 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Edit Profile functionality
+    const editProfileBtn = document.querySelector('.edit-profile-btn');
+    const editProfileModal = document.querySelector('.edit-profile-modal');
+    const editProfileForm = document.getElementById('edit-profile-form');
+    const cancelBtn = document.querySelector('.btn-cancel');
+    
+    if (editProfileBtn && editProfileModal) {
+        // Show modal when edit button is clicked
+        editProfileBtn.addEventListener('click', function() {
+            editProfileModal.style.display = 'flex';
+        });
+
+        // Hide modal when cancel button is clicked
+        cancelBtn.addEventListener('click', function() {
+            editProfileModal.style.display = 'none';
+        });
+
+        // Handle form submission
+        editProfileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('username', document.getElementById('username').value);
+            
+            const profilePicture = document.getElementById('profile-picture').files[0];
+            if (profilePicture) {
+                formData.append('profile_picture', profilePicture);
+            }
+            
+            fetch('/romaccom/api/user/update-profile/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update profile information on the page
+                    if (data.username) {
+                        document.querySelector('.profile-username').textContent = data.username;
+                    }
+                    if (data.profile_picture_url) {
+                        const profileAvatar = document.querySelector('.profile-avatar');
+                        if (profileAvatar.querySelector('img')) {
+                            profileAvatar.querySelector('img').src = data.profile_picture_url;
+                        } else {
+                            const img = document.createElement('img');
+                            img.src = data.profile_picture_url;
+                            img.alt = 'Profile Picture';
+                            profileAvatar.innerHTML = '';
+                            profileAvatar.appendChild(img);
+                        }
+                    }
+                    editProfileModal.style.display = 'none';
+                    alert('Profile updated successfully');
+                } else {
+                    throw new Error(data.error || 'Failed to update profile');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'An error occurred while updating your profile');
+            });
+        });
+    }
+
     // Privacy toggle functionality
     const privacyToggle = document.getElementById('privacy-toggle');
     if (!privacyToggle) {

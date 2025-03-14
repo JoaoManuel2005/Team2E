@@ -92,6 +92,40 @@
                 <p>View and manage all your accommodation reviews</p>
             </div>
         </a>
+        
+        <!-- Edit Profile Card -->
+        <div class="nav-card edit-profile-card">
+            <div class="nav-card-icon">
+                <span class="material-icons">edit</span>
+            </div>
+            <div class="nav-card-content">
+                <h3>Edit Profile</h3>
+                <p>Update your name and profile picture</p>
+            </div>
+            <button class="edit-profile-btn">Edit</button>
+        </div>
+        
+        <!-- Edit Profile Modal -->
+        <div class="edit-profile-modal">
+            <div class="modal-content">
+                <h3>Edit Profile</h3>
+                <form id="edit-profile-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" value="{{ user.username }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-picture">Profile Picture</label>
+                        <input type="file" id="profile-picture" name="profile_picture" accept="image/*">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel">Cancel</button>
+                        <button type="submit" class="btn-save">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
     
     <div class="account-actions">

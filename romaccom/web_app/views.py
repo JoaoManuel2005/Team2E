@@ -821,6 +821,77 @@ def edit_operator_profile_view(request):
     })
 
 from django.db import transaction
+import time
+
+from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
+import os
+
+@login_required
+def edit_user_profile_view(request):
+    """Render the edit profile page"""
+    return render(request, 'romaccom/edit_user_profile.html')
+
+@csrf_exempt
+@login_required
+def update_user_profile_view(request):
+    """Handle profile updates via AJAX"""
+    if request.method == 'POST':
+        try:
+            user = request.user
+            # Create profile if it doesn't exist
+            if not hasattr(user, 'profile'):
+                UserProfile.objects.create(user=user)
+            
+            # Update username if provided
+            username = request.POST.get('username')
+            if username:
+                user.username = username
+            
+            # Update profile picture if provided
+            if 'profile_picture' in request.FILES:
+                profile_picture = request.FILES['profile_picture']
+                
+                # Delete old profile picture if exists
+                if user.profile.picture:
+                    try:
+                        old_picture_path = user.profile.picture.path
+                        if os.path.exists(old_picture_path):
+                            os.remove(old_picture_path)
+                    except Exception as e:
+                        logger.warning(f"Failed to delete old profile picture: {str(e)}")
+                
+                # Save new profile picture
+                try:
+                    picture_name = f"profile_pictures/{user.id}_{int(time.time())}.jpg"
+                    picture_path = default_storage.save(picture_name, profile_picture)
+                    user.profile.picture = picture_path
+                except Exception as e:
+                    logger.error(f"Failed to save new profile picture: {str(e)}")
+                    raise Exception("Failed to upload profile picture. Please try again.")
+            
+            user.save()
+            user.profile.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Profile updated successfully',
+                'username': user.username,
+                'profile_picture_url': user.profile.picture.url if user.profile.picture else None
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Invalid request method'
+    }, status=400)
 
 @csrf_exempt
 def delete_operator_account_view(request):

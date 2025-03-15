@@ -82,7 +82,7 @@ def create_accommodations(operators, n=30):
         name="aparto Glasgow West End",
         address="Kelvinhaugh Street, Glasgow",
         postcode="G3 8PX",
-        map_link="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2237.6997033286593!2d-4.301292!3d55.867908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4888441d32566293%3A0x10a2a350cac75e4a!2saparto%20Glasgow%20West%20End!5e0!3m2!1sen!2suk!4v1646147020959!5m2!1sen!2suk",
+        map_link="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2238.9210848058406!2d-4.295280023052101!3d55.86403557312559!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x488845d7081005ad%3A0x817dbb0b34ec784d!2saparto%20Glasgow%20West%20End!5e0!3m2!1sen!2suk!4v1742061791797!5m2!1sen!2suk",
         average_rating=5.0,
         view_count=random.randint(500, 1200)
     )

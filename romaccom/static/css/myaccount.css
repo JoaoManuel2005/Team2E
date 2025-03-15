@@ -391,6 +391,11 @@ input:checked + .slider:before {
 /* Edit Profile Styles */
 .edit-profile-card {
     position: relative;
+    cursor: pointer;
+}
+
+.edit-profile-card:hover {
+    background-color: var(--md-surface-hover, rgba(0, 0, 0, 0.04));
 }
 
 .edit-profile-btn {

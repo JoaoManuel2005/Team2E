@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Edit Profile functionality
-    const editProfileBtn = document.querySelector('.edit-profile-btn');
+    const editProfileCard = document.getElementById('edit-profile-trigger');
     const editProfileModal = document.querySelector('.edit-profile-modal');
     const editProfileForm = document.getElementById('edit-profile-form');
     const cancelBtn = document.querySelector('.btn-cancel');
     
-    if (editProfileBtn && editProfileModal) {
-        // Show modal when edit button is clicked
-        editProfileBtn.addEventListener('click', function() {
+    if (editProfileCard && editProfileModal) {
+        // Show modal when the entire card is clicked
+        editProfileCard.addEventListener('click', function() {
             editProfileModal.style.display = 'flex';
         });
 

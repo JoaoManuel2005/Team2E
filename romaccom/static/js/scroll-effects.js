@@ -5,10 +5,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const heroContent = document.getElementById('hero-content');
     const heroLogo = document.getElementById('hero-logo');
     const fixedHeader = document.getElementById('fixed-header');
+    const scrollIndicator = document.getElementById('scroll-indicator');
     
     // Initial dimensions
     const initialLogoSize = 150; // px
     const finalLogoSize = 40; // px
+    
+    // Ensure scroll indicator is fully visible initially
+    if (scrollIndicator) {
+        // Force opacity to 1 and ensure it's visible
+        scrollIndicator.style.opacity = '1';
+        scrollIndicator.style.display = 'flex';
+        
+        // Add a pulsing effect after a short delay to draw attention
+        setTimeout(() => {
+            scrollIndicator.classList.add('active-pulse');
+        }, 1500);
+    }
     
     // Handle scroll events
     window.addEventListener('scroll', function() {
@@ -37,6 +50,16 @@ document.addEventListener('DOMContentLoaded', function() {
         fixedHeader.classList.add('visible');
       } else {
         fixedHeader.classList.remove('visible');
+      }
+      
+      // Fade out scroll indicator
+      if (scrollIndicator) {
+        scrollIndicator.style.opacity = Math.max(0, 1 - (scrollProgress * 3));
+        
+        // Remove pulse effect once scrolling starts
+        if (scrollProgress > 0.05) {
+          scrollIndicator.classList.remove('active-pulse');
+        }
       }
     });
     

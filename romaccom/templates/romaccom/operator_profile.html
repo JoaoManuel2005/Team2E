@@ -3,29 +3,39 @@
 
 {% block title %}{{ operator.name }} - Operator Profile{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operator_profile.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="operator-profile-container">
-    <h1>{{ operator.name }}</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">{{ operator.name }}</h1>
 
     {% if profile.logo %}
-        <img src="{{ profile.logo.url }}" alt="{{ operator.name }} Logo" class="operator-logo">
+        <img src="{{ profile.logo.url }}" alt="{{ operator.name }} Logo" class="img-fluid mb-3 operator-logo">
     {% endif %}
 
-    {% if profile.description %}
-        <p>{{ profile.description }}</p>
-    {% else %}
-        <p>This operator has not provided a description.</p>
-    {% endif %}
+    <div class="card mb-4">
+        <div class="card-body">
+            {% if profile.description %}
+                <p>{{ profile.description }}</p>
+            {% else %}
+                <p class="text-muted">This operator has not provided a description.</p>
+            {% endif %}
+            
+            {% if profile.website %}
+                <p>Visit our website: <a href="{{ profile.website }}" target="_blank" class="link-primary">{{ profile.website }}</a></p>
+            {% endif %}
+        </div>
+    </div>
 
-    {% if profile.website %}
-        <p>Visit our website: <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></p>
-    {% endif %}
-
-    <h2>Managed Accommodations</h2>
-    <ul>
+    <h2 class="mb-3">Managed Accommodations</h2>
+    <div class="list-group mb-4">
         {% for accommodation in operator.accommodations.all %}
-            <li><a href="{% url 'accom_page_view' accommodation.id %}">{{ accommodation.name }}</a></li>
+            <a href="{% url 'accom_page_view' accommodation.id %}" class="list-group-item list-group-item-action">
+                {{ accommodation.name }}
+            </a>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}

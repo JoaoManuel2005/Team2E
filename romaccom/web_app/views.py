@@ -40,7 +40,8 @@ def home_view(request):
         'trending_accommodations': trending_accommodations,
         'top_rated_accommodations': top_rated_accommodations,
         'operator_logged_in': operator_logged_in,
-        'operator_name': operator_name
+        'operator_name': operator_name,
+        'glasgow_postcodes': GLASGOW_POSTCODES  # Add this line
     })
 
 def search_results_view(request):

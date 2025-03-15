@@ -1,0 +1,12 @@
+.operator-logo {
+    max-width: 1920px;
+    height: 400px;
+    object-fit: contain;
+    border-radius: 4px;        /* Slightly rounded corners */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+    transition: transform 0.3s; /* Animation for hover effect */
+}
+
+.operator-logo:hover {
+    transform: scale(1.05);     /* Slight zoom on hover */
+}

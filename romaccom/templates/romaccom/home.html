@@ -15,6 +15,7 @@
         <img src="{% static 'images/appicon.png' %}" alt="RomAccom Logo" class="img-fluid">
     </div>
     <h1 class="text-primary">RomAccom</h1>
+    <p class="lead text-primary">Did you fall in love with your accom?</p>
 </div>
 {% endblock %}
 
@@ -50,12 +51,12 @@
         <div class="mb-5">
             <form method="GET" action="{% url 'search_results' %}" class="search-form" id="search-form">
                 <div class="mb-3 position-relative">
-                    <div class="input-group input-group-lg custom-search shadow-sm rounded-pill">
-                        <span class="input-group-text border-2 border-end-0">
+                    <div class="input-group input-group-lg custom-search shadow-sm">
+                        <span class="input-group-text">
                             <span class="material-icons">search</span>
                         </span>
                         <input type="text" name="query" id="search-input" 
-                               class="form-control border-2 border-start-0 shadow-sm" 
+                               class="form-control" 
                                placeholder="Discover student accommodations in Glasgow" 
                                autocomplete="off"
                                data-search-url="{% url 'search_results' %}">

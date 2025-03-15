@@ -95,59 +95,128 @@
         {% endif %}
         
         <div class="reviews-list">
-            {% if accommodation.reviews.all %}
+            {% if user.is_authenticated %}
                 {% for review in accommodation.reviews.all %}
-                    <div class="review-card">
-                        <div class="review-header">
-                            <div class="reviewer-info">
-                                <div class="reviewer-avatar">
-                                    {% if review.user.profile.picture %}
-                                        <img src="{{ review.user.profile.picture.url }}" alt="{{ review.user.username }}" class="reviewer-avatar">
-                                    {% else %}
-                                        {{ review.user.username|first|upper }}
-                                    {% endif %}
+                    {% if review.user == user %}
+                        <div class="review-card my-review">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar">
+                                        {% if review.user.profile.picture %}
+                                            <img src="{{ review.user.profile.picture.url }}" alt="{{ review.user.username }}" class="reviewer-avatar">
+                                        {% else %}
+                                            {{ review.user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <span class="reviewer-name">
+                                        <a href="{% url 'user_profile' review.user.username %}" class="profile-link">
+                                            {{ review.user.username }}
+                                        </a>
+                                        <span class="my-review-tag">(My Review)</span>
+                                    </span>
                                 </div>
-                                <span class="reviewer-name">
-                                    <a href="{% url 'user_profile' review.user.username %}" class="profile-link">
-                                        {{ review.user.username }}
-                                    </a>
-                                </span>
+                                
+                                <div class="review-rating">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <span class="material-icons">star</span>
+                                        {% else %}
+                                            <span class="material-icons">star_outline</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
                             </div>
                             
-                            <div class="review-rating">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= review.rating %}
-                                        <span class="material-icons">star</span>
-                                    {% else %}
-                                        <span class="material-icons">star_outline</span>
-                                    {% endif %}
-                                {% endfor %}
+                            {% if review.title %}
+                                <h3 class="review-title">
+                                    <a href="{% url 'edit_review' review.id %}">{{ review.title }}</a>
+                                </h3>
+                            {% else %}
+                                <h3 class="review-title">
+                                    <a href="{% url 'edit_review' review.id %}">My Review</a>
+                                </h3>
+                            {% endif %}
+                            
+                            <p class="review-text">{{ review.review_text }}</p>
+                            
+                            {% if review.images.all %}
+                                <div class="review-images">
+                                    {% for image in review.images.all %}
+                                        <img src="{{ image.image.url }}" alt="Review image" class="review-image">
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="review-footer">
+                                <span class="review-date">
+                                    <span class="material-icons">calendar_today</span>
+                                    {{ review.created_at|date:"F j, Y" }}
+                                </span>
+                                <a href="{% url 'edit_review' review.id %}" class="edit-review-btn">
+                                    <span class="material-icons">edit</span>
+                                    Edit Review
+                                </a>
                             </div>
                         </div>
-                        
-                        {% if review.title %}
-                            <h3 class="review-title">
-                                <a href="{% url 'accom_review_detail' accommodation.id review.id %}">{{ review.title }}</a>
-                            </h3>
-                        {% endif %}
-                        
-                        <p class="review-text">{{ review.review_text }}</p>
-                        
-                        {% if review.images.all %}
-                            <div class="review-images">
-                                {% for image in review.images.all %}
-                                    <img src="{{ image.image.url }}" alt="Review image" class="review-image">
-                                {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            {% if accommodation.reviews.all %}
+                {% for review in accommodation.reviews.all %}
+                    {% if not review.user == user %}
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar">
+                                        {% if review.user.profile.picture %}
+                                            <img src="{{ review.user.profile.picture.url }}" alt="{{ review.user.username }}" class="reviewer-avatar">
+                                        {% else %}
+                                            {{ review.user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <span class="reviewer-name">
+                                        <a href="{% url 'user_profile' review.user.username %}" class="profile-link">
+                                            {{ review.user.username }}
+                                        </a>
+                                    </span>
+                                </div>
+                                
+                                <div class="review-rating">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <span class="material-icons">star</span>
+                                        {% else %}
+                                            <span class="material-icons">star_outline</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
                             </div>
-                        {% endif %}
-                        
-                        <div class="review-footer">
-                            <span class="review-date">
-                                <span class="material-icons">calendar_today</span>
-                                {{ review.created_at|date:"F j, Y" }}
-                            </span>
+                            
+                            {% if review.title %}
+                                <h3 class="review-title">
+                                    <a href="{% url 'accom_review_detail' accommodation.id review.id %}">{{ review.title }}</a>
+                                </h3>
+                            {% endif %}
+                            
+                            <p class="review-text">{{ review.review_text }}</p>
+                            
+                            {% if review.images.all %}
+                                <div class="review-images">
+                                    {% for image in review.images.all %}
+                                        <img src="{{ image.image.url }}" alt="Review image" class="review-image">
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="review-footer">
+                                <span class="review-date">
+                                    <span class="material-icons">calendar_today</span>
+                                    {{ review.created_at|date:"F j, Y" }}
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 <div class="review-card">

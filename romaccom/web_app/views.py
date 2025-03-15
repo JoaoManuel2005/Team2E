@@ -140,7 +140,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect('home')
+            return redirect('myaccount')
         else:
             return render(request, 'romaccom/login.html', {'error': 'Invalid username or password'})
     return render(request, 'romaccom/login.html')

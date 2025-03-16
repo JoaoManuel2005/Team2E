@@ -1,6 +1,22 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from web_app.models import User
+from web_app.models import validate_glasgow_postcode
+from web_app.models import validate_uk_address
+
+
+class PostCodeAndAddressValidation(TestCase):
+
+    def test_postcode_validate(self): 
+        invalid_postcodes =["g1","E1","G100",""]      
+        for pc in invalid_postcodes:
+            with self.assertRaises(ValidationError):
+                validate_glasgow_postcode(pc)
+
+    
+
+
+        
 
 class UserModelTests(TestCase):
     def test_create_user(self):
@@ -39,4 +55,5 @@ class UserModelTests(TestCase):
             with self.assertRaises(ValidationError):
                 user = User(username=username)
                 user.full_clean()
-        
+
+

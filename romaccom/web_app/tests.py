@@ -10,3 +10,7 @@ class UserModelTests(TestCase):
         user = User.objects.create_user(username="testname", password="testpassword")
         self.assertEqual(user.username, "testname")
         
+    def test_default_public(self):
+        user = User.objects.create_user(username="testname", password="testpassword")
+        self.assertEqual(user.account_type, "public")
+        self.assertTrue(user.profile_visibility)

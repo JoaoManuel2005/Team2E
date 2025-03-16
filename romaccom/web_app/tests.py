@@ -12,8 +12,9 @@ class PostCodeAndAddressValidation(TestCase):
         for pc in invalid_postcodes:
             with self.assertRaises(ValidationError):
                 validate_glasgow_postcode(pc)
+                self.assertEqual(ValidationError, f"{pc} is not a valid Glasgow postcode. Use only the first part (e.g., G1, G2, G12)" )
 
-    
+
 
 
         

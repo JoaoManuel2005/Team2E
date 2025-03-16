@@ -14,7 +14,12 @@ class PostCodeAndAddressValidation(TestCase):
                 validate_glasgow_postcode(pc)
                 self.assertEqual(ValidationError, f"{pc} is not a valid Glasgow postcode. Use only the first part (e.g., G1, G2, G12)" )
 
-
+    def test_address_validate(self): 
+        invalid_addresses = ["Main Street","123","123 @Main Street","","   ",]
+        for address in invalid_addresses:
+            with self.assertRaises(ValidationError):
+                validate_uk_address(address)
+                self.assertEqual(ValidationError, "Address must start with a number followed by a street name.")
 
 
         

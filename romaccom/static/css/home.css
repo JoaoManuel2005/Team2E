@@ -114,8 +114,10 @@ p.lead.text-primary {
 }
 
 .btn-primary:hover {
+    background-color: var(--md-on-primary) !important;
+    color: var(--md-primary) !important;
+    border: 1px solid var(--md-primary) !important;
     box-shadow: var(--md-elevation-2) !important;
-    background-color: #5D4996 !important;
 }
 
 .btn-primary:active {

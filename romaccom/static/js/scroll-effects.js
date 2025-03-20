@@ -78,27 +78,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     }
-  });
 
-// Limit scrolling to prevent empty space at bottom
-document.addEventListener('DOMContentLoaded', function() {
-    const mainContent = document.getElementById('main-content');
-    
-    if (mainContent) {
-      // Calculate the maximum scrollable height
-      const setScrollLimit = () => {
-        const viewportHeight = window.innerHeight;
-        const contentTop = parseFloat(getComputedStyle(mainContent).marginTop);
-        const contentHeight = mainContent.scrollHeight;
-        const footerHeight = 50; // Approximate footer height
-        
-        // Set document height to exactly match content
-        document.body.style.height = (contentTop + contentHeight + footerHeight) + 'px';
-      };
-      
-      // Apply initially and on window resize
-      setScrollLimit();
-      window.addEventListener('resize', setScrollLimit);
+    // Fix document height calculation
+    function setPageHeight() {
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            // Get the actual content height
+            const footerElement = document.querySelector('.footer');
+            const footerHeight = footerElement ? footerElement.offsetHeight : 50;
+            const heroHeight = window.innerHeight; // Hero is 100vh
+            const mainContentHeight = mainContent.scrollHeight;
+            
+            // Set page height to precisely fit the content
+            // No min-height, just the exact size needed
+            document.body.style.height = (heroHeight + mainContentHeight + footerHeight) + 'px';
+        }
     }
+    
+    // Apply height adjustment initially and on resize
+    setPageHeight();
+    window.addEventListener('resize', setPageHeight);
   });
 

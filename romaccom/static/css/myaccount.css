@@ -183,7 +183,8 @@
     text-decoration: none;
     font-weight: 500;
     margin-right: var(--md-space-2);
-    transition: background-color 0.2s;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    height: 40px;
 }
 
 .btn-primary {
@@ -195,21 +196,20 @@
     background-color: var(--md-primary-hover);
 }
 
-.btn-danger {
+.btn-danger, .btn-delete {
     background-color: var(--md-error);
     color: white; 
     border: 1px solid var(--md-error-container);
 }
 
-.btn-danger:hover {
-    background-color: var(--md-error-hover);
+.btn-danger:hover, .btn-delete:hover {
+    background-color: white;
+    color: var(--md-error);
+    border: 1px solid var(--md-error);
     box-shadow: var(--md-elevation-2);
 }
 
 .btn-delete {
-    background-color: #d32f2f;
-    color: white;
-    border: 1px solid #b71c1c;
     box-shadow: 0 2px 4px rgba(211, 47, 47, 0.3);
     margin-left: 10px;
     transition: all 0.2s ease;
@@ -218,12 +218,6 @@
     display: inline-flex;
     align-items: center;
     line-height: 1;
-}
-
-.btn-delete:hover {
-    background-color: var(--md-error-hover);
-    box-shadow: var(--md-elevation-2);
-    transform: translateY(-1px);
 }
 
 .btn-delete:active {
@@ -235,6 +229,10 @@
     color: rgba(255, 255, 255, 0.9);
     margin-right: 8px;
     vertical-align: middle;
+}
+
+.btn-delete:hover .material-icons {
+    color: var(--md-error);
 }
 
 .action-btn .material-icons {
@@ -252,7 +250,7 @@
         width: 100%;
     }
 }
-/* privacy toggle style */
+
 .privacy-card {
     display: flex;
     align-items: center;
@@ -321,7 +319,6 @@ input:checked + .slider:before {
     margin-bottom: var(--md-space-3);
 }
 
-/* Delete account modal styles */
 .delete-modal {
     display: none;
     position: fixed;
@@ -388,7 +385,6 @@ input:checked + .slider:before {
     background-color: var(--md-error-hover);
 }
 
-/* Edit Profile Styles */
 .edit-profile-card {
     position: relative;
     cursor: pointer;

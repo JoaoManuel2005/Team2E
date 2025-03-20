@@ -491,3 +491,12 @@ input:checked + .slider:before {
 .btn-save:hover {
     background-color: var(--md-primary-hover);
 }
+
+.privacy-card:hover {
+    box-shadow: var(--md-elevation-1);
+}
+
+a.nav-card:hover {
+    background-color: var(--md-surface-hover, rgba(0, 0, 0, 0.04));
+    box-shadow: var(--md-elevation-1);
+}

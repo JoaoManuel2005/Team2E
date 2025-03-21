@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from web_app.models import User
+from web_app.models import User, Accommodation, Review, Image, AccommodationImage
 from web_app.models import validate_glasgow_postcode
 from web_app.models import validate_uk_address
 
@@ -62,4 +62,96 @@ class UserModelTests(TestCase):
                 user = User(username=username)
                 user.full_clean()
 
+
+class AccommodationMethodTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="testuser")
+        self.accommodation = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Main Street",
+            postcode="G1"
+        )
+
+    def test_update_average_rating_with_reviews(self):
+        Review.objects.create(user=self.user, accommodation=self.accommodation, rating=4, review_text="Good")
+        Review.objects.create(user=self.user, accommodation=self.accommodation, rating=2, review_text="Okay")
+
+        self.accommodation.update_average_rating()
+        expected_rating = (4 + 2) / 2
+        self.assertAlmostEqual(self.accommodation.average_rating, expected_rating, places=1)
+
+    def test_update_average_rating_without_reviews(self):
+        self.accommodation.update_average_rating()
+        self.assertEqual(self.accommodation.average_rating, 0)
+
+    def test_increment_view_count(self):
+        initial_count = self.accommodation.view_count
+        self.accommodation.increment_view_count()
+        self.assertEqual(self.accommodation.view_count, initial_count + 1)
+
+class ReviewMethodTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="testuser")
+        self.accommodation = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Main Street",
+            postcode="G1"
+        )
+
+    def test_review_creation(self):
+        review = Review.objects.create(
+            user=self.user,
+            accommodation=self.accommodation,
+            rating=4,
+            review_text="Good place"
+            )
+
+        self.assertEqual(review.user.username, "testuser")
+        self.assertEqual(review.accommodation.name, "Test Hotel")
+        self.assertEqual(review.accommodation.address, "123 Main Street")
+        self.assertEqual(review.accommodation.postcode, "G1")
+        self.assertEqual(review.rating, 4)
+        self.assertEqual(review.review_text, "Good place")
+
+class ImageMethodTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="testuser")
+        self.accommodation = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Main Street",
+            postcode="G1"
+        )
+        self.review = Review.objects.create(
+            user=self.user,
+            accommodation=self.accommodation,
+            rating=4,
+            review_text="Good place"
+        )
+
+    def test_image_creation(self):
+        image = Image.objects.create(
+            review=self.review,
+            image="review_images/test.jpg"
+        )
+
+        self.assertEqual(image.review, self.review)
+        self.assertEqual(image.image, "review_images/test.jpg")
+
+class AccommodationImageMethodTest(TestCase):
+    def setUp(self):
+        self.accommodation = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Main Street",
+            postcode="G1"
+        )
+
+    def test_accommodation_image_creation(self):
+        accom_image = AccommodationImage.objects.create(
+            accommodation=self.accommodation,
+            image="accommodation_images/test.jpg"
+        )
+
+        self.assertEqual(accom_image.accommodation, self.accommodation)
+        self.assertEqual(accom_image.image, "accommodation_images/test.jpg")
+        self.assertFalse(accom_image.is_main)
 

@@ -6,7 +6,6 @@ from web_app.models import validate_uk_address
 
 
 class PostCodeAndAddressValidation(TestCase):
-
     def test_postcode_validate(self): 
         invalid_postcodes =["g1","E1","G100",""]      
         for pc in invalid_postcodes:
@@ -61,6 +60,8 @@ class UserModelTests(TestCase):
             with self.assertRaises(ValidationError):
                 user = User(username=username)
                 user.full_clean()
+
+class UserProfileModelTests(TestCase):
 
 
 class AccommodationMethodTest(TestCase):
@@ -155,3 +156,5 @@ class AccommodationImageMethodTest(TestCase):
         self.assertEqual(accom_image.image, "accommodation_images/test.jpg")
         self.assertFalse(accom_image.is_main)
 
+
+    

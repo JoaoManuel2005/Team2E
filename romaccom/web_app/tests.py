@@ -75,7 +75,11 @@ class UserProfileModelTests(TestCase):
 
         user.delete()
         self.assertEqual(UserProfile.objects.count(),0)
-      
+    
+    def test_user_profile_access(self):
+        user = User.objects.create_user(username="testname", password="testpassword")
+
+        self.assertEqual(user.profile, self.profile)
 
 
 

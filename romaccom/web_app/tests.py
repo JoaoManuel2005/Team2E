@@ -64,7 +64,7 @@ class UserModelTests(TestCase):
 class UserProfileModelTests(TestCase):
     def test_one_profile_per_user(self):
         user = User.objects.create_user(username="testname", password="testpassword")
-        UserProfile.objects.create(user=user)
+        profile = UserProfile.objects.create(user=user)
 
         profile, created = UserProfile.objects.get_or_create(user=self.user)
         self.assertFalse(created)

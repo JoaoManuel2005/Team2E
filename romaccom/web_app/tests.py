@@ -103,6 +103,20 @@ class UserProfileModelTests(TestCase):
       #  with self.assertRaises(ValidationError):
        #     profile.save()
 
+    def test_blank_website(self):
+        user = User.objects.create_user(username="testname", password="testpassword")
+        profile = UserProfile.objects.create(user=user, website="")  
+        
+        self.assertFalse(profile.website)
+
+    def test_blank_picture(self):
+       
+        user = User.objects.create_user(username="testname", password="testpassword")
+        profile = UserProfile.objects.create(user=user, picture="") 
+        
+       
+        self.assertFalse(profile.picture)  
+
 
 
 

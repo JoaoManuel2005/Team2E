@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from web_app.models import User, UserProfile, Operator, OperatorProfile, Accommodation, Review, Image, AccommodationImage
 from web_app.models import validate_glasgow_postcode
 from web_app.models import validate_uk_address
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class PostCodeAndAddressValidation(TestCase):
@@ -66,7 +67,7 @@ class UserProfileModelTests(TestCase):
         user = User.objects.create_user(username="testname", password="testpassword")
         profile = UserProfile.objects.create(user=user)
 
-        profile, created = UserProfile.objects.get_or_create(user=self.user)
+        profile, created = UserProfile.objects.get_or_create(user=user)
         self.assertFalse(created)
     
     def test_profile_deletion(self):
@@ -78,8 +79,30 @@ class UserProfileModelTests(TestCase):
     
     def test_user_profile_access(self):
         user = User.objects.create_user(username="testname", password="testpassword")
+        profile = UserProfile.objects.create(user=user)
+        self.assertEqual(user.profile, profile)
 
-        self.assertEqual(user.profile, self.profile)
+    def test_valid_url(self):
+        user = User.objects.create_user(username="testname", password="password123")
+        profile = UserProfile.objects.create(user=user, website="https://example.com")
+    
+        self.assertEqual(profile.website,"https://example.com")
+
+    def test_invalid_url(self):
+        user = User.objects.create_user(username="testname", password="password123")
+        profile = UserProfile.objects.create(user=user, website="invalid_url")
+    
+        with self.assertRaises(ValidationError):
+            profile.full_clean()
+
+   # def test_invalid_image(self):
+   #     user = User.objects.create_user(username="testname", password="password123")
+    #    invalid_file = SimpleUploadedFile(name="document.txt", content=b"This is not an image.", content_type="text/plain")
+     #   profile = UserProfile.objects.create(user=user, picture =invalid_file)
+    
+      #  with self.assertRaises(ValidationError):
+       #     profile.save()
+
 
 
 

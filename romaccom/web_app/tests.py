@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from web_app.models import User, Accommodation, Review, Image, AccommodationImage
+from web_app.models import User, UserProfile, Operator, OperatorProfile, Accommodation, Review, Image, AccommodationImage
 from web_app.models import validate_glasgow_postcode
 from web_app.models import validate_uk_address
 
@@ -62,6 +62,23 @@ class UserModelTests(TestCase):
                 user.full_clean()
 
 class UserProfileModelTests(TestCase):
+    def test_one_profile_per_user(self):
+        user = User.objects.create_user(username="testname", password="testpassword")
+        UserProfile.objects.create(user=user)
+
+        profile, created = UserProfile.objects.get_or_create(user=self.user)
+        self.assertFalse(created)
+    
+    def test_profile_deletion(self):
+        user = User.objects.create_user(username="testname", password="testpassword")
+        profile = UserProfile.objects.create(user=user)
+
+        user.delete()
+        self.assertEqual(UserProfile.objects.count(),0)
+      
+
+
+
 
 
 class AccommodationMethodTest(TestCase):
@@ -157,4 +174,3 @@ class AccommodationImageMethodTest(TestCase):
         self.assertFalse(accom_image.is_main)
 
 
-    

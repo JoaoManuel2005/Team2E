@@ -24,16 +24,16 @@ body {
 
 /* Search suggestions styles - Google style */
 .search-suggestions {
-    top: calc(100% - 2px);  /* Overlap slightly with search bar */
-    z-index: 990;  /* Below the search bar */
+    top: calc(100% - 2px);  
+    z-index: 990;  
     display: none;
     background-color: var(--md-surface);
-    border-radius: 0 0 24px 24px;  /* Round bottom corners only */
-    margin-top: 0;  /* Remove the gap */
+    border-radius: 0 0 24px 24px;  
+    margin-top: 0;  
     box-shadow: var(--md-elevation-2);
     overflow: hidden;
-    border: none; /* Removed the border */
-    border-top: none;  /* No border at the top */
+    border: none; 
+    border-top: none; 
 }
 
 .search-suggestions.active {
@@ -47,7 +47,7 @@ body {
     box-shadow: var(--md-elevation-1);
 }
 
-/* Ensure the search suggestions width matches exactly */
+
 .mb-3.position-relative {
     display: flex;
     flex-direction: column;
@@ -85,7 +85,6 @@ body {
     color: var(--md-primary);
 }
 
-/* Typography */
 h1.text-primary {
     color: var(--md-primary) !important;
     font-size: 2.25rem !important;
@@ -99,7 +98,6 @@ p.lead.text-primary {
     font-size: 1.25rem !important;
 }
 
-/* Material buttons */
 .btn-primary {
     background-color: var(--md-primary) !important;
     border-color: var(--md-primary) !important;
@@ -136,15 +134,14 @@ p.lead.text-primary {
     background-color: var(--md-primary-container) !important;
     color: var(--md-on-primary-container) !important;
 }
-
-/* Material Search Bar - More Rounded */
+/* Search Bar */
 .input-group.custom-search {
-    border-radius: 50px !important; /* Increased roundness */
+    border-radius: 24px 24px 24px 24px !important; 
     box-shadow: var(--md-elevation-1);
     background-color: var(--md-surface);
     transition: box-shadow 0.3s;
     border: none !important;
-    overflow: hidden; /* Ensures inner elements respect the border radius */
+    overflow: hidden;
 }
 
 .input-group.custom-search:focus-within {
@@ -157,7 +154,7 @@ p.lead.text-primary {
     font-size: 1rem;
     background-color: transparent;
     padding-left: 16px;
-    border-radius: 0 50px 50px 0 !important; /* Increased roundness */
+    border-radius: 0 24px 24px 0;
 }
 
 .input-group.custom-search .form-control:focus {
@@ -171,10 +168,9 @@ p.lead.text-primary {
     width: 56px;
     justify-content: center;
     font-size: 24px;
-    border-radius: 50px 0 0 50px !important; /* Increased roundness */
+    border-radius: 24px 0 0 24px !important; 
 }
 
-/* Material Cards */
 .card {
     border-radius: 12px;
     overflow: hidden;

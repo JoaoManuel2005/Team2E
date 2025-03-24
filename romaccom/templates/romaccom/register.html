@@ -21,6 +21,13 @@
     <div class="registration-container">
         <div class="registration-card">
             <h2 class="card-title">User Registration</h2>
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+            
             <form method="post" action="{% url 'user_register' %}">
                 {% csrf_token %}
                 <div class="text-field">

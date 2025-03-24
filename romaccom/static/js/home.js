@@ -8,6 +8,58 @@ document.addEventListener("DOMContentLoaded", function() {
     // Get the search URL from the data attribute in home.html
     const searchUrl = searchInput.getAttribute("data-search-url");
 
+    // Function to fetch random suggestions when search is focused without text
+    function fetchRandomSuggestions() {
+        // Add a random parameter to indicate we want random results
+        const url = `${searchUrl}?query=&postcode=&random=true`;
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.html) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data.html, 'text/html');
+                const accomItems = doc.querySelectorAll('.accommodation-card');
+                
+                suggestionsContainer.innerHTML = '';
+                
+                // Show header for initial suggestions
+                const suggestionHeader = document.createElement('div');
+                suggestionHeader.className = 'suggestion-header';
+                suggestionHeader.innerHTML = 'You might like:';
+                suggestionsContainer.appendChild(suggestionHeader);
+
+                // Take first 5 items or fewer if less available
+                const itemsToShow = Math.min(accomItems.length, 5);
+                for (let i = 0; i < itemsToShow; i++) {
+                    const item = accomItems[i];
+                    const accomName = item.querySelector('.accom-name a').textContent;
+                    const accomLink = item.querySelector('.accom-name a').getAttribute('href');
+
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.className = 'suggestion-item';
+                    
+                    suggestionItem.innerHTML = `
+                        <span class="suggestion-icon material-icons">apartment</span>
+                        <span class="suggestion-text">${accomName}</span>
+                    `;
+
+                    suggestionItem.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.location.href = accomLink;
+                    });
+
+                    suggestionsContainer.appendChild(suggestionItem);
+                }
+                
+                suggestionsContainer.classList.add("active");
+            }
+        })
+        .catch(error => console.error("Error fetching random suggestions:", error));
+    }
+
     // Function to fetch and display suggestions
     function fetchSuggestions() {
         clearTimeout(debounceTimer);
@@ -15,8 +67,8 @@ document.addEventListener("DOMContentLoaded", function() {
         debounceTimer = setTimeout(() => {
             const query = searchInput.value.trim();
             if (query.length < 1) {
-                suggestionsContainer.classList.remove("active");
-                suggestionsContainer.innerHTML = "";
+                // When query is empty, show random suggestions instead
+                fetchRandomSuggestions();
                 return;
             }
 
@@ -89,9 +141,12 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // Show suggestions immediately on focus, even if empty
     searchInput.addEventListener('focus', function() {
         if (searchInput.value.trim().length > 0) {
             fetchSuggestions();
+        } else {
+            fetchRandomSuggestions();
         }
     });
 

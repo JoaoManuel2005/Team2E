@@ -175,4 +175,4 @@ cython_debug/
 
 **/migrations/
 
-**/media/**
+# **/media/**

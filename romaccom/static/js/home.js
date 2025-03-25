@@ -5,12 +5,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const searchForm = document.querySelector("#search-form");
     let debounceTimer;
 
-    // Get the search URL from the data attribute in home.html
     const searchUrl = searchInput.getAttribute("data-search-url");
 
-    // Function to fetch random suggestions when search is focused without text
+    /**
+     * Fetches random accommodation suggestions when no query is provided
+     */
     function fetchRandomSuggestions() {
-        // Add a random parameter to indicate we want random results
         const url = `${searchUrl}?query=&postcode=&random=true`;
 
         fetch(url, {
@@ -25,13 +25,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 suggestionsContainer.innerHTML = '';
                 
-                // Show header for initial suggestions
                 const suggestionHeader = document.createElement('div');
                 suggestionHeader.className = 'suggestion-header';
                 suggestionHeader.innerHTML = 'You might like:';
                 suggestionsContainer.appendChild(suggestionHeader);
 
-                // Take first 5 items or fewer if less available
                 const itemsToShow = Math.min(accomItems.length, 5);
                 for (let i = 0; i < itemsToShow; i++) {
                     const item = accomItems[i];
@@ -60,14 +58,15 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(error => console.error("Error fetching random suggestions:", error));
     }
 
-    // Function to fetch and display suggestions
+    /**
+     * Fetches search suggestions based on user input with a debounce mechanism
+     */
     function fetchSuggestions() {
         clearTimeout(debounceTimer);
 
         debounceTimer = setTimeout(() => {
             const query = searchInput.value.trim();
             if (query.length < 1) {
-                // When query is empty, show random suggestions instead
                 fetchRandomSuggestions();
                 return;
             }
@@ -130,18 +129,27 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => console.error("Error fetching search suggestions:", error));
         }, 300); // 300ms debounce delay
     }
-
-    // Event listeners
+    /**
+     * Event listener for user input in the search field
+     */
     searchInput.addEventListener("input", fetchSuggestions);
+    /**
+     * Event listener for postcode dropdown selection changes
+     */
     postcodeDropdown.addEventListener("change", fetchSuggestions);
 
+    /**
+     * Closes suggestions dropdown when clicking outside the search area
+     */
     document.addEventListener('click', function(e) {
         if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
             suggestionsContainer.classList.remove('active');
         }
     });
 
-    // Show suggestions immediately on focus, even if empty
+    /**
+     * Fetches suggestions when the search input gains focus
+     */
     searchInput.addEventListener('focus', function() {
         if (searchInput.value.trim().length > 0) {
             fetchSuggestions();
@@ -150,6 +158,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    /**
+     * Prevents search form submission if the input is empty
+     */
     searchForm.addEventListener('submit', function(e) {
         const query = searchInput.value.trim();
         if (query.length < 1) {

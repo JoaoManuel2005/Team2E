@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('accom-info-form');
     const errorMessage = document.getElementById('error-message');
 
+    /**
+     * Retrieves a cookie value by name
+     * 
+     * @param {string} name - The name of the cookie to retrieve
+     * @returns {string|null} - The value of the cookie or null if not found
+     */
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -17,7 +23,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return cookieValue;
     }
-
+    /**
+     * Validates the accommodation form fields
+     * 
+     * @returns {boolean} - Returns true if the form is valid, false otherwise
+     */
     function validateForm() {
         errorMessage.style.display = 'none';
 
@@ -39,7 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return true;
     }
-
+    /**
+     * Handles the save button click event, validates the form, and submits data via AJAX
+     */
     saveBtn.addEventListener('click', function() {
         if (!validateForm()) {
             return;

@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
         djangoFileField.parentElement.style.display = 'none';
     }
     
-    // Set up custom file input
+    /**
+     * Creates a custom file input element
+     */
     const customFileInput = document.createElement('input');
     customFileInput.type = 'file';
     customFileInput.id = 'custom-logo-upload';
@@ -13,28 +15,32 @@ document.addEventListener('DOMContentLoaded', function() {
     customFileInput.style.display = 'none';
     document.body.appendChild(customFileInput);
     
-    // Connect custom button to custom file input
+    /**
+     * Creates a custom file input element
+     */
     const customButton = document.querySelector('.custom-file-upload');
     customButton.addEventListener('click', function(e) {
         e.preventDefault();
         customFileInput.click();
     });
     
-    // Handle file selection
+    /**
+     * Handles file selection and updates the UI accordingly
+     */
     customFileInput.addEventListener('change', function() {
         if (this.files.length > 0) {
-            // Update file name display
             const fileNameDisplay = document.getElementById('file-name-display');
             const fileName = document.getElementById('file-name');
             fileNameDisplay.style.display = 'flex';
             fileName.textContent = this.files[0].name;
             
-            // Update the hidden Django input
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(this.files[0]);
             djangoFileField.files = dataTransfer.files;
             
-            // Add a "remove" button option
+            /**
+             * Creates a clear option to remove the selected file
+             */
             const clearContainer = document.createElement('div');
             clearContainer.className = 'custom-clear-option';
             clearContainer.innerHTML = `
@@ -44,21 +50,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 </label>
             `;
             
-            // Replace any existing clear option
             const existingClear = document.querySelector('.custom-clear-option');
             if (existingClear) {
                 existingClear.remove();
             }
             fileNameDisplay.insertAdjacentElement('afterend', clearContainer);
             
-            // Handle clear checkbox
+            /**
+             * Handles the clear option checkbox functionality
+             */
             document.getElementById('clear-logo').addEventListener('change', function() {
                 if (this.checked) {
                     customFileInput.value = '';
                     djangoFileField.value = '';
                     fileNameDisplay.style.display = 'none';
                     
-                    // Set Django's clear checkbox if it exists
                     const djangoClear = document.querySelector('input[name="logo-clear"]');
                     if (djangoClear) {
                         djangoClear.checked = true;

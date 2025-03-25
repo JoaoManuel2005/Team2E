@@ -83,42 +83,42 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Custom file upload handling
         const customFileInput = document.getElementById('custom-logo-upload');
         const djangoFileInput = document.querySelector('input[name="logo"]');
         const fileNameDisplay = document.getElementById('file-name-display');
         const fileName = document.getElementById('file-name');
         const clearLogoCheckbox = document.getElementById('clear-logo');
         
-        // Handle custom file selection
+        /**
+         * Handles file selection for the custom file input
+         * Displays the selected file name and updates the corresponding Django file input
+         */
         customFileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
-                // Update UI
                 fileNameDisplay.style.display = 'flex';
                 fileName.textContent = this.files[0].name;
                 
-                // Update Django's file input
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(this.files[0]);
                 djangoFileInput.files = dataTransfer.files;
                 
-                // Uncheck clear checkbox if it exists
                 if (clearLogoCheckbox) {
                     clearLogoCheckbox.checked = false;
                 }
             }
         });
         
-        // Handle clear checkbox
+        /**
+         * Handles the "clear logo" checkbox functionality.
+         * Clears the selected file and resets the form inputs.
+         */
         if (clearLogoCheckbox) {
             clearLogoCheckbox.addEventListener('change', function() {
                 if (this.checked) {
-                    // Clear both inputs
                     customFileInput.value = '';
                     djangoFileInput.value = '';
                     fileNameDisplay.style.display = 'none';
                     
-                    // Set Django's clear checkbox
                     const djangoClearCheckbox = document.querySelector('input[name="logo-clear"]');
                     if (djangoClearCheckbox) {
                         djangoClearCheckbox.checked = true;

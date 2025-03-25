@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (modal) {
         modal.style.display = 'none';
     }
-    
-    // Open modal when delete button is clicked
+    /**
+     * Opens confirmation modal for deleting an accommodation
+     */
     document.querySelectorAll('.delete-accommodation').forEach(button => {
         button.addEventListener('click', function() {
             const id = this.dataset.id;
@@ -22,24 +23,28 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.style.display = 'flex';
         });
     });
-    
-    // Close modal functions
+        
+    /**
+     * Closes the modal and resets the current accommodation ID
+     */
     function closeModal() {
         modal.style.display = 'none';
         currentAccommodationId = null;
     }
-    
+
     modalClose.addEventListener('click', closeModal);
     cancelDelete.addEventListener('click', closeModal);
-    
-    // Handle modal background click to close
+    /**
+     * Closes the modal when clicking outside of it.
+     */
     modal.addEventListener('click', function(event) {
         if (event.target === modal) {
             closeModal();
         }
     });
-    
-    // Confirm delete action
+    /**
+     * Confirms deletion of an accommodation and sends a delete request to the API
+     */
     confirmDelete.addEventListener('click', function() {
         if (currentAccommodationId) {
             fetch('/api/accommodation/delete/', {
@@ -70,25 +75,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    /**
+     * Account deletion modal handling
+     */
     const deleteAccountBtn = document.getElementById('delete-account-btn');
     const confirmDeleteAccountModal = document.getElementById('confirm-delete-modal');
     const closeDeleteAccountModal = document.getElementById('close-delete-modal');
     const cancelDeleteAccount = document.getElementById('cancel-delete-account');
     const confirmDeleteAccount = document.getElementById('confirm-delete-account');
 
-    // Ensure account deletion modal is hidden on page load
     if (confirmDeleteAccountModal) {
         confirmDeleteAccountModal.style.display = 'none';
     }
 
-    // Show confirmation modal for account deletion when button is clicked
     if (deleteAccountBtn) {
         deleteAccountBtn.addEventListener('click', function() {
             confirmDeleteAccountModal.style.display = 'flex';
         });
     }
 
-    // Close modal for account deletion
     if (closeDeleteAccountModal) {
         closeDeleteAccountModal.addEventListener('click', function() {
             confirmDeleteAccountModal.style.display = 'none';
@@ -100,8 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmDeleteAccountModal.style.display = 'none';
         });
     }
-
-    // Confirm delete operator account
+    /**
+     * Sends a request to delete the user account
+     */
     if (confirmDeleteAccount) {
         confirmDeleteAccount.addEventListener('click', function() {
             fetch('/romaccom/operator/delete-account/', {
@@ -126,8 +132,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
-    // Utility function to get CSRF token
+    /**
+     * Retrieves a specific cookie by name
+     * 
+     * @param {string} name - The name of the cookie to retrieve
+     * @returns {string|null} - The value of the cookie or null if not found
+     */
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {

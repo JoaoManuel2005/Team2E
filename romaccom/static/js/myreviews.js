@@ -1,5 +1,8 @@
+/**
+ * Adds event listeners to all delete buttons
+ * Prompts user for confirmation before deleting a review
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners to all delete review buttons
     document.querySelectorAll('.btn-delete').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -10,7 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
+    /**
+     * Sends a request to delete a review by its ID
+     * If successful, removes the review card from the page
+     * 
+     * @param {string} reviewId - The ID of the review to delete
+     */
     function deleteReview(reviewId) {
         fetch('/romaccom/delete_review/', {
             method: 'POST',
@@ -25,13 +34,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Fade out and remove the review card from the DOM
                 const reviewCard = document.querySelector(`.review-card[data-review-id="${reviewId}"]`);
                 reviewCard.style.opacity = '0';
                 setTimeout(() => {
                     reviewCard.remove();
                     
-                    // If no reviews left, show a message
                     if (document.querySelectorAll('.review-card').length === 0) {
                         const reviewsList = document.querySelector('.reviews-list');
                         reviewsList.innerHTML = '<div class="no-reviews"><p>You haven\'t written any reviews yet.</p><p>Share your experiences with accommodations and help other students make informed decisions!</p><a href="/" class="browse-btn"><span class="material-icons">search</span>Find your next accommodation</a></div>';
@@ -46,8 +53,13 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('An error occurred while deleting the review.');
         });
     }
-    
-    // Utility function to get CSRF token
+
+    /**
+     * Retrieves the value of a specified cookie.
+     * 
+     * @param {string} name - The name of the cookie to retrieve
+     * @returns {string|null} The value of the cookie, or null if not found
+     */
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {

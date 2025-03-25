@@ -1,22 +1,23 @@
+/**
+ * Handles the edit profile modal functionality
+ * Opens and closes the modal, submits profile updates
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // Edit Profile functionality
     const editProfileCard = document.getElementById('edit-profile-trigger');
     const editProfileModal = document.querySelector('.edit-profile-modal');
     const editProfileForm = document.getElementById('edit-profile-form');
     const cancelBtn = document.querySelector('.btn-cancel');
     
+    // Opens the edit profile modal
     if (editProfileCard && editProfileModal) {
-        // Show modal when the entire card is clicked
         editProfileCard.addEventListener('click', function() {
             editProfileModal.style.display = 'flex';
         });
-
-        // Hide modal when cancel button is clicked
+    // Closes the edit profile modal
         cancelBtn.addEventListener('click', function() {
             editProfileModal.style.display = 'none';
         });
-
-        // Handle form submission
+        // Handles form submission for profile update
         editProfileForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data.success) {
-                    // Update profile information on the page
+                    // Updates UI with new profile information
                     if (data.username) {
                         document.querySelector('.profile-username').textContent = data.username;
                     }
@@ -72,7 +73,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Privacy toggle functionality
+    /**
+     * Handles privacy toggle functionality
+     * Sends an update request when the privacy setting is changed
+     */
     const privacyToggle = document.getElementById('privacy-toggle');
     if (!privacyToggle) {
         console.error("Privacy toggle not found.");
@@ -107,11 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
-    // Account deletion functionality
+    /**
+     * Handles account deletion process
+     * Displays a confirmation modal and sends a delete request upon confirmation
+     */
     const deleteAccountBtn = document.querySelector('.btn-delete');
     if (deleteAccountBtn) {
-        // Create confirmation modal
         const modal = document.createElement('div');
         modal.className = 'delete-modal';
         modal.innerHTML = `
@@ -126,13 +131,11 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.body.appendChild(modal);
 
-        // Show modal when delete button is clicked
         deleteAccountBtn.addEventListener('click', function(e) {
             e.preventDefault();
             modal.style.display = 'flex';
         });
 
-        // Handle modal button clicks
         modal.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal-cancel')) {
                 modal.style.display = 'none';
@@ -141,7 +144,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Function to handle account deletion
+        /**
+         * Sends a request to delete the user account
+         */
         function deleteAccount() {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             

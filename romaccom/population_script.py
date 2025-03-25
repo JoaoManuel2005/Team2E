@@ -18,13 +18,26 @@ OPERATOR_LOGOS_DIR = os.path.join(BASE_MEDIA_DIR, "operator_logos")
 ACCOMMODATION_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "accommodation_images")
 REVIEW_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "review_images")
 
-
+"""
+Returns a random image file path from a given directory
+"""
+"""
+Returns a random image file path from a given directory
+"""
 def get_random_image(directory):
-    """Returns a random image file path from a given directory."""
     if not os.path.exists(directory) or not os.listdir(directory):
-        return None  # Return None if no images found
+        return None  
+        return None  
     return random.choice(os.listdir(directory))
 
+"""
+Creates 20 users
+All of their passwords are set to password123 so that we can enter their accounts while testing
+"""
+"""
+Creates 20 users
+All of their passwords are set to password123 so that we can enter their accounts while testing
+"""
 def create_users(n=20):
     users = []
     for _ in range(n):
@@ -38,18 +51,15 @@ def create_users(n=20):
 def create_operators(n=6):  
     operators = []
     
-    # Create a well-known operator with just name and password
     aparto_operator = Operator.objects.create(
         name="aparto Student",
         password="securepassword"
     )
-
-    # Assign a random logo if available
     logo_filename = get_random_image(OPERATOR_LOGOS_DIR)
     if logo_filename:
         aparto_profile = OperatorProfile.objects.create(
             operator=aparto_operator,
-            logo=f"populate_images/operator_logos/{logo_filename}"  # Correct path for Django media
+            logo=f"populate_images/operator_logos/{logo_filename}"  
         )
 
     operators.append(aparto_operator)
@@ -102,7 +112,6 @@ def create_operators(n=6):
             name=name,
             password=password
         )
-        #Assign a random logo
         logo_filename = get_random_image(OPERATOR_LOGOS_DIR)
         if logo_filename:
             OperatorProfile.objects.create(
@@ -114,10 +123,19 @@ def create_operators(n=6):
     
     return operators
 
+"""
+Creates 30 accoms
+Randomly assigns them to one of the operators other than apartos operator
+"""
+"""
+Creates 30 accoms
+Randomly assigns them to one of the operators other than apartos operator
+"""
 def create_accommodations(operators, n=30):
     accommodations = []
 
-    # Featured real accommodation
+    # Featured real accommodation (aparto)
+    # Featured real accommodation (aparto)
     aparto_accom = Accommodation.objects.create(
         name="aparto Glasgow West End",
         address="Kelvinhaugh Street, Glasgow",
@@ -476,12 +494,19 @@ def create_accommodations(operators, n=30):
 
     return accommodations
 
+"""
+Creates 50 reviews
+Randomly assigns them to accomodations
+Aparto gets its own special reviews
+"""
+"""
+Creates 50 reviews
+Randomly assigns them to accomodations
+Aparto gets its own special reviews
+"""
 def create_reviews(users, accommodations, n=50):
-    # Generate a random date in the past year
     def random_date():
-        # Get current time
         now = timezone.now()
-        # Random number of days ago (up to 365)
         days_ago = random.randint(1, 365)
         return now - timedelta(days=days_ago)
 
@@ -505,7 +530,6 @@ def create_reviews(users, accommodations, n=50):
             title="Fantastic Experience",
             review_text=premium_reviews[i]
         )
-        # Assign an image to the review
         image_filename = get_random_image(REVIEW_IMAGES_DIR)
         if image_filename:
             Image.objects.create(
@@ -513,7 +537,8 @@ def create_reviews(users, accommodations, n=50):
                 image=f"populate_images/review_images/{image_filename}"
             )
 
-    # Create a mix of good and bad reviews for other accommodations
+    # create a mix of good and bad reviews for accommodations
+    # create a mix of good and bad reviews for accommodations
     for _ in range(n):
         user = random.choice(users)
         accommodation = random.choice(accommodations)
@@ -531,10 +556,11 @@ def create_reviews(users, accommodations, n=50):
             rating=rating,
             title=fake.sentence(nb_words=4),
             review_text=review_text,
-            created_at=random_date()  # Add the random date
+            created_at=random_date() 
         )
 
-        # Assign an image
+        # assign an image
+        # assign an image
         image_filename = get_random_image(REVIEW_IMAGES_DIR)
         if image_filename:
             Image.objects.create(

@@ -1,5 +1,7 @@
+/**
+ * Handles image upload functionality through button click or drag-and-drop
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // Image upload functionality
     const uploadTrigger = document.getElementById('upload-trigger');
     const imageUpload = document.getElementById('image-upload');
     
@@ -13,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Drag and drop functionality
     uploadTrigger.addEventListener('dragover', function(e) {
         e.preventDefault();
         uploadTrigger.classList.add('dragging');
@@ -30,16 +31,19 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadImages(e.dataTransfer.files);
         }
     });
-    
+        /**
+     * Uploads selected images to the server
+     * @param files - The files to be uploaded
+     */
+
     function uploadImages(files) {
         const formData = new FormData();
-        formData.append('accommodation_id', accommodationId); // Use global var
+        formData.append('accommodation_id', accommodationId); 
         
         for (let i = 0; i < files.length; i++) {
             formData.append('images', files[i]);
         }
         
-        // Send AJAX request to upload images
         fetch(uploadImageUrl, { // Use global var
             method: 'POST',
             body: formData,
@@ -50,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Refresh the page to show new images
                 location.reload();
             } else {
                 alert('Error uploading images: ' + data.error);
@@ -61,6 +64,10 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('An error occurred while uploading images.');
         });
     }
+    /**
+     * Validates the accommodation form fields before submission
+     * @returns {boolean} - Returns true if form is valid, false otherwise
+     */
 
     function validateForm() {
         const name = document.getElementById('accom-name').value.trim();
@@ -88,8 +95,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return true;
     }
-    
-    // Save changes functionality
+
+
+    /**
+     * Handles form submission to update accommodation details
+     */
     document.getElementById('save-changes-btn').addEventListener('click', function() {
         if (!validateForm()) {
             return;
@@ -125,7 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Delete accommodation functionality
+    /**
+     * Handles accommodation deletion confirmation and execution
+     */
     const deleteButton = document.getElementById('delete-accom-btn');
     const confirmModal = document.getElementById('confirm-modal');
     const modalClose = document.getElementById('modal-close');
@@ -169,8 +181,9 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('An error occurred while deleting the accommodation.');
         });
     });
-    
-    // Set main image functionality
+    /**
+     * Sets the selected image as the main image for the accommodation
+     */
     document.querySelectorAll('.set-main-image').forEach(button => {
         button.addEventListener('click', function() {
             const imageId = this.getAttribute('data-image-id');
@@ -200,8 +213,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-    
-    // Delete image functionality
+    /**
+     * Deletes an image after user confirmation
+     */
     document.querySelectorAll('.delete-image').forEach(button => {
         button.addEventListener('click', function() {
             if (confirm('Are you sure you want to delete this image?')) {
@@ -232,8 +246,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Utility function to get CSRF token
+    /**
+    * Retrieves a cookie value by name
+    * @param {string} name - The name of the cookie to retrieve
+    * @returns {string|null} - The value of the cookie or null if not found
+    */
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {

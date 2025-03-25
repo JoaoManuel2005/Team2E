@@ -70,48 +70,6 @@
 
 <div class="results-list">
     {% include 'romaccom/search_results_partial.html' %}
-    <!-- {% if results %}
-        {% for accom in results %}
-            <div class="accommodation-card">
-                {% if accom.image %}
-                    <img src="{{ accom.image.url }}" alt="{{ accom.name }}" class="accom-image">
-                {% else %}
-                    <img src="{% static 'images/default-accommodation.jpg' %}" alt="Default accommodation image" class="accom-image">
-                {% endif %}
-                
-                <div class="accom-content">
-                    <div class="accom-header">
-                        <h2 class="accom-name">
-                            <a href="{% url 'accommodation_detail' accom.id %}">{{ accom.name }}</a>
-                        </h2>
-                        
-                        <div class="accom-rating">
-                            <span class="material-icons">star</span>
-                            <span class="rating-value">
-                                {% if accom.average_rating %}
-                                    {{ accom.average_rating|floatformat:1 }}
-                                {% else %}
-                                    No ratings
-                                {% endif %}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <p class="accom-address">{{ accom.address }}</p>
-                    
-                    <div class="view-count">
-                        <span class="material-icons">visibility</span>
-                        <span>{{ accom.view_count }} views</span>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="no-results">
-            <p>We couldn't find any accommodations matching your search.</p>
-            <p class="search-again">Try different keywords or browse our trending accommodations.</p>
-        </div>
-    {% endif %} -->
 </div>
 {% endblock %}
 

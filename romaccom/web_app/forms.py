@@ -5,7 +5,9 @@ from .models import UserProfile, Review, Image, OperatorProfile
 
 User = get_user_model()
 
-# User Registration Form
+"""
+Form for user registtration
+"""
 class UserForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
@@ -13,12 +15,20 @@ class UserForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
-# User Profile Form
+"""
+Form to update user profile details
+allows updating website and profile pocture
+"""
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['website', 'picture']
 
+"""
+Form for submitting reciews
+Allows submitting title, rating, a review description
+Supports multiple image uploads
+"""
 class ReviewForm(forms.ModelForm):
     images = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}), required=False)
     
@@ -29,6 +39,10 @@ class ReviewForm(forms.ModelForm):
             'review_text': forms.Textarea(attrs={'rows': 4}),
         }
 
+"""
+Form for updating operator profile details
+Allows updating operator description, webiste and logo
+"""
 class OperatorProfileForm(forms.ModelForm):
     class Meta:
         model = OperatorProfile

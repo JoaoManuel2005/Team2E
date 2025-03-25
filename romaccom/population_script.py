@@ -18,13 +18,18 @@ OPERATOR_LOGOS_DIR = os.path.join(BASE_MEDIA_DIR, "operator_logos")
 ACCOMMODATION_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "accommodation_images")
 REVIEW_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "review_images")
 
-
+"""
+Returns a random image file path from a given directory
+"""
 def get_random_image(directory):
-    """Returns a random image file path from a given directory."""
     if not os.path.exists(directory) or not os.listdir(directory):
-        return None  # Return None if no images found
+        return None  
     return random.choice(os.listdir(directory))
 
+"""
+Creates 20 users
+All of their passwords are set to password123 so that we can enter their accounts while testing
+"""
 def create_users(n=20):
     users = []
     for _ in range(n):
@@ -35,26 +40,26 @@ def create_users(n=20):
         users.append(user)
     return users
 
+"""
+Creates 6 operators
+All of their passwords are set to securepassword so that we can enter their accounts while testing
+"""
 def create_operators(n=5):
     operators = []
     
-    # Create a well-known operator with just name and password
     aparto_operator = Operator.objects.create(
         name="aparto Student",
         password="securepassword"
     )
-
-    # Assign a random logo if available
     logo_filename = get_random_image(OPERATOR_LOGOS_DIR)
     if logo_filename:
         aparto_profile = OperatorProfile.objects.create(
             operator=aparto_operator,
-            logo=f"populate_images/operator_logos/{logo_filename}"  # Correct path for Django media
+            logo=f"populate_images/operator_logos/{logo_filename}"  
         )
 
     operators.append(aparto_operator)
     
-    # Create other random student accommodation operators
     for _ in range(n):
         name = fake.company() + " Accommodation"
         password = "securepassword"
@@ -62,7 +67,6 @@ def create_operators(n=5):
             name=name,
             password=password
         )
-        #Assign a random logo
         logo_filename = get_random_image(OPERATOR_LOGOS_DIR)
         if logo_filename:
             OperatorProfile.objects.create(
@@ -74,10 +78,14 @@ def create_operators(n=5):
     
     return operators
 
+"""
+Creates 30 accoms
+Randomly assigns them to one of the operators other than apartos operator
+"""
 def create_accommodations(operators, n=30):
     accommodations = []
 
-    # Featured real accommodation
+    # Featured real accommodation (aparto)
     aparto_accom = Accommodation.objects.create(
         name="aparto Glasgow West End",
         address="Kelvinhaugh Street, Glasgow",
@@ -89,7 +97,6 @@ def create_accommodations(operators, n=30):
     aparto_accom.operators.add(operators[0])  # Assign to aparto operator
     accommodations.append(aparto_accom)
 
-    # Create more accommodations
     for _ in range(n):
         name = fake.company() + " Student Living"
         address = fake.street_address() + ", Glasgow"
@@ -102,15 +109,14 @@ def create_accommodations(operators, n=30):
             postcode=postcode,
             map_link=map_link,
             average_rating=random.uniform(2.5, 5.0),
-            view_count=random.randint(50, 1000)  # Some should be highly viewed
+            view_count=random.randint(50, 1000)
         )
-        # When creating random accommodations, exclude the real operator
-        other_operators = [op for op in operators if op != operators[0]]  # Exclude aparto operator
+        # when creating random accommodations, exclude the aparto operator
+        other_operators = [op for op in operators if op != operators[0]]
         accommodation.operators.set(random.sample(other_operators, random.randint(1, len(other_operators))))
         accommodations.append(accommodation)
 
-        # Add images
-        for _ in range(random.randint(1, 3)):  # Assign 1-3 images per accommodation
+        for _ in range(random.randint(1, 3)):  # assign 1-3 images per accommodation
             image_filename = get_random_image(ACCOMMODATION_IMAGES_DIR)
             if image_filename:
                 AccommodationImage.objects.create(
@@ -121,12 +127,14 @@ def create_accommodations(operators, n=30):
 
     return accommodations
 
+"""
+Creates 50 reviews
+Randomly assigns them to accomodations
+Aparto gets its own special reviews
+"""
 def create_reviews(users, accommodations, n=50):
-    # Generate a random date in the past year
     def random_date():
-        # Get current time
         now = timezone.now()
-        # Random number of days ago (up to 365)
         days_ago = random.randint(1, 365)
         return now - timedelta(days=days_ago)
 
@@ -150,7 +158,6 @@ def create_reviews(users, accommodations, n=50):
             title="Fantastic Experience",
             review_text=premium_reviews[i]
         )
-        # Assign an image to the review
         image_filename = get_random_image(REVIEW_IMAGES_DIR)
         if image_filename:
             Image.objects.create(
@@ -158,7 +165,7 @@ def create_reviews(users, accommodations, n=50):
                 image=f"populate_images/review_images/{image_filename}"
             )
 
-    # Create a mix of good and bad reviews for other accommodations
+    # create a mix of good and bad reviews for accommodations
     for _ in range(n):
         user = random.choice(users)
         accommodation = random.choice(accommodations)
@@ -176,10 +183,10 @@ def create_reviews(users, accommodations, n=50):
             rating=rating,
             title=fake.sentence(nb_words=4),
             review_text=review_text,
-            created_at=random_date()  # Add the random date
+            created_at=random_date() 
         )
 
-        # Assign an image
+        # assign an image
         image_filename = get_random_image(REVIEW_IMAGES_DIR)
         if image_filename:
             Image.objects.create(

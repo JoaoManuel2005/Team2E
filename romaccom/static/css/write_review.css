@@ -152,7 +152,6 @@ input[type="file"] {
     z-index: -1;
 }
 
-/* Style the custom file upload button */
 input[type="file"] + label {
     display: inline-flex;
     align-items: center;
@@ -167,7 +166,6 @@ input[type="file"] + label {
     margin-top: var(--md-space-1);
 }
 
-/* Add Material Icon to the button */
 input[type="file"] + label::before {
     content: 'add_photo_alternate';
     font-family: 'Material Icons';
@@ -181,13 +179,11 @@ input[type="file"] + label:hover {
     color: var(--md-on-primary-container);
 }
 
-/* Focus state for accessibility */
 input[type="file"]:focus + label {
     outline: 1px solid var(--md-primary);
     outline-offset: 2px;
 }
 
-/* File upload info text */
 .file-upload-info {
     margin-top: var(--md-space-2);
     font-size: 0.85rem;

@@ -113,7 +113,6 @@
     font-size: 18px;
 }
 
-/* Modal for image preview */
 .modal-overlay {
     display: none;
     position: fixed;

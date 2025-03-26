@@ -71,7 +71,6 @@
     z-index: -1;
 }
 
-/* Custom file upload button styling */
 .form-group .custom-file-upload {
     display: inline-flex;
     align-items: center;
@@ -120,12 +119,10 @@
     font-size: 1.2rem;
 }
 
-/* Hidden file input */
 input[type="file"] {
     display: none;
 }
 
-/* Selected file display */
 .selected-file {
     display: flex;
     align-items: center;
@@ -142,7 +139,6 @@ input[type="file"] {
     font-size: 1.2rem;
 }
 
-/* Form actions */
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -150,7 +146,6 @@ input[type="file"] {
     margin-top: 2rem;
 }
 
-/* Error messages */
 .errorlist {
     list-style: none;
     color: var(--md-error);
@@ -176,7 +171,6 @@ input[type="file"] {
     }
 }
 
-/* Add these button styles from management.css */
 .management-btn {
     display: inline-flex;
     align-items: center;
@@ -218,40 +212,34 @@ input[type="file"] {
     color: var(--md-on-primary-container);
 }
 
-/* Style for Django's file input elements */
 .form-group p:first-of-type {
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
     color: var(--md-on-surface-variant);
 }
 
-/* Style for the "Clear" checkbox container */
 .form-group p:nth-of-type(2) {
     display: inline-flex;
     align-items: center;
     margin: 0.75rem 0;
 }
 
-/* Style for the checkbox itself */
 .form-group p:nth-of-type(2) input[type="checkbox"] {
     width: auto;
     margin-right: 0.5rem;
     cursor: pointer;
 }
 
-/* Style for the "Clear" label */
 .form-group p:nth-of-type(2) label {
     display: inline;
     margin-bottom: 0;
     cursor: pointer;
 }
 
-/* Hide the "Change:" text */
 .form-group p:nth-of-type(3) {
     display: none;
 }
 
-/* Ensure the actual file input remains hidden */
 .form-group input[type="file"] {
     width: 0.1px;
     height: 0.1px;
@@ -261,7 +249,6 @@ input[type="file"] {
     z-index: -1;
 }
 
-/* Style for "Currently:" text and filename */
 .form-group .currentfile {
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
@@ -269,14 +256,12 @@ input[type="file"] {
     display: block;
 }
 
-/* Style for the "Clear" checkbox container */
 .form-group .checkbox {
     display: inline-flex;
     align-items: center;
     margin: 0.75rem 0;
 }
 
-/* Style for the checkbox itself */
 .form-group .checkbox input[type="checkbox"] {
     width: auto;
     margin-right: 0.5rem;
@@ -291,12 +276,10 @@ input[type="file"] {
     font-weight: 400;
 }
 
-/* Hide "Change:" text */
 .form-group label[for="id_logo"] + span {
     display: none;
 }
 
-/* Custom logo display styles */
 .current-logo-container {
     margin-top: 1rem;
 }
@@ -307,7 +290,6 @@ input[type="file"] {
     margin-bottom: 0.5rem;
 }
 
-/* Enhanced custom clear logo option */
 .clear-logo-option {
     display: inline-flex;
     align-items: center;
@@ -343,32 +325,26 @@ input[type="file"] {
     transform: scale(1.2);
 }
 
-/* Hide all Django-generated file field elements */
 .form-group div.file-upload {
     display: none !important;
 }
 
-/* Hide any "Currently:" text */
 .form-group p:has(span.file-upload) {
     display: none !important;
 }
 
-/* Hide Django's clear checkbox container */
 .form-group span.clearable-file-input {
     display: none !important;
 }
 
-/* Hide any "Change:" text */
 .form-group label[for="id_logo"] + span {
     display: none !important;
 }
 
-/* Ensure any hidden file inputs stay hidden */
 .form-group input[type="file"][name="logo"] {
     display: none !important;
 }
 
-/* Hide any Django-generated file field wrapper */
 .form-group div:has(> input[type="file"][name="logo"]) {
     display: none !important;
 }

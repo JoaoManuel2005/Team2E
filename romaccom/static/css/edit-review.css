@@ -260,6 +260,9 @@
     box-shadow: var(--md-elevation-2);
 }
 
+/* Repsomsive styling
+Reverse form action buttons order for smaller screens
+and makes buttons full-width  */
 @media (max-width: 768px) {
     .form-actions {
         flex-direction: column-reverse;

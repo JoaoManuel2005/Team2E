@@ -1,19 +1,22 @@
+/* Container for about section content */
 .about-content {
     max-width: 800px;
     margin: 0 auto;
 }
-
+/* Title styling */
 .about-title {
     font-size: 1.8rem;
     margin-bottom: 20px;
     color: #333;
 }
 
+/* Gemeral text styling */
 .about-text {
     margin-bottom: 20px;
     line-height: 1.8;
 }
 
+/* Slogan styling */
 .about-slogan {
     font-style: italic;
     color: #6750A4;

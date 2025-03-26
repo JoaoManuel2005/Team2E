@@ -207,7 +207,12 @@
     color: #666;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments 
+Stacks profile sections vertically is creen is smaller
+Makes the sidebar full width and changes border for separation
+Stacks elements in accom header vertically and alings accom content tot he elft
+Adds spacing above review rating to prevent overlap
+*/
 @media (max-width: 768px) {
     .profile-section {
         flex-direction: column;

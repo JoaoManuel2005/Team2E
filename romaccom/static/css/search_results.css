@@ -152,6 +152,8 @@
     color: var(--md-on-surface-variant);
 }
 
+/* stacks elements vertically in accomodation card on smaller screns
+Makes images responsive to fit container */
 @media (max-width: 600px) {
     .accommodation-card {
         flex-direction: column;
@@ -231,6 +233,8 @@
     background-color: var(--md-primary-container);
 }
 
+/* stacks search elements vertically on smaller screns
+Makes input fields and button responsive to fit container */
 @media (max-width: 768px) {
     .search-form {
         flex-direction: column;

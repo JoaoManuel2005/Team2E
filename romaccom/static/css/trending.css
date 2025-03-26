@@ -89,6 +89,9 @@
     margin-right: 4px;
 }
 
+
+/* stacks elements vertically in accomodation card on smaller screns
+Makes images responsive to fit container */
 @media (max-width: 600px) {
     .accommodation-card {
         flex-direction: column;

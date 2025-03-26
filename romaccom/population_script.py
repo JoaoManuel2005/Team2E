@@ -18,9 +18,7 @@ OPERATOR_LOGOS_DIR = os.path.join(BASE_MEDIA_DIR, "operator_logos")
 ACCOMMODATION_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "accommodation_images")
 REVIEW_IMAGES_DIR = os.path.join(BASE_MEDIA_DIR, "review_images")
 
-"""
-Returns a random image file path from a given directory
-"""
+
 """
 Returns a random image file path from a given directory
 """
@@ -30,10 +28,7 @@ def get_random_image(directory):
         return None  
     return random.choice(os.listdir(directory))
 
-"""
-Creates 20 users
-All of their passwords are set to password123 so that we can enter their accounts while testing
-"""
+
 """
 Creates 20 users
 All of their passwords are set to password123 so that we can enter their accounts while testing
@@ -123,10 +118,7 @@ def create_operators(n=6):
     
     return operators
 
-"""
-Creates 30 accoms
-Randomly assigns them to one of the operators other than apartos operator
-"""
+
 """
 Creates 30 accoms
 Randomly assigns them to one of the operators other than apartos operator
@@ -134,7 +126,6 @@ Randomly assigns them to one of the operators other than apartos operator
 def create_accommodations(operators, n=30):
     accommodations = []
 
-    # Featured real accommodation (aparto)
     # Featured real accommodation (aparto)
     aparto_accom = Accommodation.objects.create(
         name="aparto Glasgow West End",
@@ -494,11 +485,7 @@ def create_accommodations(operators, n=30):
 
     return accommodations
 
-"""
-Creates 50 reviews
-Randomly assigns them to accomodations
-Aparto gets its own special reviews
-"""
+
 """
 Creates 50 reviews
 Randomly assigns them to accomodations
@@ -538,7 +525,6 @@ def create_reviews(users, accommodations, n=50):
             )
 
     # create a mix of good and bad reviews for accommodations
-    # create a mix of good and bad reviews for accommodations
     for _ in range(n):
         user = random.choice(users)
         accommodation = random.choice(accommodations)
@@ -559,7 +545,6 @@ def create_reviews(users, accommodations, n=50):
             created_at=random_date() 
         )
 
-        # assign an image
         # assign an image
         image_filename = get_random_image(REVIEW_IMAGES_DIR)
         if image_filename:

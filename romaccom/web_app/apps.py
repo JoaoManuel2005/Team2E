@@ -1,4 +1,4 @@
 from django.apps import AppConfig
 
-class RomaccomConfig(AppConfig):
+class WebAppConfig(AppConfig):
     name = 'web_app'

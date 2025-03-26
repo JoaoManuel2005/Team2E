@@ -117,6 +117,22 @@ class UserProfileModelTests(TestCase):
        
         self.assertFalse(profile.picture)  
 
+class OperatorModelTest(TestCase):
+    def test_create_operator(self):
+        operator = Operator.objects.create(
+            name="Test Operator",
+            email="test@example.com",
+            password="securepassword"
+        )
+        self.assertEqual(str(operator), "Test Operator")
+        self.assertEqual(operator.email, "test@example.com")
+
+    def test_operator_email_optional(self):
+        operator = Operator.objects.create(
+            name="No Email Operator",
+            password="securepassword"
+        )
+        self.assertIsNone(operator.email)
 
 
 

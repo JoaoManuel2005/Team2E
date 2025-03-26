@@ -30,7 +30,7 @@ Allows submitting title, rating, a review description
 Supports multiple image uploads
 """
 class ReviewForm(forms.ModelForm):
-    images = forms.FileField(widget=forms.FileInput(attrs={'multiple': True}), required=False)
+    images = forms.FileField(widget=forms.FileInput(attrs={'multiple': False}), required=False)
     
     class Meta:
         model = Review

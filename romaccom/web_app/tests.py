@@ -125,6 +125,13 @@ class OperatorModelTest(TestCase):
             password="securepassword"
         )
         self.assertEqual(str(operator), "Test Operator")
+
+    def test_operator_email_stored_correctly(self):
+        operator = Operator.objects.create(
+            name="Test Operator",
+            email="test@example.com",
+            password="securepassword"
+        )
         self.assertEqual(operator.email, "test@example.com")
 
     def test_operator_email_optional(self):

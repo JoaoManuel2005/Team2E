@@ -160,6 +160,14 @@ class OperatorProfileModelTest(TestCase):
         self.assertEqual(str(profile), "Test Operator's Profile")
         self.assertEqual(profile.website, "https://example.com")
 
+    def test_operator_profile_only_one(self):
+        
+        operator = Operator.objects.create(name="Unique Profile Operator", email="unique@example.com", password="password123")
+        OperatorProfile.objects.create(operator=operator)
+
+        with self.assertRaises(Exception): 
+            OperatorProfile.objects.create(operator=operator)
+
     
 
     

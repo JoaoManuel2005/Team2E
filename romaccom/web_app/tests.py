@@ -437,5 +437,33 @@ class HomePageViewTests(TestCase):
         self.assertIn('Accom 1', response.content.decode('utf-8'))
         self.assertNotIn('Accom 2', response.content.decode('utf-8'))
 
+class TrendingViewTests(TestCase):
+
+    def setUp(self):
+        """Create test accommodations with varying view counts."""
+        self.accommodation1 = Accommodation.objects.create(name="Accom 1", view_count=100, average_rating=4.5)
+        self.accommodation2 = Accommodation.objects.create(name="Accom 2", view_count=200, average_rating=3.8)
+        self.accommodation3 = Accommodation.objects.create(name="Accom 3", view_count=50, average_rating=4.0)
+        self.accommodation4 = Accommodation.objects.create(name="Accom 4", view_count=250, average_rating=4.7)
+        self.accommodation5 = Accommodation.objects.create(name="Accom 5", view_count=150, average_rating=4.2)
+        self.accommodation6 = Accommodation.objects.create(name="Accom 6", view_count=300, average_rating=3.9)
+        self.accommodation7 = Accommodation.objects.create(name="Accom 7", view_count=350, average_rating=4.3)
+        self.accommodation8 = Accommodation.objects.create(name="Accom 8", view_count=400, average_rating=4.1)
+        self.accommodation9 = Accommodation.objects.create(name="Accom 9", view_count=500, average_rating=4.6)
+        self.accommodation10 = Accommodation.objects.create(name="Accom 10", view_count=600, average_rating=4.9)
+        self.accommodation11 = Accommodation.objects.create(name="Accom 11", view_count=450, average_rating=4.4)
+
+    def test_trending_view_top_ten(self):
+        response = self.client.get(reverse('trending'))
+        
+        trending_accoms = response.context['trending_accommodations']
+
+        self.assertEqual(len(trending_accoms), 10)
+
+        # Check that the accommodations are ordered by view_count (in descending order)
+        self.assertEqual(trending_accoms[0], self.accommodation10)
+        
+        self.assertNotIn(self.accommodation3, trending_accoms)
+
 
 

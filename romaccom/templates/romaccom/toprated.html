@@ -17,11 +17,11 @@
     {% if top_rated_accommodations %}
         {% for accom in top_rated_accommodations %}
             <div class="accommodation-card">
-                {% if accom.image %}
-                    <img src="{{ accom.image.url }}" alt="{{ accom.name }}" class="accom-image">
-                {% else %}
-                    <img src="{% static 'images/default-accommodation.jpg' %}" alt="Default accommodation image" class="accom-image">
-                {% endif %}
+                {% for image in accom.images.all %}
+                    {% if image.is_main %}
+                        <img src="{{ image.image.url }}" alt="{{ accom.name }}" class="accom-image">
+                    {% endif %}
+                {% endfor %}
                 
                 <div class="accom-content">
                     <div class="accom-header">

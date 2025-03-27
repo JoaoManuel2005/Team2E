@@ -14,11 +14,11 @@
     </div>
     
     <div class="accommodation-info">
-        {% if accommodation.image %}
-            <img src="{{ accommodation.image.url }}" alt="{{ accommodation.name }}" class="accommodation-image">
-        {% else %}
-            <img src="{% static 'images/default-accommodation.jpg' %}" alt="{{ accommodation.name }}" class="accommodation-image">
-        {% endif %}
+        {% for image in accommodation.images.all %}
+            {% if image.is_main %}
+                <img src="{{ image.image.url }}" alt="{{ accommodation.name }}" class="accommodation-image">
+            {% endif %}
+        {% endfor %}
         
         <div class="accommodation-details">
             <h3>{{ accommodation.name }}</h3>

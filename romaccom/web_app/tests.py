@@ -1,9 +1,13 @@
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.contrib.auth.models import User
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from web_app.models import User, UserProfile, Operator, OperatorProfile, Accommodation, Review, Image, AccommodationImage
 from web_app.models import validate_glasgow_postcode
 from web_app.models import validate_uk_address
 from django.core.files.uploadedfile import SimpleUploadedFile
+import json
+from .models import AccommodationImage
 
 
 class PostCodeAndAddressValidation(TestCase):
@@ -213,5 +217,854 @@ class AccommodationImageMethodTest(TestCase):
         self.assertEqual(accom_image.accommodation, self.accommodation)
         self.assertEqual(accom_image.image, "accommodation_images/test.jpg")
         self.assertFalse(accom_image.is_main)
+
+class MyReviewsViewTest(TestCase):
+    def setUp(self):
+        #create 2 users
+        self.user1 = User.objects.create_user(username="testuser1", password="password123")
+        self.user2 = User.objects.create_user(username="testuser2", password="password123")
+        #create an accommodation
+        self.accom =Accommodation.objects.create(name="Test Hotel", address="123 Main Street", postcode="G1")
+
+        Review.objects.create(user=self.user1, accommodation=self.accom, rating=4, review_text="Good")
+        Review.objects.create(user=self.user1, accommodation=self.accom, rating=5, review_text="They help me a lot!!!")
+        Review.objects.create(user=self.user2, accommodation=self.accom, rating=2, review_text="BAD!")
+
+        self.client = Client()
+
+    def test_only_logged_in_user_reviews_returned(self):
+        self.client.login(username="testuser1", password="password123")
+        response = self.client.get(reverse("myreviews"))
+        reviews = response.context["reviews"]
+
+        self.assertEqual(len(reviews), 2)
+        for review in reviews:
+            self.assertEqual(review.user, self.user1)
+
+#class SearchViewTest(TestCase):
+
+
+class AccomPageViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.accom = Accommodation.objects.create(name="Test Hotel", address="123 Main St", postcode="G1")
+        #creat two views
+        self.review1 = Review.objects.create(user=User.objects.create_user("user1"), accommodation=self.accom, rating=4,
+                                             review_text="Nice")
+        self.review2 = Review.objects.create(user=User.objects.create_user("user2"), accommodation=self.accom, rating=5,
+                                             review_text="Great")
+
+        self.image_main = AccommodationImage.objects.create(accommodation=self.accom, image="main.jpg", is_main=True)
+        self.image_other = AccommodationImage.objects.create(accommodation=self.accom, image="other.jpg", is_main=False)
+
+        self.operator1 = Operator.objects.create(name="Operator 1")
+        self.operator2 = Operator.objects.create(name="Operator 2")
+        self.accom.operators.add(self.operator1) #Only operator1 can edit
+
+    def test_view_without_operator(self):
+        response = self.client.get(reverse('accommodation_detail', args=[self.accom.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['accommodation'], self.accom)
+        self.assertEqual(list(response.context['reviews']),
+                         list(Review.objects.filter(accommodation=self.accom).order_by('-created_at')))
+        self.assertEqual(response.context['main_image'], self.image_main)
+        self.assertFalse(response.context['operator_logged_in'])
+        self.assertFalse(response.context['operator_manages_accommodation'])
+
+    def test_view_with_logged_in_operator_not_managing(self):
+        session = self.client.session
+        session['operator_id'] = self.operator2.id
+        session.save()
+        response = self.client.get(reverse('accommodation_detail', args=[self.accom.id]))
+
+        self.assertTrue(response.context['operator_logged_in'])
+        self.assertFalse(response.context['operator_manages_accommodation'])
+
+    def test_view_with_logged_in_operator_managing(self):
+        session = self.client.session
+        session['operator_id'] = self.operator1.id
+        session.save()
+        response = self.client.get(reverse('accommodation_detail', args=[self.accom.id]))
+        self.assertTrue(response.context['operator_logged_in'])
+        self.assertTrue(response.context['operator_manages_accommodation'])
+
+
+class AccomReviewsViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.accommodation = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Main Street",
+            postcode="G1"
+        )
+        self.review = Review.objects.create(
+            accommodation=self.accommodation,
+            user=self.user,
+            review_text="Very comfortable",
+            rating=4
+        )
+
+    def test_accom_reviews_view_returns_correct_template_and_context(self):
+        url = reverse('accom_review_detail', args=[self.accommodation.id, self.review.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTemplateUsed(response, 'romaccom/reviews.html')
+
+        self.assertEqual(response.context['accommodation'], self.accommodation)
+        self.assertEqual(response.context['review'], self.review)
+
+
+
+#class AccomMapViewTest(TestCase):
+
+
+class WriteReviewViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="test123pass")
+        self.accommodation = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Main Street",
+            postcode="G1"
+        )
+
+    def test_redirects_to_edit_when_review_exists(self):
+        Review.objects.create(user=self.user, accommodation=self.accommodation, rating=4, review_text="Nice")
+        self.client.login(username="testuser", password="test123pass")
+
+        response = self.client.get(reverse('write_review', args=[self.accommodation.id]))
+        existing_review = Review.objects.get(user=self.user, accommodation=self.accommodation)
+        self.assertRedirects(response, reverse('edit_review', args=[existing_review.id]))
+
+    def test_get_review_form_if_no_existing_review(self):
+        self.client.login(username="testuser", password="test123pass")
+        response = self.client.get(reverse('write_review', args=[self.accommodation.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/write-review.html')
+        self.assertIn('form', response.context)
+        self.assertEqual(response.context['accommodation'], self.accommodation)
+
+    def test_post_valid_review_creates_review(self):
+        self.client.login(username="testuser", password="test123pass")
+        response = self.client.post(
+            reverse('write_review', args=[self.accommodation.id]),
+            data={
+                'title': 'Great stay!',
+                'rating': 5,
+                'review_text': 'Really enjoyed the place!'
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Review.objects.filter(user=self.user, accommodation=self.accommodation).exists())
+
+class OperatorLoginView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testUser", password="testpass")
+        self.operator = Operator.objects.create(name="testOperator", password="testpass")
+        self.accommodation = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Main Street",
+            postcode="G1"
+        )
+
+    def test_user_logged_in_cannot_access_operator_login(self):
+        self.client.login(username='testUser', password="testpass")
+        response = self.client.get(reverse('operator_login'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/operator-login.html')
+        self.assertContains(response, 'Please log out as user first')
+
+    def test_get_invalid_accommodation_id_shows_error(self):
+        invalid_id = 9999
+        response = self.client.get(reverse('operator_login') + f'?accommodation_id={invalid_id}')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/operator-login.html')
+        self.assertContains(response, 'Accommodation not found')
+
+    def test_valid_operator_login_without_accommodation(self):
+        response = self.client.post(reverse('operator_login'), {
+            'property_name': "testOperator",
+            'password': "testpass"
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('management'))
+
+        session = self.client.session
+        self.assertEqual(session.get('operator_id'), self.operator.id)
+        self.assertEqual(session.get('operator_name'), self.operator.name)
+
+    def test_invalid_operator_login_shows_error(self):
+        response = self.client.post(reverse('operator_login'), {
+            'property_name': "wrongTestOperator",  # invalid operator not exist
+            'password': "wrongpass"
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/operator-login.html')
+        self.assertContains(response, 'Invalid property name or password')
+
+    def test_operator_does_not_manage_accommodation(self):
+        # create an operator
+        operator = Operator.objects.create(name="unrelatedOperator", password="op12345")
+
+        # creat an accommodation，but not related an operator
+        accommodation = Accommodation.objects.create(
+            name="Unrelated Hotel",
+            address="999 Test Street",
+            postcode="G5"
+        )
+
+        response = self.client.post(
+            reverse('operator_login') + f'?accommodation_id={accommodation.id}',
+            {
+                'property_name':"unrelatedOperator",
+                'password': "op12345",
+                'accommodation_id': accommodation.id
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/operator-login.html')
+        self.assertContains(response, 'You are not authorized to manage this accommodation')
+
+
+class OperatorDashboardViewTest(TestCase):
+    def setUp(self):
+        self.operator = Operator.objects.create(name="op1", password="12345")
+        self.accom = Accommodation.objects.create(
+            name="Test Hotel",
+            address="123 Street",
+            postcode="G1"
+        )
+        self.accom.operators.add(self.operator)
+
+    def login_operator(self, operator):
+        session = self.client.session
+        session['operator_id'] = operator.id
+        session['operator_name'] = operator.name
+        session.save()
+
+    def test_dashboard_redirects_if_not_logged_in(self):
+        response = self.client.get(reverse('operator_dashboard'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('operator_login'))
+
+    def test_dashboard_redirects_if_operator_does_not_manage_accommodation(self):
+        other_accom = Accommodation.objects.create(
+            name="Unrelated Hotel",
+            address="456 Avenue",
+            postcode="G5"
+        )
+        self.login_operator(self.operator)
+        response = self.client.get(reverse('operator_dashboard') + f'?accommodation_id={other_accom.id}')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('management'))
+
+    def test_dashboard_renders_if_operator_manages_accommodation(self):
+        self.login_operator(self.operator)
+        response = self.client.get(reverse('operator_dashboard') + f'?accommodation_id={self.accom.id}')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/operator-dashboard.html')
+
+    def test_dashboard_renders_first_accommodation_if_none_provided(self):
+        self.login_operator(self.operator)
+        response = self.client.get(reverse('operator_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/operator-dashboard.html')
+
+    def test_dashboard_redirects_if_operator_has_no_accommodation(self):
+        new_operator = Operator.objects.create(name="no_accom_op", password="pass123")
+        self.login_operator(new_operator)
+        response = self.client.get(reverse('operator_dashboard'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('management'))
+
+
+# My Listings test
+
+class AddAccommodationView(TestCase):
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse('add_accommodation'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('operator_login'))
+
+    def test_logged_in_operator_can_access_add_accommodation_page(self):
+        operator = Operator.objects.create(name="Testoperater", password="pass123")
+        session = self.client.session
+        session['operator_id'] = operator.id
+        session['operator_name'] = operator.name
+        session.save()
+
+        response = self.client.get(reverse('add_accommodation'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'romaccom/addnewaccommodation.html')
+        self.assertEqual(response.context['operator'], operator)
+
+    def test_invalid_operator_id_clears_session_and_redirects(self):
+        session = self.client.session
+        session['operator_id'] = 9999  # not exist
+        session['operator_name'] = "Bob"
+        session.save()
+
+        response = self.client.get(reverse('add_accommodation'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('operator_login'))
+
+        # check clear invalid session data
+        session = self.client.session
+        self.assertIsNone(session.get('operator_id'))
+        self.assertIsNone(session.get('operator_name'))
+
+class CreateAccommodationViewTest(TestCase):
+    def setUp(self):
+        self.url = reverse('create_accommodation')
+        self.operator = Operator.objects.create(name="op1", password="12345")
+        self.valid_data = {
+            'name': "My Accom",
+            'address': "123 Test Street",
+            'postcode': "G1",
+            'map_link': "https://maps.example.com",
+            'description': "A nice place"
+        }
+
+    def login_operator(self):
+        session = self.client.session
+        session['operator_id'] = self.operator.id
+        session['operator_name'] = self.operator.name
+        session.save()
+
+    def test_rejects_get_request(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Invalid request method", response.json()['error'])
+
+    def test_requires_authentication(self):
+        response = self.client.post(self.url, self.valid_data)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("Authentication required", response.json()['error'])
+
+    def test_missing_fields_return_error(self):
+        self.login_operator()
+        incomplete_data = self.valid_data.copy()
+        incomplete_data.pop('name')
+        response = self.client.post(self.url, incomplete_data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Missing required fields", response.json()['error'])
+
+    def test_valid_submission_creates_accommodation(self):
+        self.login_operator()
+        response = self.client.post(self.url, self.valid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertIn('redirect_url', response.json())
+        self.assertTrue(Accommodation.objects.filter(name="My Accom").exists())
+
+    def test_operator_does_not_exist(self):
+        session = self.client.session
+        session['operator_id'] = 2345  #invalid ID
+        session['operator_name'] = "Jack"
+        session.save()
+
+        data = self.valid_data.copy()
+        data['postcode'] = "G1"
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("Operator not found", response.json()['error'])
+
+    def test_invalid_postcode_raises_validation_error(self):
+        self.login_operator()
+        data = self.valid_data.copy()
+        data['postcode'] = "INVALID"
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("not a valid Glasgow postcode", response.json()['error'])
+
+#manage_accom_info_view
+
+class UpdatePrivacyViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+        self.url = reverse('update-privacy')
+
+    def test_only_post_allowed(self):
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Invalid request', response.json()['error'])
+
+    def test_updates_privacy_to_private(self):
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'private': True}),
+            content_type='application/json'
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertFalse(self.user.profile_visibility)  # private → profile_visibility=False
+
+    def test_updates_privacy_to_public(self):
+        self.user.profile_visibility = False
+        self.user.save()
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'private': False}),
+            content_type='application/json'
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.user.profile_visibility)
+
+    def test_invalid_json_returns_400(self):
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(self.url, data="not_json", content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Invalid JSON data", response.json()['error'])
+
+    def test_unauthenticated_user_still_redirected(self):
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'private': True}),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+
+class UploadAccommodationImagesViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        # Operator
+        self.operator = Operator.objects.create(name='Test Operator', email='test@op.com', password='pass123')
+        # OperatorProfile
+        OperatorProfile.objects.create(operator=self.operator)
+
+        # Accommodation，without operator
+        self.accommodation = Accommodation.objects.create(
+            name="Test Accom",
+            address="123 Street",
+            postcode="G1"
+        )
+        # relate operator
+        self.accommodation.operators.add(self.operator)
+
+        self.url = reverse('upload_accommodation_images')
+
+    def test_get_method_not_allowed(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn("Invalid request method", response.json()['error'])
+
+    def test_upload_images_successfully(self):
+        self.client.force_login(self.user)
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+
+        response = self.client.post(
+            self.url,
+            {'accommodation_id': self.accommodation.id, 'images': [image]},
+            format='multipart'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertEqual(AccommodationImage.objects.count(), 1)
+
+    def test_upload_to_invalid_accommodation(self):
+        self.client.force_login(self.user)
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+
+        response = self.client.post(
+            self.url,
+            {'accommodation_id': 1234, 'images': [image]},
+            format='multipart'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn("error", response.json())
+
+
+
+
+class UpdateAccommodationViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.operator = Operator.objects.create(name='op',email='op@example.com', password='pass')
+        self.accom = Accommodation.objects.create(
+            name="Old Name",
+            address="12 Queen Street",
+            postcode="G1",
+            description="Old description",
+            map_link="http://map.link"
+        )
+        self.accom.operators.add(self.operator)
+        self.url = reverse('update_accommodation')
+
+    def login_as_operator(self):
+        session = self.client.session
+        session['operator_id'] = self.operator.id
+        session.save()
+
+    def test_successful_update(self):
+        self.login_as_operator()
+        response = self.client.post(self.url, {
+            'accommodation_id': self.accom.id,
+            'name': 'New Name',
+            'address': '34 King Street',
+            'postcode': 'G2',
+            'description': 'Updated',
+            'map_link': 'http://new.map'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {'success': True})
+        self.accom.refresh_from_db()
+        self.assertEqual(self.accom.name, 'New Name')
+        self.assertEqual(self.accom.postcode, 'G2')
+
+    def test_missing_fields(self):
+        self.login_as_operator()
+        response = self.client.post(self.url, {
+            'accommodation_id': self.accom.id,
+            'name': '',
+            'address': '',
+            'postcode': ''
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Missing required fields', response.json()['error'])
+
+    def test_invalid_postcode(self):
+        self.login_as_operator()
+        response = self.client.post(self.url, {
+            'accommodation_id': self.accom.id,
+            'name': 'New Name',
+            'address': '34 King Street',
+            'postcode': 'INVALID'
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('not a valid Glasgow postcode', response.json()['error'])
+
+    def test_not_owner(self):
+        other_operator = Operator.objects.create(name='op2', password='pass')
+        session = self.client.session
+        session['operator_id'] = other_operator.id
+        session.save()
+        response = self.client.post(self.url, {
+            'accommodation_id': self.accom.id,
+            'name': 'New Name',
+            'address': '34 King Street',
+            'postcode': 'G1',
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('Not authorized', response.json()['error'])
+
+    def test_not_authenticated(self):
+        response = self.client.post(self.url, {
+            'accommodation_id': self.accom.id,
+            'name': 'New Name',
+            'address': '34 King Street',
+            'postcode': 'G1',
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('Authentication required', response.json()['error'])
+
+
+
+class DeleteAccommodationViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.operator = Operator.objects.create(name='Test Operator', email='op@example.com', password='pass')
+        self.accom = Accommodation.objects.create(
+            name="To Be Deleted",
+            address="1 Main St",
+            postcode="G1",
+            description="nice",
+            map_link="http://map.link"
+        )
+        self.accom.operators.add(self.operator)
+        self.url = reverse('delete_accommodation')
+
+    def login_operator(self):
+        session = self.client.session
+        session['operator_id'] = self.operator.id
+        session.save()
+
+    def test_successful_deletion(self):
+        self.login_operator()
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'accommodation_id': self.accom.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {'success': True, 'redirect_url': reverse('management')})
+        self.assertFalse(Accommodation.objects.filter(id=self.accom.id).exists())
+
+    def test_unauthenticated_access(self):
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'accommodation_id': self.accom.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('Authentication required', response.json()['error'])
+
+    def test_operator_does_not_exist(self):
+        session = self.client.session
+        session['operator_id'] = 1234  # invalid operator ID
+        session.save()
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'accommodation_id': self.accom.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('Operator not found', response.json()['error'])
+
+    def test_accommodation_does_not_exist(self):
+        self.login_operator()
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'accommodation_id': 1234}),  # invalid accom ID
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('Accommodation not found', response.json()['error'])
+
+    def test_operator_not_authorized(self):
+        other_operator = Operator.objects.create(name='Other', email='x@x.com', password='pass')
+        session = self.client.session
+        session['operator_id'] = other_operator.id
+        session.save()
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'accommodation_id': self.accom.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('Not authorized', response.json()['error'])
+
+
+
+class DeleteAccommodationImageViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.accom = Accommodation.objects.create(
+            name="Test Accom",
+            address="1 Street",
+            postcode="G1",
+            description="Good!",
+            map_link="http://map"
+        )
+        self.review = Review.objects.create(
+            user=self.user,
+            accommodation=self.accom,
+            rating=5,
+            title="Great",
+            review_text="Nice place!"
+        )
+        self.image = Image.objects.create(
+            review=self.review,
+            image='test.jpg'
+        )
+        self.url = reverse('delete_accommodation_image')
+
+    def test_successful_image_deletion(self):
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'image_id': self.image.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {'success': True})
+        self.assertFalse(Image.objects.filter(id=self.image.id).exists())
+
+    def test_image_not_found(self):
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'image_id': 999}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('error', response.json())
+        self.assertEqual(response.json()['success'], False)
+
+    def test_invalid_method(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['success'], False)
+        self.assertIn('Invalid request method', response.json()['error'])
+
+    def test_invalid_json(self):
+        response = self.client.post(
+            self.url,
+            data="not json",
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('Expecting value', response.json()['error'])
+
+    def test_missing_image_id(self):
+        response = self.client.post(
+            self.url,
+            data=json.dumps({}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('error', response.json())
+
+
+
+class SetMainImageViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.accom = Accommodation.objects.create(
+            name="Test Accom",
+            address="1 Test Street",
+            postcode="G1",
+            description="Nice place",
+            map_link="http://example.com"
+        )
+        self.image1 = AccommodationImage.objects.create(accommodation=self.accom, image='image1.jpg', is_main=False)
+        self.image2 = AccommodationImage.objects.create(accommodation=self.accom, image='image2.jpg', is_main=True)
+        self.url = reverse('set_main_image')
+
+    def test_set_main_image_successfully(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'image_id': self.image1.id, 'accommodation_id': self.accom.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {'success': True})
+        self.image1.refresh_from_db()
+        self.image2.refresh_from_db()
+        self.assertTrue(self.image1.is_main)
+        self.assertFalse(self.image2.is_main)
+
+    def test_image_does_not_exist(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'image_id': 1234}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['success'], False)
+        self.assertIn('error', response.json())
+
+    def test_invalid_method(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['success'], False)
+        self.assertIn('Invalid request method', response.json()['error'])
+
+    def test_missing_image_id(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.url,
+            data=json.dumps({}),  # no image_id
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['success'], False)
+        self.assertIn('error', response.json())
+
+
+class DeleteReviewViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+
+        self.accom = Accommodation.objects.create(
+            name="Test Accom",
+            address="1 Street",
+            postcode="G1",
+            description="Nice",
+            map_link="http://map"
+        )
+
+        self.review = Review.objects.create(
+            user=self.user1,
+            accommodation=self.accom,
+            title="Review title",
+            rating=4,
+            review_text="Good stay!"
+        )
+
+        self.url = reverse('delete_review')
+
+    def test_successful_review_deletion(self):
+        self.client.force_login(self.user1)
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'review_id': self.review.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {'success': True})
+        self.assertFalse(Review.objects.filter(id=self.review.id).exists())
+
+    def test_user_not_authorized(self):
+        self.client.force_login(self.user2)
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'review_id': self.review.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('error', response.json())
+        self.assertIn('not authorized', response.json()['error'])
+
+    def test_review_not_found(self):
+        self.client.force_login(self.user1)
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'review_id': 9999}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('error', response.json())
+        self.assertEqual(response.json()['error'], 'Review not found')
+
+    def test_missing_review_id(self):
+        self.client.force_login(self.user1)
+        response = self.client.post(
+            self.url,
+            data=json.dumps({}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('error', response.json())
+
+    def test_not_authenticated(self):
+        response = self.client.post(
+            self.url,
+            data=json.dumps({'review_id': self.review.id}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 302)  # Redirect to login
+        self.assertIn('/accounts/login/', response.url)
+
+
+
+
+
+
+
+
 
 

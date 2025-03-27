@@ -167,6 +167,26 @@ class OperatorProfileModelTest(TestCase):
 
         with self.assertRaises(Exception): 
             OperatorProfile.objects.create(operator=operator)
+    
+    def test_operator_profile_description_optional(self):
+        operator = Operator.objects.create(name="Blank Fields Operator", email="blank@example.com", password="password123")
+        profile = OperatorProfile.objects.create(operator=operator)
+
+        self.assertEqual(profile.description, "") 
+
+    def test_operator_profile_website_optional(self):
+        operator = Operator.objects.create(name="Blank Fields Operator", email="blank@example.com", password="password123")
+        profile = OperatorProfile.objects.create(operator=operator)
+
+        self.assertEqual(profile.website, "")
+
+    def test_operator_profile_logo_optional(self):
+        operator = Operator.objects.create(name="Blank Fields Operator", email="blank@example.com", password="password123")
+        profile = OperatorProfile.objects.create(operator=operator)
+
+        self.assertFalse(profile.logo)  
+
+    
 
     
 

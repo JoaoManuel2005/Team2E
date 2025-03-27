@@ -309,12 +309,11 @@ class IndexPageViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_index_uses_correct_template(self):
-        """ Test if the index view uses the correct template """
         response = self.client.get(reverse('index'))
         self.assertTemplateUsed(response, 'romaccom/home.html')
 
-    def test_trending_accommodations_order(self):
-        """ Test if trending accommodations are ordered by view count """
+    def test_trending_accommodations_order_by_view_count(self):
+        
         response = self.client.get(reverse('index'))
         trending_accommodations = list(response.context['trending_accommodations'])
 
@@ -327,8 +326,23 @@ class IndexPageViewTests(TestCase):
         ]
         self.assertEqual(trending_accommodations, expected_order)
 
-    def test_top_rated_accommodations_order(self):
-        """ Test if top-rated accommodations are ordered by average rating """
+    def test_trending_accommodations_top_five(self):
+        """ Ensure only the top 5 accommodations by view count are included in trending. """
+        response = self.client.get(reverse('index'))
+        trending_accommodations = list(response.context['trending_accommodations'])
+
+        # Expected top 5 accommodations based on view_count
+        expected_top_5 = [
+            self.accommodation6,  # 300 views
+            self.accommodation4,  # 250 views
+            self.accommodation2,  # 200 views
+            self.accommodation5,  # 150 views
+            self.accommodation1,  # 100 views
+        ]
+        self.assertNotIn(self.accommodation3, trending_accommodations)
+
+    def test_top_rated_accommodations_ordered_by_average_rating(self):
+        
         response = self.client.get(reverse('index'))
         top_rated_accommodations = list(response.context['top_rated_accommodations'])
 

@@ -160,6 +160,40 @@ class OperatorProfileModelTest(TestCase):
         self.assertEqual(str(profile), "Test Operator's Profile")
         self.assertEqual(profile.website, "https://example.com")
 
+    def test_operator_profile_only_one(self):
+        
+        operator = Operator.objects.create(name="Unique Profile Operator", email="unique@example.com", password="password123")
+        OperatorProfile.objects.create(operator=operator)
+
+        with self.assertRaises(Exception): 
+            OperatorProfile.objects.create(operator=operator)
+
+    def test_operator_profile_description_optional(self):
+        operator = Operator.objects.create(name="Blank Fields Operator", email="blank@example.com", password="password123")
+        profile = OperatorProfile.objects.create(operator=operator)
+
+        self.assertEqual(profile.description, "") 
+
+    def test_operator_profile_website_optional(self):
+        operator = Operator.objects.create(name="Blank Fields Operator", email="blank@example.com", password="password123")
+        profile = OperatorProfile.objects.create(operator=operator)
+
+        self.assertEqual(profile.website, "")
+
+    def test_operator_profile_logo_optional(self):
+        operator = Operator.objects.create(name="Blank Fields Operator", email="blank@example.com", password="password123")
+        profile = OperatorProfile.objects.create(operator=operator)
+
+        self.assertFalse(profile.logo)  
+
+    def test_operator_profile_logo_upload(self):
+        """Test that a logo can be uploaded successfully"""
+        operator = Operator.objects.create(name="Logo Operator", email="logo@example.com", password="password123")
+        image = SimpleUploadedFile("logo.jpg", b"file_content", content_type="image/jpeg")
+        
+        profile = OperatorProfile.objects.create(operator=operator, logo=image)
+        self.assertTrue(profile.logo)
+
     
 
 

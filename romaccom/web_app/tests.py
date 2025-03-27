@@ -5,6 +5,7 @@ from web_app.models import validate_glasgow_postcode
 from web_app.models import validate_uk_address
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+#TESTING MODELS
 
 class PostCodeAndAddressValidation(TestCase):
     def test_postcode_validate(self): 
@@ -194,11 +195,6 @@ class OperatorProfileModelTest(TestCase):
         profile = OperatorProfile.objects.create(operator=operator, logo=image)
         self.assertTrue(profile.logo)
 
-    
-
-    
-
-
 
 class AccommodationMethodTest(TestCase):
     def setUp(self):
@@ -291,5 +287,7 @@ class AccommodationImageMethodTest(TestCase):
         self.assertEqual(accom_image.accommodation, self.accommodation)
         self.assertEqual(accom_image.image, "accommodation_images/test.jpg")
         self.assertFalse(accom_image.is_main)
+
+#TESTING VIEWS
 
 

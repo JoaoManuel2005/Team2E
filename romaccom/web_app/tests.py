@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from web_app.models import User, UserProfile, Operator, OperatorProfile, Accommodation, Review, Image, AccommodationImage
 from web_app.models import validate_glasgow_postcode
 from web_app.models import validate_uk_address
@@ -289,5 +290,56 @@ class AccommodationImageMethodTest(TestCase):
         self.assertFalse(accom_image.is_main)
 
 #TESTING VIEWS
+
+class IndexPageViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+       #Create accommodations with different view counts and ratings.
+       
+        cls.accommodation1 = Accommodation.objects.create(name="Accom 1", view_count=100, average_rating=4.5)
+        cls.accommodation2 = Accommodation.objects.create(name="Accom 2", view_count=200, average_rating=3.0)
+        cls.accommodation3 = Accommodation.objects.create(name="Accom 3", view_count=50, average_rating=5.0)
+        cls.accommodation4 = Accommodation.objects.create(name="Accom 4", view_count=250, average_rating=2.0)
+        cls.accommodation5 = Accommodation.objects.create(name="Accom 5", view_count=150, average_rating=4.8)
+        cls.accommodation6 = Accommodation.objects.create(name="Accom 6", view_count=300, average_rating=3.5)
+
+    def test_index_view_status_code(self):
+        #Test if the index page loads successfully (status code 200)
+        response = self.client.get(reverse('index')) 
+        self.assertEqual(response.status_code, 200)
+
+    def test_index_uses_correct_template(self):
+        """ Test if the index view uses the correct template """
+        response = self.client.get(reverse('index'))
+        self.assertTemplateUsed(response, 'romaccom/home.html')
+
+    def test_trending_accommodations_order(self):
+        """ Test if trending accommodations are ordered by view count """
+        response = self.client.get(reverse('index'))
+        trending_accommodations = list(response.context['trending_accommodations'])
+
+        expected_order = [
+            self.accommodation6,  # 300 views
+            self.accommodation4,  # 250 views
+            self.accommodation2,  # 200 views
+            self.accommodation5,  # 150 views
+            self.accommodation1,  # 100 views
+        ]
+        self.assertEqual(trending_accommodations, expected_order)
+
+    def test_top_rated_accommodations_order(self):
+        """ Test if top-rated accommodations are ordered by average rating """
+        response = self.client.get(reverse('index'))
+        top_rated_accommodations = list(response.context['top_rated_accommodations'])
+
+        expected_order = [
+            self.accommodation3,  # 5.0 rating
+            self.accommodation5,  # 4.8 rating
+            self.accommodation1,  # 4.5 rating
+            self.accommodation6,  # 3.5 rating
+            self.accommodation2,  # 3.0 rating
+        ]
+        self.assertEqual(top_rated_accommodations, expected_order)
+
 
 

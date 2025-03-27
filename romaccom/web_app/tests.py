@@ -186,7 +186,13 @@ class OperatorProfileModelTest(TestCase):
 
         self.assertFalse(profile.logo)  
 
-    
+    def test_operator_profile_logo_upload(self):
+        
+        operator = Operator.objects.create(name="Logo Operator", email="logo@example.com", password="password123")
+        image = SimpleUploadedFile("logo.jpg", b"file_content", content_type="image/jpeg")
+        
+        profile = OperatorProfile.objects.create(operator=operator, logo=image)
+        self.assertTrue(profile.logo)
 
     
 

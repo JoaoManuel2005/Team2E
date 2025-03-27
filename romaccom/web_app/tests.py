@@ -25,8 +25,6 @@ class PostCodeAndAddressValidation(TestCase):
                 self.assertEqual(ValidationError, "Address must start with a number followed by a street name.")
 
 
-        
-
 class UserModelTests(TestCase):
     def test_create_user(self):
         user = User.objects.create_user(username="testname", password="testpassword")
@@ -98,13 +96,6 @@ class UserProfileModelTests(TestCase):
         with self.assertRaises(ValidationError):
             profile.full_clean()
 
-   # def test_invalid_image(self):
-   #     user = User.objects.create_user(username="testname", password="password123")
-    #    invalid_file = SimpleUploadedFile(name="document.txt", content=b"This is not an image.", content_type="text/plain")
-     #   profile = UserProfile.objects.create(user=user, picture =invalid_file)
-    
-      #  with self.assertRaises(ValidationError):
-       #     profile.save()
 
     def test_blank_website(self):
         user = User.objects.create_user(username="testname", password="testpassword")
@@ -290,6 +281,9 @@ class AccommodationImageMethodTest(TestCase):
         self.assertEqual(accom_image.image, "accommodation_images/test.jpg")
         self.assertFalse(accom_image.is_main)
 
+
+
+
 #TESTING VIEWS
 
 class IndexPageViewTests(TestCase):
@@ -359,14 +353,12 @@ class IndexPageViewTests(TestCase):
 class HomePageViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.accommodation1 = Accommodation.objects.create(name="Accom 1", view_count=100, average_rating=4.5)
-        cls.accommodation2 = Accommodation.objects.create(name="Accom 2", view_count=200, average_rating=3.0)
-        cls.accommodation3 = Accommodation.objects.create(name="Accom 3", view_count=50, average_rating=5.0)
-        cls.accommodation4 = Accommodation.objects.create(name="Accom 4", view_count=250, average_rating=2.0)
-        cls.accommodation5 = Accommodation.objects.create(name="Accom 5", view_count=150, average_rating=4.8)
-        cls.accommodation6 = Accommodation.objects.create(name="Accom 6", view_count=300, average_rating=3.5)
-
-    
+        cls.accommodation1 = Accommodation.objects.create(name="Accom 1", view_count=100, average_rating=4.5, postcode="G1 1AA")
+        cls.accommodation2 = Accommodation.objects.create(name="Accom 2", view_count=200, average_rating=3.0, postcode="G1 2BB")
+        cls.accommodation3 = Accommodation.objects.create(name="Accom 3", view_count=50, average_rating=5.0, postcode="G2 3CC")
+        cls.accommodation4 = Accommodation.objects.create(name="Accom 4", view_count=250, average_rating=2.0, postcode="G3 4DD")
+        cls.accommodation5 = Accommodation.objects.create(name="Accom 5", view_count=150, average_rating=4.8, postcode="G4 5EE")
+        cls.accommodation6 = Accommodation.objects.create(name="Accom 6", view_count=300, average_rating=3.5, postcode="G4 5FF")
 
     def test_home_view_top_rated_accommodations(self):
         
@@ -393,12 +385,57 @@ class HomePageViewTests(TestCase):
         response = self.client.get(reverse('home'))  
 
         self.assertTrue(response.context['operator_logged_in']) 
-        
 
     def test_home_view_operator_logic_not_logged_in(self):
         response = self.client.get(reverse('home'))
 
         self.assertFalse(response.context['operator_logged_in'])
+
+    def test_search_results_view_with_query(self):
+        """Ensure the search results filter by accommodation name query."""
+        response = self.client.get(reverse('search_results'), {'query': 'Accom 1'})
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Accom 1')
+        self.assertNotContains(response, 'Accom 2')
+        self.assertNotContains(response, 'Accom 3')
+        self.assertNotContains(response, 'Accom 4')
+        self.assertNotContains(response, 'Accom 5')
+
+    def test_search_results_view_with_postcode(self):
+        
+        response = self.client.get(reverse('search_results'), {'postcode': 'G1'})
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Accom 1')
+        self.assertContains(response, 'Accom 2')
+        self.assertNotContains(response, 'Accom 3')
+        self.assertNotContains(response, 'Accom 4')
+        self.assertNotContains(response, 'Accom 5')
+
+    def test_search_results_view_with_query_and_postcode(self):
+        """Ensure the search results filter by both query and postcode."""
+        response = self.client.get(reverse('search_results'), {'query': 'Accom', 'postcode': 'G1'})
+        
+       
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Accom 1')
+        self.assertContains(response, 'Accom 2')
+        self.assertNotContains(response, 'Accom 3')
+
+
+    def test_search_results_view_no_results(self):
+        query = 'Nonexistent'
+        postcode = 'ZZZ'
+        response = self.client.get(reverse('search_results'), {'query': query, 'postcode': postcode})
+
+        self.assertContains(response, 'No results found for') #couldn't figure out how to include postcode withing testing respons
+            
+    def test_search_results_view_ajax_returns_correct_HTML(self):
+        response = self.client.get(reverse('search_results'), {'query': 'Accom 1'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        self.assertIn('Accom 1', response.content.decode('utf-8'))
+        self.assertNotIn('Accom 2', response.content.decode('utf-8'))
 
 
 

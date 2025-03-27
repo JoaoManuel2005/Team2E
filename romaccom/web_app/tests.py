@@ -1175,7 +1175,6 @@ class IndexPageViewTests(TestCase):
         self.assertEqual(trending_accommodations, expected_order)
 
     def test_trending_accommodations_top_five(self):
-        """ Ensure only the top 5 accommodations by view count are included in trending. """
         response = self.client.get(reverse('index'))
         trending_accommodations = list(response.context['trending_accommodations'])
 
@@ -1245,7 +1244,7 @@ class HomePageViewTests(TestCase):
         self.assertFalse(response.context['operator_logged_in'])
 
     def test_search_results_view_with_query(self):
-        """Ensure the search results filter by accommodation name query."""
+        
         response = self.client.get(reverse('search_results'), {'query': 'Accom 1'})
         
         self.assertEqual(response.status_code, 200)
@@ -1308,15 +1307,101 @@ class TrendingViewTests(TestCase):
 
     def test_trending_view_top_ten(self):
         response = self.client.get(reverse('trending'))
-        
         trending_accoms = response.context['trending_accommodations']
-
         self.assertEqual(len(trending_accoms), 10)
 
-        # Check that the accommodations are ordered by view_count (in descending order)
+        # Check that the accommodations are ordered by view_count
         self.assertEqual(trending_accoms[0], self.accommodation10)
         
         self.assertNotIn(self.accommodation3, trending_accoms)
+
+class TopRatedPageViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.accom1 = Accommodation.objects.create(name="Accom 1", average_rating=4.5)
+        cls.accom2 = Accommodation.objects.create(name="Accom 2", average_rating=3.8)
+        cls.accom3 = Accommodation.objects.create(name="Accom 3", average_rating=5.0)
+        cls.accom4 = Accommodation.objects.create(name="Accom 4", average_rating=2.0)
+        cls.accom5 = Accommodation.objects.create(name="Accom 5", average_rating=4.8)
+        cls.accom6 = Accommodation.objects.create(name="Accom 6", average_rating=3.5)
+        cls.accom7 = Accommodation.objects.create(name="Accom 7", average_rating=4.7)
+        cls.accom8 = Accommodation.objects.create(name="Accom 8", average_rating=4.1)
+        cls.accom9 = Accommodation.objects.create(name="Accom 9", average_rating=5.0)
+        cls.accom10 = Accommodation.objects.create(name="Accom 10", average_rating=4.3)
+        cls.accom11 = Accommodation.objects.create(name="Accom 11", average_rating=4.0)
+
+    def test_top_rated_view(self):
+        """Ensure the page shows the top 10 rated accommodations."""
+        response = self.client.get(reverse('top_rated'))
+        self.assertEqual(response.status_code, 200)
+        top_rated = response.context['top_rated_accommodations']
+        
+        self.assertEqual(len(top_rated), 10)  # Should only return 10
+        self.assertEqual(top_rated[0], self.accom3)  # Highest rating should be first
+
+    def test_contact_page(self):
+        response = self.client.get(reverse('contact'))
+        
+        self.assertTemplateUsed(response, 'romaccom/contact.html')
+
+    def test_about_page(self):
+        response = self.client.get(reverse('about'))
+        
+        self.assertTemplateUsed(response, 'romaccom/about.html')
+
+class UserRegisterViewTests(TestCase):
+
+    def test_user_registration_success(self):
+        response = self.client.post(reverse('user_register'), {
+            'username': 'testuser',
+            'password': 'password123'
+        })
+        self.assertEqual(response.status_code, 302)  # Redirect after registration
+
+    def test_user_registration_duplicate(self):
+        User.objects.create_user(username='existinguser', password='password123')
+        response = self.client.post(reverse('user_register'), {
+            'username': 'existinguser',
+            'password': 'password123'
+        })
+        self.assertEqual(response.status_code, 200)  # Should not redirect
+        self.assertContains(response, "Username already exists")
+
+class UserLoginLogoutViewTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password123")
+
+    def test_login_success(self):
+        response = self.client.post(reverse('login'), {'username': 'testuser', 'password': 'password123'})
+        self.assertEqual(response.status_code, 302)  # Redirects after login
+
+    def test_login_invalid_credentials(self):
+        response = self.client.post(reverse('login'), {'username': 'testuser', 'password': 'wrongpassword'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Invalid username or password")
+    
+    def test_logout(self):
+        response = self.client.get(reverse('logout'))
+        self.assertEqual(response.status_code, 302)  # Redirects after logout
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+class UserProfileViewTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password123")
+
+    def test_my_account_page_authenticated(self):
+        self.client.login(username="testuser", password="password123")
+        response = self.client.get(reverse('myaccount'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_profile_page(self):
+        response = self.client.get(reverse('user_profile', args=['testuser']))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "testuser")
+        
 
 
 

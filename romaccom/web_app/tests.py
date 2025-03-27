@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from web_app.views import index, home_view
 from web_app.models import User, UserProfile, Operator, OperatorProfile, Accommodation, Review, Image, AccommodationImage
 from web_app.models import validate_glasgow_postcode
 from web_app.models import validate_uk_address
@@ -354,6 +355,50 @@ class IndexPageViewTests(TestCase):
             self.accommodation2,  # 3.0 rating
         ]
         self.assertEqual(top_rated_accommodations, expected_order)
+
+class HomePageViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.accommodation1 = Accommodation.objects.create(name="Accom 1", view_count=100, average_rating=4.5)
+        cls.accommodation2 = Accommodation.objects.create(name="Accom 2", view_count=200, average_rating=3.0)
+        cls.accommodation3 = Accommodation.objects.create(name="Accom 3", view_count=50, average_rating=5.0)
+        cls.accommodation4 = Accommodation.objects.create(name="Accom 4", view_count=250, average_rating=2.0)
+        cls.accommodation5 = Accommodation.objects.create(name="Accom 5", view_count=150, average_rating=4.8)
+        cls.accommodation6 = Accommodation.objects.create(name="Accom 6", view_count=300, average_rating=3.5)
+
+    
+
+    def test_home_view_top_rated_accommodations(self):
+        
+        response = self.client.get(reverse('home'))
+        top_rated_accommodations = response.context['top_rated_accommodations']
+        expected_top_rated = [self.accommodation3, self.accommodation5, self.accommodation1, self.accommodation6, self.accommodation2]
+
+        self.assertEqual(list(top_rated_accommodations), expected_top_rated)
+
+    def test_home_view_trending_accommodations(self):
+    
+        response = self.client.get(reverse('home'))
+        trending_accommodations = response.context['trending_accommodations']
+        expected_trending = [self.accommodation6, self.accommodation4, self.accommodation2, self.accommodation5, self.accommodation1]
+
+        self.assertEqual(list(trending_accommodations), expected_trending)
+
+    def test_home_view_operator_logic_logged_in(self):
+        session = self.client.session
+        session['operator_id'] = 1
+        session['operator_name'] = 'Test Operator'
+        session.save()
+
+        response = self.client.get(reverse('home'))  
+
+        self.assertTrue(response.context['operator_logged_in']) 
+        
+
+    def test_home_view_operator_logic_not_logged_in(self):
+        response = self.client.get(reverse('home'))
+
+        self.assertFalse(response.context['operator_logged_in'])
 
 
 

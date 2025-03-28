@@ -1,6 +1,5 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
 
 from django.urls import reverse
 from django.core.exceptions import ValidationError
@@ -12,7 +11,7 @@ from web_app.models import validate_uk_address
 from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 from .models import AccommodationImage
-from django.http import JsonResponse
+
 from unittest.mock import patch
 
 #TESTING MODELS
@@ -1507,6 +1506,19 @@ class ManagementViewTests(TestCase):
         response = self.client.get(self.url)
         
         self.assertRedirects(response, reverse('operator_login'))
+
+class OperatorProfileTests(TestCase):
+    def setUp(self):
+        # Setup operator and profile
+        self.operator = Operator.objects.create(name="Test Operator", email="test@operator.com", password="password")
+        self.profile = OperatorProfile.objects.create(operator=self.operator, description="Test Description")
+
+    def test_operator_profile_creation(self):
+        """Test that the operator profile is created with the correct fields."""
+        profile = self.operator.profile
+        self.assertEqual(profile.description, "Test Description")
+        self.assertEqual(profile.operator.name, "Test Operator")
+
 
 
 

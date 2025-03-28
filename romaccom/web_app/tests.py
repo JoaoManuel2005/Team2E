@@ -1514,7 +1514,7 @@ class OperatorProfileTests(TestCase):
         self.profile = OperatorProfile.objects.create(operator=self.operator, description="Test Description")
 
     def test_operator_profile_creation(self):
-        """Test that the operator profile is created with the correct fields."""
+    
         profile = self.operator.profile
         self.assertEqual(profile.description, "Test Description")
         self.assertEqual(profile.operator.name, "Test Operator")

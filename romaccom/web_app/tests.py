@@ -1,5 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -1496,6 +1498,15 @@ class EditReviewTests(TestCase):
         self.assertFormError(response, 'form', 'review_text', 'This field is required.')
         self.assertFormError(response, 'form', 'rating', 'This field is required.')
 
+class ManagementViewTests(TestCase):
+
+    def setUp(self):
+        self.url = reverse('management')
+
+    def test_redirect_if_operator_not_logged_in(self):
+        response = self.client.get(self.url)
+        
+        self.assertRedirects(response, reverse('operator_login'))
 
 
 

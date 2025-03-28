@@ -1426,8 +1426,77 @@ class DeleteAccountTests(TestCase):
             with patch('django.contrib.auth.models.User.delete', side_effect=Exception('Deletion failed')):
                 url = reverse('delete_account')
                 response = self.client.post(url)
-                
+
                 # Check for status code 500 (server error)
                 self.assertEqual(response.status_code, 500)
+
+
+class EditReviewTests(TestCase):
+    
+    def setUp(self):
+   
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.other_user = User.objects.create_user(username="otheruser", password="password")
+        self.accommodation = Accommodation.objects.create(name="Test Accom", view_count=0, average_rating=4.5)
+        
+        self.review = Review.objects.create(
+            accommodation=self.accommodation,
+            user=self.user,
+            rating=4,
+            review_text="Great stay!"  
+        )
+
+    def test_edit_own_review(self):
+
+        self.client.login(username="testuser", password="password")
+        url = reverse('edit_review', kwargs={'review_id': self.review.id})
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Great stay!')
+
+        # Simulate a valid form
+        data = {
+            'rating': 5,
+            'review_text': 'Amazing stay!'  
+        }
+        response = self.client.post(url, data)
+
+        # Ensure that the review is updated
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.review_text, 'Amazing stay!') 
+        self.assertEqual(response.status_code, 302) 
+
+    def test_edit_other_user_review(self):
+        """Test that a user cannot edit another user's review."""
+        self.client.login(username="testuser", password="password")
+        url = reverse('edit_review', kwargs={'review_id': self.review.id})
+        
+        # Log in as a different user and try to edit
+        self.client.login(username="otheruser", password="password")
+        response = self.client.get(url)
+
+        # Should redirect to 'myreviews' page because the user cannot edit another user's review
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('myreviews'))
+    
+    def test_invalid_review_form_does_not_update(self):
+       
+        self.client.login(username="testuser", password="password")
+        url = reverse('edit_review', kwargs={'review_id': self.review.id})
+
+        # Submit an invalid form
+        data = {
+            'rating': '',  
+            'review_text': '',  
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, 'form', 'review_text', 'This field is required.')
+        self.assertFormError(response, 'form', 'rating', 'This field is required.')
+
+
+
 
 

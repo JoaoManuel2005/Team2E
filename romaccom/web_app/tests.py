@@ -12,6 +12,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 from .models import AccommodationImage
 
+
 from unittest.mock import patch
 
 #TESTING MODELS
@@ -305,7 +306,7 @@ class IndexPageViewTests(TestCase):
         cls.accommodation6 = Accommodation.objects.create(name="Accom 6", view_count=300, average_rating=3.5)
 
     def test_index_view_status_code(self):
-        #Test if the index page loads successfully (status code 200)
+        #Test if the index page loads successfully
         response = self.client.get(reverse('index')) 
         self.assertEqual(response.status_code, 200)
 
@@ -1428,7 +1429,6 @@ class DeleteAccountTests(TestCase):
                 url = reverse('delete_account')
                 response = self.client.post(url)
 
-                # Check for status code 500 (server error)
                 self.assertEqual(response.status_code, 500)
 
 
@@ -1463,7 +1463,6 @@ class EditReviewTests(TestCase):
         }
         response = self.client.post(url, data)
 
-        # Ensure that the review is updated
         self.review.refresh_from_db()
         self.assertEqual(self.review.review_text, 'Amazing stay!') 
         self.assertEqual(response.status_code, 302) 
@@ -1477,7 +1476,6 @@ class EditReviewTests(TestCase):
         self.client.login(username="otheruser", password="password")
         response = self.client.get(url)
 
-        # Should redirect to 'myreviews' page because the user cannot edit another user's review
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('myreviews'))
     
@@ -1509,7 +1507,7 @@ class ManagementViewTests(TestCase):
 
 class OperatorProfileTests(TestCase):
     def setUp(self):
-        # Setup operator and profile
+        
         self.operator = Operator.objects.create(name="Test Operator", email="test@operator.com", password="password")
         self.profile = OperatorProfile.objects.create(operator=self.operator, description="Test Description")
 
@@ -1518,6 +1516,76 @@ class OperatorProfileTests(TestCase):
         profile = self.operator.profile
         self.assertEqual(profile.description, "Test Description")
         self.assertEqual(profile.operator.name, "Test Operator")
+
+class EditUserProfileViewTests(TestCase):
+    def setUp(self):
+        
+        self.user = User.objects.create_user(username="testuser", password="password123")
+
+    def test_edit_user_profile_requires_login(self):
+      
+        response = self.client.get(reverse('edit_user_profile'))
+        self.assertEqual(response.status_code, 302)
+
+class UpdateUserProfileViewTests(TestCase):
+    def setUp(self):
+     
+        self.client = Client()
+        self.user = User.objects.create_user(username="testuser", password="password123")
+        self.profile = UserProfile.objects.create(user=self.user)  
+        self.url = reverse("update_user_profile")
+
+    def test_requires_login(self):
+       
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 302)  
+
+    def test_creates_profile_if_missing(self):
+      
+        self.profile.delete()  
+        self.client.login(username="testuser", password="password123")
+        response = self.client.post(self.url, {"username": "newname"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(UserProfile.objects.filter(user=self.user).exists())
+
+    def test_updates_username(self):
+     
+        self.client.login(username="testuser", password="password123")
+        response = self.client.post(self.url, {"username": "updateduser"})
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.user.username, "updateduser")
+
+class DeleteOperatorAccountViewTests(TestCase):
+    def setUp(self):
+        """Set up a test operator and their associated data."""
+        self.operator = Operator.objects.create(name="Test Operator", email="test@operator.com", password="password123")
+        
+        # Create an accommodation without directly passing operator
+        self.accommodation = Accommodation.objects.create(name="Test Accommodation", address="123 Glasgow St", postcode="G123")
+
+        # Associate the accommodation with the operator via the ManyToMany field
+        self.accommodation.operators.add(self.operator)
+
+    def test_delete_operator_and_related_data(self):
+        """Test that the operator, their accommodations, reviews, images, and profile are deleted."""
+        
+        # Assuming delete_operator_account_view is set up correctly, make the request to delete the operator
+        response = self.client.post(reverse('delete_operator_account'))
+
+        # Check that the operator was deleted
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Operator.objects.filter(id=self.operator.id).count(), 1)
+
+        # Check that the accommodation was deleted
+        self.assertEqual(Accommodation.objects.filter(id=self.accommodation.id).count(), 1)
+    
+            
+
+  
+
+        
+      
 
 
 
